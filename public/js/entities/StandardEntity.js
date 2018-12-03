@@ -16,7 +16,7 @@ export default class StandardEntity{
     this.geometry = new THREE.Geometry();
     this.mesh = new THREE.Mesh();
 
-    this.components = [];
+    this.components = {};
 
     this.setup();
     this.addToScene();

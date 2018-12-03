@@ -1,22 +1,27 @@
 import * as THREE from "three";
 
 import StandardManager from "./system/StandardManager";
-import FeedbackManager from "./system/FeedbackManager";
 import Capture from "./utilities/Capture";
 import Debug from "./utilities/Debug";
-import Box from "./entities/Box";
-import Capsule from "./entities/Capsule";
+import City from "./entities/City";
 import Camera from "./entities/Camera";
 import PointLight from "./entities/PointLight";
 
-let manager, debug, capturer, box, camera, capsule, light;
+let manager, debug, capturer, camera, light;
+let city;
+
+/*
+  main.js is to assemble all of the entities for the scene.
+
+  entities are each individual object.
+
+  components are what make those objects up.
+*/
 
 const setup = () => {
-  manager = new FeedbackManager();
+  manager = new StandardManager();
 
-  // box = new Box(manager);
-  capsule = new Capsule(manager);
-  light = new PointLight(manager);
+  city = new City(manager);
 
   debug = new Debug(manager, {
     stats: true,

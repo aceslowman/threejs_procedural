@@ -15,14 +15,14 @@ export default class Camera extends StandardEntity{
     this.camera = new THREE.PerspectiveCamera(
       75,           // fov
       this.aspect,  // aspect
-      0.1,          // near
+      0.01,          // near
       1000          // far
     );
 
-    this.zoom        = 1;
+    this.zoom        = 2;
     this.focalLength = this.camera.getFocalLength();
 
-    this.camera.position.z = 2;
+    this.camera.position.z = 1;
     this.camera.zoom = this.zoom;
     this.camera.updateProjectionMatrix();
 
