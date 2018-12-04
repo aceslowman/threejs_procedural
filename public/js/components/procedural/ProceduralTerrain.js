@@ -4,10 +4,10 @@ import SimplexNoise from "simplex-noise";
 import * as elevation from "../../shaders/elevation";
 
 export default class ProceduralTerrain{
-  constructor(city, width = 1.0, height = 1.0, detail = 200.0, amp = 0.2){
-    this.width = width;
-    this.height = height;
-    this.detail = detail;
+  constructor(city, options){
+    this.width = options.size[0];
+    this.height = options.size[1];
+    this.detail = options.detail;
 
     this.noise_amp = amp
     this.noise_freq = 200;

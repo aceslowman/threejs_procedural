@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import ProceduralRoads from '../components/procedural/ProceduralRoads';
 import ProceduralTerrain from '../components/procedural/ProceduralTerrain';
+import ProceduralMap from '../components/procedural/ProceduralMap';
 
 /*
   City
@@ -14,8 +15,29 @@ export default class City{
     this.scene = manager.scene;
     this.gui = manager.gui;
 
-    this.terrain = new ProceduralTerrain(this);
-    this.roads = new ProceduralRoads(this);
+    this.elevation = new ProceduralMap(this, {
+      size: [512,512],
+      frequency: 50,
+      range: [0,1],
+      octaves: 5
+    });
+
+    this.population = new ProceduralMap(this, {
+      size: [512,512],
+      frequency: 50,
+      range: [0,1],
+      octaves: 5
+    });
+
+    this.terrain = new ProceduralTerrain(this, {
+      size: [1,1],
+      elevation: this.elevation.target,
+      detail: 1.0
+    });
+
+    this.roads = new ProceduralRoads(this, {
+      population: this.population.target
+    });
 
     this.setup();
     this.addToScene();
@@ -24,6 +46,7 @@ export default class City{
   setup(){
     this.terrain.setup();
     this.roads.setup();
+    this.elevation.setupDisplay();
 
     this.setupGUI();
   }

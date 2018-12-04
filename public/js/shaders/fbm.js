@@ -125,8 +125,9 @@ void main()
 {
 	float noise;
 	float octave = 1.0;
+  int octs = octaves;
 
-	for(int i = 0; i < octaves; i++){
+	for(int i = 0; i < 8; i++){
 		noise += (1./octave) * snoise(octave * vec3(vUv.x * scale.x, vUv.y * scale.y, time));
 		octave *= 2.0;
 	}
@@ -141,7 +142,7 @@ void main()
 		noise = smoothstep(map.x, map.y, noise);
 	}
 
-	gl_FragColor = vec4(vec3(noise),alpha);
+	gl_FragColor = vec4(vec3(noise),1.0);
 }
 
 `;
