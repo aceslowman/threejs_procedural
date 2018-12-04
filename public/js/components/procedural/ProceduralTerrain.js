@@ -8,12 +8,8 @@ export default class ProceduralTerrain{
     this.width = options.size[0];
     this.height = options.size[1];
     this.detail = options.detail;
-
-    this.noise_amp = amp
-    this.noise_freq = 200;
-    this.noise_octaves = 8;
-
-    this.simplex = new SimplexNoise();
+    this.elevation = options.elevation;
+    this.amplitude = options.amplitude;
   }
 
   setup(){
@@ -24,13 +20,13 @@ export default class ProceduralTerrain{
       this.height * this.detail
     );
 
-    this.displace();
+    this.displace(this.elevation);
     this.generateMesh();
   }
 
   generateMesh(){
     this.elev_uniforms = {
-      range: { value: this.noise_amp },
+      range: { value: this.amplitude },
       draw_elev: {value: true},
       draw_topo: {value: true}
     };
@@ -45,34 +41,27 @@ export default class ProceduralTerrain{
     this.mesh = new THREE.Mesh( this.geometry, this.material );
   }
 
-  displace(){
-    let pos = this.geometry.getAttribute("position");
-    let positions = pos.array;
+  displace(map){
+    const displacement_buffer = map.getBufferArray();
+    const positions = this.geometry.getAttribute('position').array;
+    const uvs = this.geometry.getAttribute('uv').array;
+    const count = this.geometry.getAttribute('position').count;
+    const indexes = this.geometry.getIndex().array;
 
-    let i = 0;
-    for(let x = 0; x < (this.width * this.detail)+1; x++){
-      for(let y = 0; y < (this.height * this.detail)+1; y++){
-        let _x = x;
-        let _y = y;
+    console.log(map.height);
 
-        let val = 0.0;
-        let amp = this.noise_amp;
-        let freq = this.noise_freq;
-        let oct = this.noise_octaves;
-
-        for(let j = 0; j < oct; j++){
-            val += amp * this.simplex.noise2D(_x / freq, _y / freq);
-            _x *= 2.0;
-            _y *= 2.0;
-            amp *= 0.5;
-        }
-
-        positions[3*(y*((this.width * this.detail)+1)+x)+2] = val;
-        i++;
-      }
+    for (let i = 0; i < count; i++) {
+    	const u = uvs[i * 2];
+    	const v = uvs[i * 2 + 1];
+      const x = (u * map.width);
+      const y = (v * map.height);
+      const d_index = (y * map.height + x) * 4; // fuck yeah!
+    	const r = displacement_buffer[d_index];
+      
+    	positions[i * 3 + 2] = r * this.amplitude;
     }
 
-    pos.needsUpdate = true;
+    this.geometry.getAttribute('position').needsUpdate = true;
     this.geometry.computeVertexNormals();
   }
 

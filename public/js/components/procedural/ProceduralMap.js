@@ -4,14 +4,14 @@ import * as fbm from '../../shaders/fbm';
 export default class ProceduralMap{
   constructor(city, options){
       this.manager = city.manager;
-      this.size = size;
-      this.frequency = frequency;
-      this.range = range;
-      this.octaves = octaves;
+      this.size = options.size;
+      this.frequency = options.frequency;
+      this.range = options.range;
+      this.octaves = options.octaves;
       this.texture = new THREE.Texture();
 
-      this.width = size[0];
-      this.height = size[1];
+      this.width = this.size[0];
+      this.height = this.size[1];
 
       this.generate();
   }
@@ -49,12 +49,12 @@ export default class ProceduralMap{
     this.scene = new THREE.Scene();
     this.scene.add( quad );
 
-    this.target = new THREE.WebGLRenderTarget(this.width,this.height); // make float
+    this.target = new THREE.WebGLRenderTarget(this.width,this.height, {
+      format: THREE.RGBAFormat,
+      type: THREE.FloatType
+    }); // make float
 
     this.manager.renderer.render(this.scene, this.camera, this.target);
-
-    this.setupDisplay();
-    // this.sample(10,10);
   }
 
   setupDisplay(){
@@ -69,9 +69,15 @@ export default class ProceduralMap{
 
   invert(){}
 
-  sample(x, y){
-    this.buffer = new Uint8Array(4); // make float
-    this.renderer.readRenderTargetPixels(this.target, x, y, 1, 1, this.buffer);
-    console.log(this.buffer);
+  getSample(x, y){
+    const buffer = new Float32Array(4); // can't use floats in Safari!
+    this.manager.renderer.readRenderTargetPixels(this.target, x, y, 1, 1, buffer);
+    return buffer;
+  }
+
+  getBufferArray(){
+    const buffer = new Float32Array(this.width*this.height*4); // can't use floats in Safari!
+    this.manager.renderer.readRenderTargetPixels(this.target, 0, 0, this.width, this.height, buffer);
+    return buffer;
   }
 }

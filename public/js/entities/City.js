@@ -16,14 +16,14 @@ export default class City{
     this.gui = manager.gui;
 
     this.elevation = new ProceduralMap(this, {
-      size: [512,512],
+      size: [256,256],
       frequency: 50,
       range: [0,1],
       octaves: 5
     });
 
     this.population = new ProceduralMap(this, {
-      size: [512,512],
+      size: [256,256],
       frequency: 50,
       range: [0,1],
       octaves: 5
@@ -31,12 +31,13 @@ export default class City{
 
     this.terrain = new ProceduralTerrain(this, {
       size: [1,1],
-      elevation: this.elevation.target,
-      detail: 1.0
+      elevation: this.elevation,
+      detail: 256.0,
+      amplitude: 0.3
     });
 
     this.roads = new ProceduralRoads(this, {
-      population: this.population.target
+      population: this.population
     });
 
     this.setup();
