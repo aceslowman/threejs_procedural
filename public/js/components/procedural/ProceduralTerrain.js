@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import * as ASMATH from "../../utilities/Math";
 import ProceduralMap from "./ProceduralMap";
 import SimplexNoise from "simplex-noise";
 import * as elevation from "../../shaders/elevation";
@@ -46,9 +47,6 @@ export default class ProceduralTerrain{
     const positions = this.geometry.getAttribute('position').array;
     const uvs = this.geometry.getAttribute('uv').array;
     const count = this.geometry.getAttribute('position').count;
-    const indexes = this.geometry.getIndex().array;
-
-    console.log(map.height);
 
     for (let i = 0; i < count; i++) {
     	const u = uvs[i * 2];
@@ -56,8 +54,10 @@ export default class ProceduralTerrain{
       const x = (u * map.width);
       const y = (v * map.height);
       const d_index = (y * map.height + x) * 4; // fuck yeah!
-    	const r = displacement_buffer[d_index];
-      
+    	let r = displacement_buffer[d_index];
+
+      // r = ASMATH.scale(r,0,1,-1,1);
+
     	positions[i * 3 + 2] = r * this.amplitude;
     }
 

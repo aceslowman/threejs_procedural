@@ -121,13 +121,15 @@ uniform vec2 scale;
 uniform vec2 offset;
 uniform int octaves;
 
+const int MAX_OCTAVES = 12;
+
 void main()
 {
 	float noise;
-	float octave = 1.0;
-  int octs = octaves;
+	float octave = float(octaves);
 
-	for(int i = 0; i < 8; i++){
+	for(int i = 0; i < MAX_OCTAVES; i++){
+    if(octaves == i){ break; }
 		noise += (1./octave) * snoise(octave * vec3(vUv.x * scale.x, vUv.y * scale.y, time));
 		octave *= 2.0;
 	}

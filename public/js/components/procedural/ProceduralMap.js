@@ -5,9 +5,18 @@ export default class ProceduralMap{
   constructor(city, options){
       this.manager = city.manager;
       this.size = options.size;
-      this.frequency = options.frequency;
-      this.range = options.range;
-      this.octaves = options.octaves;
+
+      this.fbm = {
+        time: options.time,
+        bSmooth: options.bSmooth,
+        map: options.map,
+        scale: options.scale,
+        offset: options.offset,
+        octaves: options.octaves,
+      };
+
+      console.log('fbm',this.fbm);
+
       this.texture = new THREE.Texture();
 
       this.width = this.size[0];
@@ -29,13 +38,15 @@ export default class ProceduralMap{
     this.camera.position.z = 1;
 
     this.uniforms = {
-      time: { value: 0 },
-      bSmooth: { value: true },
-      map: { value: [0,1] },
-      scale: { value: [1,1] },
-      offset: { value: [0,0] },
-      octaves: { value: 8}
+      time: { value: this.fbm.time },
+      bSmooth: { value: this.fbm.bSmooth },
+      map: { value: this.fbm.map },
+      scale: { value: this.fbm.scale },
+      offset: { value: this.fbm.offset },
+      octaves: { value: this.fbm.octaves }
     };
+
+    console.log('uniforms',this.uniforms);
 
     const geometry = new THREE.PlaneBufferGeometry( 2., 2.);
     const material = new THREE.ShaderMaterial({
@@ -52,7 +63,7 @@ export default class ProceduralMap{
     this.target = new THREE.WebGLRenderTarget(this.width,this.height, {
       format: THREE.RGBAFormat,
       type: THREE.FloatType
-    }); // make float
+    });
 
     this.manager.renderer.render(this.scene, this.camera, this.target);
   }

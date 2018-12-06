@@ -1,6 +1,13 @@
 import * as THREE from "three";
 
 /**
+ * Scale value from one range to another
+ */
+function scale(num, in_min, in_max, out_min, out_max){
+  return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+/**
  * Shuffles array in place. ES6 version
  * @param {Array} a items An array containing the items.
  */
@@ -39,6 +46,7 @@ function getLineIntersection(p0, p1, p2, p3){
 }
 
 module.exports = {
+  scale,
   shuffle,
   getLineIntersection
 }

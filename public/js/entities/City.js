@@ -17,16 +17,22 @@ export default class City{
 
     this.elevation = new ProceduralMap(this, {
       size: [256,256],
-      frequency: 50,
-      range: [0,1],
-      octaves: 5
+      time: Math.random()*1000,
+      bSmooth: true,
+      map: [0,1],
+      scale: [1,1],
+      offset: [0,0],
+      octaves: 6
     });
 
     this.population = new ProceduralMap(this, {
       size: [256,256],
-      frequency: 50,
-      range: [0,1],
-      octaves: 5
+      time: Math.random()*1000,
+      bSmooth: true,
+      map: [0,1],
+      scale: [3,3],
+      offset: [0,0],
+      octaves: 2
     });
 
     this.terrain = new ProceduralTerrain(this, {
