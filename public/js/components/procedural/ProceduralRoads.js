@@ -34,15 +34,16 @@ class Crossing {
 }
 
 export default class ProceduralRoads{
-  constructor(city){
+  constructor(city, options){
+    this.population = options.population;
+    this.terrain = options.terrain;
+
     this.placed = [];
     this.pending = [];
     this.crossings = [];
 
-    this.terrain = city.terrain;
-
     this.road_limit = 100;
-    this.road_scalar = 0.1;
+    this.road_scalar = 0.05;
 
     this.pointsGeometry = new THREE.Geometry();
     this.crossingsGeometry = new THREE.Geometry();
@@ -137,7 +138,7 @@ export default class ProceduralRoads{
         this.placed.push(a);
         this.pending.shift();
 
-        let mode = 0;
+        let mode = 1;
 
         for(let b of this.globalGoals(a, mode)){
           this.pending.push(b);
@@ -149,6 +150,8 @@ export default class ProceduralRoads{
   }
 
   localConstraints(a){
+    return true;
+
     if(!a.prev){ return true; }
 
     let crossings = this.checkForCrossings(a);
@@ -194,9 +197,9 @@ export default class ProceduralRoads{
   globalGoals(a, mode){
     switch (mode) {
       case 0:
-      return this.angleGoal(a, 20, 90);
+        return this.angleGoal(a, 20, 90);
       case 1:
-      return this.populationGoal(a, 60, 3);
+        return this.populationGoal(a, 60, 3);
     }
   }
 
@@ -265,33 +268,47 @@ export default class ProceduralRoads{
     let numSample = 3;
     let max_goals = 2;
 
-    (this.placed.length < road_limit) ? max_goals = 2 : max_goals = 0;
+    (this.placed.length < this.road_limit) ? max_goals = 2 : max_goals = 0;
 
     for(let i = 0; i < max_goals; i++){
-      if(a.prev != null){
-        let t_ray = new THREE.Geometry();
+      if(a.prev){
+        let t_ray = new THREE.Line3();
         let t_sum = 0;
 
         for(let i = 0; i < numRays; i++){
-          let ray = new THREE.Geometry();
+          let ray = new THREE.Line3();
           let sum = 0;
 
-          ray.vertices.push(a.prev.node);
-
-          let direction = new THREE.Vector3(a.node - a.prev.node).normalize();
+          let direction = new THREE.Vector3();
+          direction.subVectors(a.node,a.prev.node).normalize();
 
           let random_angle = THREE.Math.randFloat(-range,range);
-          direction.applyAxisAngle(random_angle, new THREE.Vector3(0,0,1));
+          direction.applyAxisAngle(new THREE.Vector3(0,0,1),random_angle);
 
-          let t_end = new THREE.Vector3(a.node + (direction * this.road_scalar));
+          let scalar = new THREE.Vector3(
+            this.road_scalar,
+            this.road_scalar,
+            this.road_scalar
+          );
 
-          ray.vertices.push(t_end);
+          let t_end = new THREE.Vector3();
+          t_end.addVectors(a.node,direction.multiply(scalar).add(a.node));
+
+          ray.set(a.prev.node,t_end);
 
           for(let j = 0; j < numSample; j++){
-            p = new THREE.Vector3(ray.getPointAtIndexInterpolated((1.0/3)*j));
-            if(this.terrain.globalBoundsCheck(p)){
-              // sum += city->population_map.sample((ofVec2f)p);
-              sum += Math.random();
+            let samp = ray.at((1.0/3)*j);
+            console.log("samp",samp);
+            /*
+              A few things:
+
+                why are so many samples (0,0,0)?
+
+                the map is using pixel width/height, not normalized, so I need
+                to think of the appropriate way to scale the sample coords
+            */
+            if(this.terrain.globalBoundsCheck(samp)){
+              sum += this.population.getSample(samp.x * this.population.width,samp.y * this.population.height);
             }
           }
 
@@ -301,23 +318,21 @@ export default class ProceduralRoads{
           }
         }
 
-        let end = new THREE.Vector3(t_ray.getPointAtIndexInterpolated(1));
+        let end = t_ray.at(1);
 
         if(this.terrain.globalBoundsCheck(end)){
-          new_road = new Road(a.it + 1, a, end);
-          t_pending.push(new_road);
+          t_pending.push(new Road(a.it + 1, a, end));
         }
       }else{
-        let new_direction = THREE.Vector3(
-          THREE.Math.randFloat(-1,1),
-          THREE.Math.randFloat(-1,1),
-          0
-        );
+        let new_direction = new THREE.Vector3(THREE.Math.randFloat(-1,1),THREE.Math.randFloat(-1,1),0).normalize();
 
-        let end = THREE.Vector3(a.node + (new_direction * this.road_scalar));
+        let scalar = new THREE.Vector3(this.road_scalar,this.road_scalar,this.road_scalar);
+        let new_node = new THREE.Vector3().multiplyVectors(new_direction, scalar);
+
+        let end = new THREE.Vector3().addVectors(a.node, new_node);
 
         if(this.terrain.globalBoundsCheck(end)){
-          new_road = new Road(a.it + 1, a, end);
+          let new_road = new Road(a.it + 1, a, end);
           t_pending.push(new_road);
         }
       }

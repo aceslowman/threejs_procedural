@@ -75,15 +75,22 @@ export default class ProceduralMap{
       transparent: true
     });
     this.outputQuad = new THREE.Mesh( this.displayGeometry, material );
+    this.outputQuad.position.z = -0.001;
     this.manager.scene.add( this.outputQuad );
+
+    /*
+      would there be a way to render this to a new canvas?
+    */
   }
 
   invert(){}
 
   getSample(x, y){
     const buffer = new Float32Array(4); // can't use floats in Safari!
+    // console.log("COORD", [x,y]);
     this.manager.renderer.readRenderTargetPixels(this.target, x, y, 1, 1, buffer);
-    return buffer;
+    // console.log("SAMPLE", buffer);
+    return buffer[0];
   }
 
   getBufferArray(){
