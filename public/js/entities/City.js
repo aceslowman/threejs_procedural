@@ -16,34 +16,26 @@ export default class City{
     this.gui = manager.gui;
 
     this.elevation = new ProceduralMap(this, {
-      size: [128,128],
-      time: Math.random()*1000,
-      bSmooth: true,
-      map: [0,2],
-      scale: [0.1,0.1],
-      offset: [0,0],
-      octaves: 6
-    });
-
-    this.population = new ProceduralMap(this, {
-      size: [128,128],
-      time: Math.random()*1000,
-      bSmooth: true,
-      map: [-1,1],
-      scale: [1,1],
-      offset: [0,0],
-      octaves: 2
+        size: [256,256],
+        time: Math.random()*1000,
+        bSmooth: true,
+        map: [-1,1],
+        scale: [0.2,0.2],
+        offset: [0,0],
+        octaves: 8
     });
 
     this.terrain = new ProceduralTerrain(this, {
       size: [1,1],
       elevation: this.elevation,
       detail: 128.0,
-      amplitude: 1.0
+      amplitude: 0.8
     });
 
+    this.population = this.elevation;
+
     this.roads = new ProceduralRoads(this, {
-      population: this.population,
+      population: this.elevation,
       terrain: this.terrain
     });
 
@@ -53,7 +45,11 @@ export default class City{
 
   setup(){
     this.terrain.setup();
+    this.terrain.setupDebug();
+
     this.roads.setup();
+
+    this.elevation.setupDisplay();
     this.population.setupDisplay();
 
     this.setupGUI();
@@ -62,16 +58,14 @@ export default class City{
   update(){}
 
   addToScene(){
-    // this.scene.add(this.terrain.mesh);
-    this.scene.add(this.roads.pointsMesh);
-    this.scene.add(this.roads.crossingsMesh);
-    this.scene.add(this.roads.lineSegmentsMesh);
     this.manager.addEntity(this);
   }
 
   setupGUI(){
-    // this.gui.roads = this.gui.addFolder("Road");
-    // this.gui.roads.add(this.roads.material,"wireframe");
+    this.gui.roads = this.gui.addFolder("Road");
+    this.gui.roads.add(this.roads.pointsMesh,"visible").name("pointsMesh");
+    this.gui.roads.add(this.roads.crossingsMesh,"visible").name("crossingsMesh");
+    this.gui.roads.add(this.roads.lineSegmentsMesh,"visible").name("lineSegmentsMesh");
 
     this.gui.terrain = this.gui.addFolder("Terrain");
     this.gui.terrain.add(this.terrain.mesh,"visible");

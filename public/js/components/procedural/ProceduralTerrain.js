@@ -6,6 +6,7 @@ import * as elevation from "../../shaders/elevation";
 
 export default class ProceduralTerrain{
   constructor(city, options){
+    this.city = city;
     this.width = options.size[0];
     this.height = options.size[1];
     this.detail = options.detail;
@@ -23,25 +24,19 @@ export default class ProceduralTerrain{
 
     this.displace(this.elevation);
     this.generateMesh();
+
+    this.city.scene.add(this.mesh);
   }
 
-  generateMesh(){
-    this.elev_uniforms = {
-      range: { value: this.amplitude },
-      draw_elev: {value: true},
-      draw_topo: {value: true}
-    };
-
-    this.material = new THREE.ShaderMaterial({
-      vertexShader: elevation.vert,
-      fragmentShader: elevation.frag,
-      uniforms: this.elev_uniforms,
-      wireframe: true
-    });
-
-    this.mesh = new THREE.Mesh( this.geometry, this.material );
+  setupDebug(){
+    var helper = new THREE.Box3Helper( this.geometry.boundingBox, 0xffff00 );
+    this.city.scene.add( helper );
   }
 
+  /**
+  * Displace the buffer geometry using a given ProceduralMap
+  * @param {ProceduralMap} map - a map representing a grayscale elevation map.
+  */
   displace(map){
     const displacement_buffer = map.getBufferArray();
     const positions = this.geometry.getAttribute('position').array;
@@ -51,20 +46,53 @@ export default class ProceduralTerrain{
     for (let i = 0; i < count; i++) {
     	const u = uvs[i * 2];
     	const v = uvs[i * 2 + 1];
-      const x = (u * map.width);
-      const y = (v * map.height);
-      const d_index = (y * map.height + x) * 4; // fuck yeah!
+      const x = Math.floor(u * (map.width-1.0));
+      const y = Math.floor(v * (map.height-1.0));
+      const d_index = (y * map.height + x) * 4;
     	let r = displacement_buffer[d_index];
 
-      // r = ASMATH.scale(r,0,1,-1,1);
+    	positions[i * 3 + 2] = (r * this.amplitude);
 
-    	positions[i * 3 + 2] = r * this.amplitude;
+      if(!r){
+        console.error("cannot find value in displacement buffer");
+      }
     }
 
     this.geometry.getAttribute('position').needsUpdate = true;
     this.geometry.computeVertexNormals();
+    this.geometry.computeFaceNormals();
+    this.geometry.computeBoundingBox();
+    this.geometry.computeBoundingSphere();
+
+    this.geometry.translate(0,0,-this.geometry.boundingBox.min.z);
   }
 
+  /**
+  * Generates terrain mesh, and utilizes custom shaders.
+  */
+  generateMesh(){
+    this.elev_uniforms = {
+      range: { value: this.geometry.boundingBox.max.z },
+      draw_elev: {value: true},
+      draw_topo: {value: true}
+    };
+
+    this.material = new THREE.ShaderMaterial({
+      vertexShader: elevation.vert,
+      fragmentShader: elevation.frag,
+      uniforms: this.elev_uniforms,
+      wireframe: false,
+      side: THREE.DoubleSide
+    });
+
+    this.mesh = new THREE.Mesh( this.geometry, this.material );
+  }
+
+  /**
+  * Checks to see if a given point is within bounds of the terrain.
+  * @param {Vector2} a - the point to be checked
+  * @returns {Boolean} true if within bounds, false if not
+  */
   globalBoundsCheck(a){
     let h_w = (this.width/2);
     let h_h = (this.height/2);

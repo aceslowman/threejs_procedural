@@ -20,6 +20,7 @@ let city;
 
 const setup = () => {
   manager = new StandardManager();
+  manager.gui.close();
 
   city = new City(manager);
 

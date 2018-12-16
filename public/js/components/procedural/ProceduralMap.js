@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import * as fbm from '../../shaders/fbm';
+import * as invert from '../../shaders/invert';
+import _ from "lodash";
 
 export default class ProceduralMap{
   constructor(city, options){
@@ -14,8 +16,6 @@ export default class ProceduralMap{
         offset: options.offset,
         octaves: options.octaves,
       };
-
-      console.log('fbm',this.fbm);
 
       this.texture = new THREE.Texture();
 
@@ -46,8 +46,6 @@ export default class ProceduralMap{
       octaves: { value: this.fbm.octaves }
     };
 
-    console.log('uniforms',this.uniforms);
-
     const geometry = new THREE.PlaneBufferGeometry( 2., 2.);
     const material = new THREE.ShaderMaterial({
       uniforms: this.uniforms,
@@ -55,10 +53,10 @@ export default class ProceduralMap{
       fragmentShader: fbm.frag
     });
 
-    const quad = new THREE.Mesh( geometry, material );
+    this.quad = new THREE.Mesh( geometry, material );
 
     this.scene = new THREE.Scene();
-    this.scene.add( quad );
+    this.scene.add( this.quad );
 
     this.target = new THREE.WebGLRenderTarget(this.width,this.height, {
       format: THREE.RGBAFormat,
@@ -77,24 +75,25 @@ export default class ProceduralMap{
     this.outputQuad = new THREE.Mesh( this.displayGeometry, material );
     this.outputQuad.position.z = -0.001;
     this.manager.scene.add( this.outputQuad );
-
-    /*
-      would there be a way to render this to a new canvas?
-    */
   }
 
-  invert(){}
+  /**
+  * copies the current ProceduralMap, but inverted.
+  * utilizes lodash cloneDeep
+  * @returns {ProceduralMap} returns new ProceduralMap
+  */
+  invert(){
+
+  }
 
   getSample(x, y){
-    const buffer = new Float32Array(4); // can't use floats in Safari!
-    // console.log("COORD", [x,y]);
+    const buffer = new Float32Array(4); // NOTE: can't use floats in Safari!
     this.manager.renderer.readRenderTargetPixels(this.target, x, y, 1, 1, buffer);
-    // console.log("SAMPLE", buffer);
     return buffer[0];
   }
 
   getBufferArray(){
-    const buffer = new Float32Array(this.width*this.height*4); // can't use floats in Safari!
+    const buffer = new Float32Array(this.width*this.height*4); // NOTE: can't use floats in Safari!
     this.manager.renderer.readRenderTargetPixels(this.target, 0, 0, this.width, this.height, buffer);
     return buffer;
   }

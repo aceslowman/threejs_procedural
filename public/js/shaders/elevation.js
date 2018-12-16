@@ -24,7 +24,7 @@ float map(float value, float min1, float max1, float min2, float max2){
 void main(){
     vec4 color = vec4(0,0,0,0);
     float alpha = 0.0;
-    float n_elev = map(elev, -range, range, 0.0, 1.0);
+    float n_elev = map(elev, 0.0, range, 0.0, 1.0);
 
     float s_offset = 0.1;
     float s_w = 0.04; // multiply by 'steepness'

@@ -48,6 +48,7 @@ export default class asDebug{
     document.body.appendChild( this.stats.domElement );
   }
 
+  // TODO: allow for boolean (x,y,z)
   assembleGrid(){
     this.grid_x = new Object();
     this.grid_x.size = this.options.grid.size || 10;
