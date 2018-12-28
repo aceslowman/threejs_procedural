@@ -1,9 +1,16 @@
 import * as THREE from "three";
 import * as ASMATH from "../../utilities/Math";
 import ProceduralMap from './ProceduralMap';
+import TessellateModifier from "../../utilities/modifiers/TesselateModifier";
+
+class Block {
+  constructor() {
+    this.polygon = new THREE.Mesh();
+  }
+}
 
 class Road {
-  constructor(it, prev, end){
+  constructor(it, prev, end) {
     this.node = end;
     this.prev = prev;
     this.siblings = [];
@@ -11,13 +18,13 @@ class Road {
     this.it = it;
   }
 
-  addSibling(a){
+  addSibling(a) {
     this.siblings.push(a);
   }
 
-  removeSibling(a){
-    for(let i = 0; i < this.siblings.length; i++){
-      if(a == this.siblings[i]){
+  removeSibling(a) {
+    for (let i = 0; i < this.siblings.length; i++) {
+      if (a == this.siblings[i]) {
         this.siblings.splice(i, 1);
       }
     }
@@ -25,7 +32,7 @@ class Road {
 }
 
 class Crossing {
-  constructor(a, b, c, location){
+  constructor(a, b, c, location) {
     this.a = a;
     this.b = b;
     this.c = c;
@@ -33,18 +40,19 @@ class Crossing {
   }
 }
 
-export default class ProceduralRoads{
-  constructor(city, options){
-    this.city = city;
-    this.population = options.population;
+export default class ProceduralRoads {
+  constructor(world, options) {
+    this.world = world;
     this.terrain = options.terrain;
+    this.population = this.terrain.elevation;
 
     this.placed = [];
     this.pending = [];
     this.crossings = [];
+    this.blocks = [];
 
-    this.road_limit = 100;
-    this.road_scalar = 0.1;
+    this.road_limit = 50;
+    this.road_scalar = 50;
 
     this.pointsGeometry = new THREE.Geometry();
     this.crossingsGeometry = new THREE.Geometry();
@@ -52,181 +60,276 @@ export default class ProceduralRoads{
     this.pointsMesh = new THREE.Points();
     this.crossingsMesh = new THREE.Points();
     this.lineSegmentsMesh = new THREE.LineSegments();
+
+    this.labels = [];
+
+    this.verbose = true;
   }
 
-  setup(){
-    this.build();
+  setup() {
+    this.buildRoads();
+    this.postBuildRoads();
+
     this.setupLineSegments();
     this.setupPointsMesh();
     this.setupCrossingsMesh();
-    // this.setupDebugText();
+    this.setupDebugNumbers();
+
+    this.buildBlocks();
   }
 
-  setupPointsMesh(){
-    let material = new THREE.PointsMaterial( {
+  setupPointsMesh() {
+    let material = new THREE.PointsMaterial({
       color: 'blue',
       size: 12,
       sizeAttenuation: false,
       depthTest: false
     });
 
-    for(let a of this.placed){
+    if (this.verbose) console.log("PLACED", this.placed);
+
+    for (let a of this.placed) {
       this.pointsGeometry.vertices.push(a.node);
     }
 
     this.pointsMesh = new THREE.Points(this.pointsGeometry, material);
-    this.city.scene.add(this.pointsMesh);
+    this.world.manager.scene.add(this.pointsMesh);
   }
 
-  setupCrossingsMesh(){
-    let material = new THREE.PointsMaterial( {
+  setupCrossingsMesh() {
+    let material = new THREE.PointsMaterial({
       color: 'red',
       size: 7,
       sizeAttenuation: false,
       depthTest: false
     });
 
-    for(let a of this.crossings){
+    for (let a of this.crossings) {
       this.crossingsGeometry.vertices.push(a);
     }
 
     this.crossingsMesh = new THREE.Points(this.crossingsGeometry, material);
-    this.city.scene.add(this.crossingsMesh);
+    this.world.manager.scene.add(this.crossingsMesh);
   }
 
-  setupLineSegments(){
+  setupLineSegments() {
     this.lineGeometry = new THREE.BufferGeometry();
     let points = [];
 
-    for(let a of this.placed){
-      for(let b of a.siblings){
-        if(b.prev){
-          points.push(a.node.x,a.node.y,a.node.z,b.node.x,b.node.y,b.node.z);
+    for (let a of this.placed) {
+      for (let b of a.siblings) {
+        if (b.prev) {
+          points.push(a.node.x, a.node.y, a.node.z, b.node.x, b.node.y, b.node.z);
         }
       }
     }
 
-    this.lineGeometry.addAttribute('position', new THREE.Float32BufferAttribute( points, 3 ) );
+    this.lineGeometry.addAttribute('position', new THREE.Float32BufferAttribute(points, 3));
     this.lineMaterial = new THREE.LineBasicMaterial({
       color: 'yellow',
       linewidth: 2
     });
-    this.lineSegmentsMesh = new THREE.LineSegments(this.lineGeometry,this.lineMaterial);
-    this.city.scene.add(this.lineSegmentsMesh);
+    this.lineSegmentsMesh = new THREE.LineSegments(this.lineGeometry, this.lineMaterial);
+    this.world.manager.scene.add(this.lineSegmentsMesh);
   }
 
-  setupDebugText(){
+  setupDebugNumbers() {
     //TODO: this is not especially useful. it would be nice to have billboarding
-    for(let i = 0; i < this.placed.length; i++){
-      let bm = document.createElement('canvas');
-      var g = bm.getContext('2d');
-      bm.width = 128;
-      bm.height = 128;
-      g.font = "Bold 18px Arial";
-      g.fillStyle = 'white';
-      g.fillText(i, 60, 20);
+    for (let i = 0; i < this.placed.length; i++) {
+      // fill up member array (this.labels) with new objects
+      let cont = document.createElement("div");
+      let label = document.createElement("h6");
+      label.appendChild(document.createTextNode(i));
 
-      let tex = new THREE.Texture(bm);
-      tex.needsUpdate = true;
+      label.style.margin = "0px";
+      label.style.color = "white";
+      label.style.fontSize = "1.2em";
 
-      let geometry = new THREE.PlaneBufferGeometry( 0.1,0.1 );
-      let material = new THREE.MeshBasicMaterial({ map: tex, transparent: true });
+      // cont.style.backgroundColor = "black"; // NOTE: difficult to see overlaps
+      cont.style.position = "absolute";
+      cont.style.zIndex = 100;
 
-      let quad = new THREE.Mesh( geometry, material );
-      let n = this.placed[i].node;
-      quad.position.set(n.x,n.y,n.z + 0.01);
-      this.city.manager.scene.add( quad );
+      cont.appendChild(label);
+      cont.classList.add("road_label");
+      cont.id = i;
+
+      document.body.appendChild(cont);
+    }
+
+    this.debug_elements = document.getElementsByClassName("road_label");
+  }
+
+  updateDebugNumbers() {
+    for (let i = 0; i < this.debug_elements.length; i++) {
+      let element = this.debug_elements[i];
+      let manager = this.world.manager;
+
+      let node = this.placed[element.id].node;
+      let cam = manager.camera.getCamera();
+      let canvas = manager.renderer.context.canvas;
+
+      let loc = ASMATH.world2Screen(node, cam, canvas);
+
+      element.style.left = (loc.x) + "px";
+      element.style.top = (loc.y) + "px";
     }
   }
 
+  setupDebug() {
+    // let div = document.createElement("div");
+    // div.classList.add("roadDebug");
+    //
+    // let ul = document.createElement("ul");
+    //
+    // let li = document.createElement("li");
+    // let num_nodes = document.createTextNode("Number of nodes in placed: "+this.placed.length);
+    // li.appendChild(num_nodes);
+    // ul.appendChild(li);
+    //
+    // div.appendChild(ul);
+    //
+    // document.body.appendChild(div);
+
+    let table = {};
+    table.number_in_placed = this.placed.length;
+    table.number_in_crossings = this.crossings.length;
+    table.number_in_pending = this.pending.length;
+
+    console.table(table);
+    console.log("PLACED", this.placed);
+  }
+
   /**
-  * builds the collection of roads.
-  */
-  build(){
-    let map_center = new THREE.Vector3(0,0,0);
+   * builds the collection of roads.
+   */
+  buildRoads() {
+    this.pending.push(new Road(0, null, new THREE.Vector3(0, 0, 0)));
 
-    let initial = new Road(0, null, map_center);
-
-    this.pending.push(initial);
-
-    while(this.pending.length > 0){
-      this.pending.sort((a, b)=>{
+    while (this.pending.length > 0) {
+      this.pending.sort((a, b) => {
         return a.it - b.it;
       });
 
       let a = this.pending[0];
 
+      // if(a.node.x == 0 && a.node.y == 0){
+      //
+      //   for(let p of this.pending){
+      //     console.warn("PENDING", p);
+      //   }
+      // }
+
       let accepted = this.localConstraints(a);
 
-      if(accepted){
-        if(a.prev){
-          a.prev.siblings.push(a);
-        }
+      if (accepted) {
+        if (a.prev) a.prev.siblings.push(a);
 
         this.placed.push(a);
         this.pending.shift();
 
         let mode = 1;
 
-        for(let b of this.globalGoals(a, mode)){
+        for (let b of this.globalGoals(a, mode)) {
+          // if(b.node.x == 0 && b.node.y == 0){
+          //   console.warn("WOAH OH NO", b);
+          // }
+
           this.pending.push(b);
         }
-      }else{
+      } else {
         this.pending.shift();
       }
     }
   }
 
   /**
-  * Local constraints checks a for certain qualities. If it passes critical
-  * tests, a is confirmed and placed into the 'placed' array.
-  * @param {Road} a - the current unconfirmed road.
-  * @returns {Bool} returns true if a has passed critical constraints.
-  */
-  localConstraints(a){
-    if(!a.prev){ return true; }
-
-    let crossings = this.checkForCrossings(a);
-    let dedupe = this.checkForDuplicates(a);
-    let elevate = this.checkForElevation(a);
-
-    return dedupe && elevate;
+   * For all processes required after the construction of the road system
+   */
+  postBuildRoads() {
+    this.subdivide();
+    this.elevate();
   }
 
   /**
-  * Checks for any intersections between a and any placed road. A is truncated
-  * to the closest intersection if an intersection is found.
-  * @param {Road} a - the current road, recently having passed localConstraints.
-  * @returns {Bool} returns true if an intersection is found, false if not.
-  *
-  * ISSUES:
-  *   currently recognzing all intersections, but not choosing the correct one.
-  */
-  checkForCrossings(a){
+   * TODO: potentially more appropriate to be done IN build, but for now, leave.
+   * TODO: implement slope threshold
+   * Checks for elevation. If it is too steep, it will be rejected. If not, the
+   * a.z value will be defined.
+   * @param {Float} thresh - the maximum incline allowed
+   * @returns {Bool} returns success value.
+   */
+  elevate() {
+    let thresh = 0.1; // FIXME: parameterize threshold!
+
+    const raycaster = new THREE.Raycaster();
+    const direction = new THREE.Vector3(0, 0, 1);
+
+    for (let endpoint of this.placed) {
+      raycaster.set(endpoint.node, direction);
+      let intersects = raycaster.intersectObject(this.terrain.mesh);
+
+      if (intersects.length > 0) {
+        let pI = intersects[0].point;
+        endpoint.node = pI;
+      }
+    }
+  }
+
+  /**
+   * Subdivide all roads by a given number of iterations.
+   * @param {int} level - the number of subdivisions applied.
+   */
+  subdivide() {
+
+  }
+
+  /**
+   * Local constraints checks a for certain qualities. If it passes critical
+   * tests, a is confirmed and placed into the 'placed' array.
+   * @param {Road} a - the current unconfirmed road.
+   * @returns {Bool} returns true if a has passed critical constraints.
+   */
+  localConstraints(a) {
+    if (!a.prev) return true;
+
+    let crossings = this.checkForCrossings(a);
+    let dedupe = this.checkForDuplicates(a);
+
+    return dedupe;
+  }
+
+  /**
+   * Checks for any intersections between a and any placed road. A is truncated
+   * to the closest intersection if an intersection is found.
+   * @param {Road} a - the current road, recently having passed localConstraints.
+   * @returns {Bool} returns true if an intersection is found, false if not.
+   */
+  checkForCrossings(a) {
     let crossings = [];
 
-    for(let b of this.placed){
-      if (!b.prev || a.prev.node == b.prev.node || a.prev.node == b.node) { continue; }
+    for (let b of this.placed) {
+      if (!b.prev || a.prev.node == b.prev.node || a.prev.node == b.node) {
+        continue;
+      }
 
       let c = b.prev;
 
       let intersect = ASMATH.getLineIntersection(a.prev.node, a.node, b.node, c.node);
 
-      if(intersect){
-        this.crossings.push(intersect);
+      if (intersect) {
         crossings.push(new Crossing(a, b, c, intersect));
       }
     }
 
-    if(crossings.length > 0){
-      crossings.sort((A,B)=>{
+    if (crossings.length > 0) {
+      crossings.sort((A, B) => {
         return (
           a.prev.node.distanceToSquared(A.location) - a.prev.node.distanceToSquared(B.location)
         );
       });
 
       let match = crossings[0];
-
+      this.crossings.push(match.location);
       a.node = match.location;
       // TODO: set siblings once a crossing is found
 
@@ -237,24 +340,26 @@ export default class ProceduralRoads{
   }
 
   /**
-  * Checks for any roads that duplicate the end point of Road a. If there is a
-  * duplicate, a will be rejected, and a.prev will be bound to the match.
-  * @param {Road} a - the current road, recently having passed localConstraints.
-  * @returns {Bool} returns success value.
-  */
-  checkForDuplicates(a){
+   * Checks for any roads that duplicate the end point of Road a. If there is a
+   * duplicate, a will be rejected, and a.prev will be bound to the match.
+   * @param {Road} a - the current road, recently having passed localConstraints.
+   * @returns {Bool} returns success value.
+   *
+   * FIXME: Appears that there might still be duplicates at the end.
+   */
+  checkForDuplicates(a) {
     let ok = true;
 
-    for(let b of this.placed){
-      if(b.prev){
-        if(a.node.distanceTo(b.node) == 0){
+    for (let b of this.placed) {
+      if (b.prev) {
+        if (a.node.distanceTo(b.node) == 0) {
           a.prev.addSibling(b);
 
-          for(let sib in a.siblings){
+          for (let sib in a.siblings) {
             b.addSibling(sib);
           }
 
-          console.warn("duplicate found, a has failed.");
+          if (this.verbose) console.warn("duplicate found, a has failed.");
           ok = false;
           break;
         }
@@ -265,100 +370,71 @@ export default class ProceduralRoads{
   }
 
   /**
-  * TODO: considering moving this to a post-build stage. I think that what might
-  * be *best* is to actually move it to globalGoals. ok maybe I just should
-  *
-  * Checks for elevation. If it is too steep, it will be rejected. If not, the
-  * a.z value will be defined.
-  * @param {Road} a - the current road, recently having passed localConstraints.
-  * @param {Float} thresh - the maximum incline allowed
-  * @returns {Bool} returns success value.
-  */
-  checkForElevation(a){
-    let ok = true;
+   * Global Goals generate new Roads from one accepted/placed Road.
+   * @param {Road} a - the current road, recently having passed localConstraints.
+   * @param {Float} mode - (0) angle, (1) population
+   * @returns {Array} returns array of new Roads.
+   */
+  globalGoals(a, mode) {
+    mode = 1;
 
-    // I don't think I need to sample elevation from the map, but rather from
-    // terrain mesh itself, using THREE.Raycaster
-
-    const raycaster = new THREE.Raycaster();
-    const direction = new THREE.Vector3(0,0,1);
-
-    // FIXME: currently miscalculating
-    raycaster.set(a.node, direction);
-    let intersects = raycaster.intersectObject(this.terrain.mesh);
-
-    if(intersects.length > 0){
-      let pI = intersects[0].point;
-      a.node = pI;
-    }
-
-    return ok;
-  }
-
-  /**
-  * Global Goals generate new Roads from one accepted/placed Road.
-  * @param {Road} a - the current road, recently having passed localConstraints.
-  * @param {Float} mode - (0) angle, (1) population
-  * @returns {Array} returns array of new Roads.
-  */
-  globalGoals(a, mode){
     switch (mode) {
       case 0:
         return this.angleGoal(a, 20, 90);
       case 1:
-        return this.populationGoal(a, 60);
+        return this.populationGoal(a, 30);
     }
   }
 
   /**
-  * A Global Goal following an angular constraint.
-  * @param {Road} a - the current road, recently having passed localConstraints.
-  * @param {Float} range - the maximum randomness around the chosen angle.
-  * @param {Float} tendency - the angle chosen before randomness.
-  * @returns {Array} returns array of new Roads.
-  */
-  angleGoal(a, range, tendency){
+   * A Global Goal following an angular constraint.
+   * @param {Road} a - the current road, recently having passed localConstraints.
+   * @param {Float} range - the maximum randomness around the chosen angle.
+   * @param {Float} tendency - the angle chosen before randomness.
+   * @returns {Array} returns array of new Roads.
+   */
+  angleGoal(a, range, tendency) {
     let t_pending = [];
 
     let max_goals = 2;
 
-    (this.placed.length < this.road_limit) ? max_goals = 2 : max_goals = 0;
+    (this.placed.length < this.road_limit) ? max_goals = 2: max_goals = 0;
 
-    let quadrants = [1,2,3]; // i dont think it should be 4
+    let quadrants = [1, 2, 3]; // i dont think it should be 4
 
     ASMATH.shuffle(quadrants);
 
-    for(let i = 0; i < max_goals; i++){
+    for (let i = 0; i < max_goals; i++) {
 
-      if(a.prev){ // generate random angle
-        let new_direction = new THREE.Vector3().subVectors(a.node,a.prev.node).normalize();
+      if (a.prev) { // generate random angle
+        let new_direction = new THREE.Vector3().subVectors(a.node, a.prev.node).normalize();
 
-        let angle = THREE.Math.randFloat((tendency * quadrants[i]) - range,(tendency * quadrants[i]) + range);
+        let angle = THREE.Math.randFloat((tendency * quadrants[i]) - range, (tendency * quadrants[i]) + range);
 
-        new_direction.applyAxisAngle(new THREE.Vector3(0,0,1), angle * Math.PI/180);
+        new_direction.applyAxisAngle(new THREE.Vector3(0, 0, 1), angle * Math.PI / 180);
 
-        let scalar = new THREE.Vector3(this.road_scalar,this.road_scalar,this.road_scalar);
+        let scalar = new THREE.Vector3(this.road_scalar, this.road_scalar, this.road_scalar);
         let new_node = new THREE.Vector3().multiplyVectors(new_direction, scalar);
 
         let endpoint = new THREE.Vector3().addVectors(a.node, new_node);
 
-        if(this.terrain.globalBoundsCheck(endpoint)){
+        if (this.terrain.globalBoundsCheck(endpoint)) {
           let new_road = new Road(a.it + 1, a, endpoint);
           t_pending.push(new_road);
         }
-      }else{ // define default point
+      } else { // define default point
         let new_direction = new THREE.Vector3(
-          THREE.Math.randFloat(-1,1),
-          THREE.Math.randFloat(-1,1),
+          THREE.Math.randFloat(-1, 1),
+          THREE.Math.randFloat(-1, 1),
           0
         ).normalize();
 
-        let scalar = new THREE.Vector3(this.road_scalar,this.road_scalar,this.road_scalar);
+        let scalar = new THREE.Vector3(this.road_scalar, this.road_scalar, this.road_scalar);
         let new_node = new THREE.Vector3().multiplyVectors(new_direction, scalar);
 
         let endpoint = new THREE.Vector3().addVectors(a.node, new_node);
 
-        if(this.terrain.globalBoundsCheck(endpoint)){
+        if (this.terrain.globalBoundsCheck(endpoint)) {
           let new_road = new Road(a.it + 1, a, endpoint);
           t_pending.push(new_road);
         }
@@ -371,34 +447,34 @@ export default class ProceduralRoads{
   }
 
   /**
-  * A Global Goal following a population constraint, utilizing ProceduralMap.
-  * @param {Road} a - the current road, recently having passed localConstraints.
-  * @param {Float} range - the maximum randomness to cast rays.
-  * @returns {Array} returns array of new Roads.
-  */
-  populationGoal(a, range){
+   * A Global Goal following a population constraint, utilizing ProceduralMap.
+   * @param {Road} a - the current road, recently having passed localConstraints.
+   * @param {Float} range - the maximum angle to cast rays.
+   * @returns {Array} returns array of new Roads.
+   */
+  populationGoal(a, range) {
     let t_pending = [];
 
     let numSample = 3; // parameterize
     let max_goals = 2; // parameterize
     let numRays = 3; // parameterize
 
-    (this.placed.length < this.road_limit) ? max_goals = 2 : max_goals = 0;
+    (this.placed.length < this.road_limit) ? max_goals = 2: max_goals = 0;
 
-    for(let i = 0; i < max_goals; i++){
-      if(a.prev){
-        let t_ray = new THREE.Line3();
-        let t_sum = 0;
+    for (let i = 0; i < max_goals; i++) {
+      if (a.prev) {
+        let final_ray = new THREE.Line3();
+        let highestSum = 0;
 
-        for(let i = 0; i < numRays; i++){
+        for (let j = 0; j < numRays; j++) {
           let ray = new THREE.Line3();
-          let sum = 0;
+          let raySum = 0;
 
-          let angle = THREE.Math.randFloat(-range,range);
+          let angle = THREE.Math.randFloat(-range, range);
 
           let direction = new THREE.Vector3();
-          direction.subVectors(a.node,a.prev.node).normalize();
-          direction.applyAxisAngle(new THREE.Vector3(0,0,1), angle * Math.PI/180);
+          direction.subVectors(a.node, a.prev.node).normalize();
+          direction.applyAxisAngle(new THREE.Vector3(0, 0, 1), angle * Math.PI / 180);
 
           let scalar = new THREE.Vector3(
             this.road_scalar,
@@ -411,29 +487,45 @@ export default class ProceduralRoads{
 
           ray.set(a.prev.node, t_end);
 
-          for(let j = 0; j <= numSample; j++){
-            let samp = ray.at((1.0/numSample)*j);
+          for (let k = 0; k <= numSample; k++) {
+            let samp = ray.at((1.0 / numSample) * k);
 
-            if(this.terrain.globalBoundsCheck(samp)){
-              sum += this.population.getSample(samp.x * this.population.width,samp.y * this.population.height);
+            if (this.terrain.globalBoundsCheck(samp)) {
+              let xcoord = ((samp.x + this.terrain.width/2) / this.terrain.width); //normalized 0-1
+              xcoord *= this.population.width;
+
+              let ycoord = ((samp.y + this.terrain.height/2) / this.terrain.height); //normalized 0-1
+              ycoord *= this.population.height;
+
+              // NOTE VERY POSSIBLE THIS IS SOLVED
+
+              let pop = this.population.getSample(xcoord, ycoord);
+
+              raySum += pop;
             }
           }
 
-          if(sum > t_sum){
-            t_sum = sum;
-            t_ray = ray;
+          if(raySum > highestSum){
+            highestSum = raySum;
+            final_ray = ray;
           }
         }
 
-        const endpoint = t_ray.at(1);
+        const endpoint = final_ray.at(1); // BAD
 
-        if(this.terrain.globalBoundsCheck(endpoint)){
+        if (this.terrain.globalBoundsCheck(endpoint)) {
+          if(endpoint.x == 0 && endpoint.y == 0){
+            console.error("Major failure, you may be incorrectly sampling the population map.", endpoint);
+          }
+
           t_pending.push(new Road(a.it + 1, a, endpoint));
         }
-      }else{
+
+      } else {
+        //OK
         let direction = new THREE.Vector3(
-          THREE.Math.randFloat(-1,1),
-          THREE.Math.randFloat(-1,1),
+          THREE.Math.randFloat(-1, 1),
+          THREE.Math.randFloat(-1, 1),
           0
         ).normalize();
 
@@ -445,7 +537,7 @@ export default class ProceduralRoads{
 
         const endpoint = new THREE.Vector3().addVectors(a.node, direction.multiply(scalar));
 
-        if(this.terrain.globalBoundsCheck(endpoint)){
+        if (this.terrain.globalBoundsCheck(endpoint)) {
           let new_road = new Road(a.it + 1, a, endpoint);
           t_pending.push(new_road);
         }
@@ -453,5 +545,104 @@ export default class ProceduralRoads{
     }
 
     return t_pending;
+  }
+
+  buildBlocks() {
+    for (let i = 0; i < this.placed.length; i++) {
+      let geometry = new THREE.BufferGeometry();
+
+      let t_vertices = [];
+
+      let first = this.placed[i];
+      let next = first;
+
+      let left = null;
+
+      let j = 0;
+
+      do {
+        for (let sib of next.siblings) {
+          if (next.prev) {
+            let a = next.prev.node;
+            let b = next.node;
+            let p = sib.node;
+
+
+            /*
+            dy = ey - cy
+            dx = ex - cx
+            theta = arctan(dy/dx)
+            theta *= 180/pi // rads to degs
+
+            https://stackoverflow.com/questions/9614109/how-to-calculate-an-angle-from-points
+            */
+
+
+
+
+
+            let t_left = (p.x - a.x) * (b.y - a.y) - (p.y - a.y) * (b.x - a.x);
+
+            if (t_left >= left || !left) {
+              console.log("one found further left");
+
+              left = t_left;
+              next = sib;
+            }
+
+
+
+
+
+
+
+
+          } else {
+            console.log('hit');
+            next = next.siblings[0];
+            break;
+          }
+        }
+
+        console.log("NEXT", next);
+        t_vertices.push(next.node.x, next.node.y, next.node.z);
+
+        j++; //TEMP
+        if (j == 10) break; // TEMP
+
+      } while (first != next);
+
+      let vertices = new Float32Array(t_vertices); // NOTE: EMPTY
+
+      geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+
+      let material = new THREE.MeshBasicMaterial({
+        'wireframe': true,
+        'color': 'green'
+      });
+      let mesh = new THREE.Mesh(geometry, material);
+
+      this.world.manager.scene.add(mesh);
+
+      /* FOR DEBUG */
+      console.log("COUNT", geometry);
+
+      /*
+        after first iteration, all subsequent points inserted into the geometry
+        are duplicates. FIXME
+      */
+      let point_material = new THREE.PointsMaterial({
+        color: 'green',
+        size: 14,
+        sizeAttenuation: false,
+        depthTest: false
+      });
+      let point_mesh = new THREE.Points(geometry, point_material);
+
+      this.world.manager.scene.add(point_mesh);
+      /* */
+
+      break;
+    }
   }
 }

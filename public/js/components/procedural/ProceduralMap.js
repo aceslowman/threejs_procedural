@@ -1,11 +1,12 @@
 import * as THREE from "three";
 import * as fbm from '../../shaders/fbm';
 import * as invert from '../../shaders/invert';
+import * as ASMATH from "../../utilities/Math";
 import _ from "lodash";
 
 export default class ProceduralMap{
-  constructor(city, options){
-      this.manager = city.manager;
+  constructor(manager, options){
+      this.manager = manager;
       this.size = options.size;
 
       this.fbm = {
@@ -16,8 +17,6 @@ export default class ProceduralMap{
         offset: options.offset,
         octaves: options.octaves,
       };
-
-      this.texture = new THREE.Texture();
 
       this.width = this.size[0];
       this.height = this.size[1];
@@ -66,15 +65,38 @@ export default class ProceduralMap{
     this.manager.renderer.render(this.scene, this.camera, this.target);
   }
 
-  setupDisplay(){
-    this.displayGeometry = new THREE.PlaneBufferGeometry(1,1);
+  setupDisplay(name, position){
+    //setup texture
+    const geometry = new THREE.PlaneBufferGeometry(this.width,this.height);
     const material = new THREE.MeshBasicMaterial({
-      map: this.target.texture,
-      transparent: true
+      map: this.target.texture
     });
-    this.outputQuad = new THREE.Mesh( this.displayGeometry, material );
-    this.outputQuad.position.z = -0.001;
-    this.manager.scene.add( this.outputQuad );
+
+    this.outputQuad = new THREE.Mesh( geometry, material );
+    this.outputQuad.position.x = position.x;
+    this.outputQuad.position.y = position.y;
+
+    this.manager.overScene.add( this.outputQuad );
+
+    //setup label
+    let labelPos = ASMATH.world2Screen(this.outputQuad.position, this.manager.ortho, this.manager.renderer.context.canvas);
+    let cont = document.createElement("div");
+    let label = document.createElement("h3");
+    label.appendChild(document.createTextNode(name));
+
+    label.style.margin = "5px";
+    label.style.color = "white";
+
+    cont.style.position = "absolute";
+    cont.style.zIndex = 100;
+    cont.style.width = this.width  + "px";
+    cont.style.height = this.height  + "px";
+
+    cont.style.left = (labelPos.x - (this.width/2.0)) + "px";
+    cont.style.top = (labelPos.y - (this.height/2.0)) + "px";
+
+    cont.appendChild(label);
+    document.body.appendChild(cont);
   }
 
   /**
@@ -86,8 +108,10 @@ export default class ProceduralMap{
 
   }
 
+  // FIXME BREAKING PROBLEM, currently sampling far out of bounds
   getSample(x, y){
     const buffer = new Float32Array(4); // NOTE: can't use floats in Safari!
+    if(x > this.width || y > this.height || x < 0 || y < 0) console.warn("sampling out of bounds")
     this.manager.renderer.readRenderTargetPixels(this.target, x, y, 1, 1, buffer);
     return buffer[0];
   }

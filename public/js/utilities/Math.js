@@ -45,8 +45,40 @@ function getLineIntersection(p0, p1, p2, p3){
   return false;
 }
 
+function world2Screen(node, camera, canvas){
+  let xy = node.clone().project(camera);
+
+  xy.x = Math.round( (   xy.x + 1 ) * canvas.width  / 2 );
+  xy.y = Math.round( ( - xy.y + 1 ) * canvas.height / 2 );
+
+  return xy
+}
+
+// TODO: this should be phased out
+//https://stackoverflow.com/questions/27409074/converting-3d-position-to-2d-screen-position-r69
+function toScreenPosition(obj, camera, renderer){
+    var vector = new THREE.Vector3();
+
+    var widthHalf = 0.5*renderer.context.canvas.width;
+    var heightHalf = 0.5*renderer.context.canvas.height;
+
+    obj.updateMatrixWorld();
+    vector.setFromMatrixPosition(obj.matrixWorld);
+    vector.project(camera);
+
+    vector.x = ( vector.x * widthHalf ) + widthHalf;
+    vector.y = - ( vector.y * heightHalf ) + heightHalf;
+
+    return {
+        x: vector.x,
+        y: vector.y
+    };
+};
+
 module.exports = {
   scale,
   shuffle,
-  getLineIntersection
+  getLineIntersection,
+  toScreenPosition,
+  world2Screen
 }

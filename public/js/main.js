@@ -3,12 +3,12 @@ import * as THREE from "three";
 import StandardManager from "./system/StandardManager";
 import Capture from "./utilities/Capture";
 import Debug from "./utilities/Debug";
-import City from "./entities/City";
-import Camera from "./entities/Camera";
-import PointLight from "./entities/PointLight";
+import World from "./entities/World";
+import PerspectiveCamera from "./entities/PerspectiveCamera";
+import OrthographicCamera from "./entities/OrthographicCamera";
 
-let manager, debug, capturer, camera, light;
-let city;
+let manager, debug, capturer, p_cam, o_cam, light;
+let world;
 
 /*
   main.js is to assemble all of the entities for the scene.
@@ -22,7 +22,12 @@ const setup = () => {
   manager = new StandardManager();
   manager.gui.close();
 
-  city = new City(manager);
+  p_cam = new PerspectiveCamera(manager);
+  o_cam = new OrthographicCamera(manager);
+
+  manager.setCamera(o_cam);
+
+  world = new World(manager);
 
   debug = new Debug(manager, {
     stats: true,
@@ -54,6 +59,31 @@ const bindEventListeners = () => {
     manager.onWindowResize.bind(manager),
     false
   );
+
+  document.addEventListener(
+    "keydown",
+    onDocumentKeyDown,
+    false
+  );
+}
+
+const onDocumentKeyDown = (event) => {
+  let keyCode = event.which;
+
+  if(keyCode == 49){ // 1
+    manager.setCamera(o_cam);
+    p_cam.enable = false;
+    o_cam.enable = true;
+  }
+  if(keyCode == 50){ // 2
+    manager.setCamera(p_cam);
+    o_cam.enable = false;
+    p_cam.enable = true;
+  }
+  if(keyCode = 192){
+    p_cam.orbitControls.reset();
+    o_cam.orbitControls.reset();
+  }
 }
 
 setup();

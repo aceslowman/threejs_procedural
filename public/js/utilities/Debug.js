@@ -35,8 +35,6 @@ export default class asDebug{
         this.template.scene.remove(this.grid_z.helper);
       }
     });
-
-
   }
 
   assembleStats(){

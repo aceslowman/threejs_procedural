@@ -5,32 +5,42 @@ import SimplexNoise from "simplex-noise";
 import * as elevation from "../../shaders/elevation";
 
 export default class ProceduralTerrain{
-  constructor(city, options){
-    this.city = city;
+  constructor(world, options){
+    this.world = world;
     this.width = options.size[0];
     this.height = options.size[1];
     this.detail = options.detail;
-    this.elevation = options.elevation;
+    this.elevation = new ProceduralMap(this.world.manager, {
+        size: [256,256],
+        time: Math.random()*1000,
+        bSmooth: true,
+        map: [-1,1],
+        scale: [0.2,0.2],
+        offset: [0,0],
+        octaves: 8
+    });
     this.amplitude = options.amplitude;
+
+    this.verbose = false;
   }
 
   setup(){
     this.geometry = new THREE.PlaneBufferGeometry(
       this.width,
       this.height,
-      this.width * this.detail,
-      this.height * this.detail
+      this.detail,
+      this.detail
     );
 
     this.displace(this.elevation);
     this.generateMesh();
 
-    this.city.scene.add(this.mesh);
+    this.world.manager.scene.add(this.mesh);
   }
 
   setupDebug(){
     var helper = new THREE.Box3Helper( this.geometry.boundingBox, 0xffff00 );
-    this.city.scene.add( helper );
+    this.world.manager.scene.add( helper );
   }
 
   /**
@@ -98,7 +108,7 @@ export default class ProceduralTerrain{
     let h_h = (this.height/2);
 
     if(a.x >= h_w || a.x <= -h_w || a.y >= h_h || a.y <= -h_h){
-      console.warn('endpoint was out of bounds', a);
+      if(this.verbose)console.warn('endpoint was out of bounds', a);
       return false;
     }
 
