@@ -108,7 +108,6 @@ export default class ProceduralMap{
 
   }
 
-  // FIXME BREAKING PROBLEM, currently sampling far out of bounds
   getSample(x, y){
     const buffer = new Float32Array(4); // NOTE: can't use floats in Safari!
     if(x > this.width || y > this.height || x < 0 || y < 0) console.warn("sampling out of bounds")

@@ -92,9 +92,7 @@ export default class asStandardManager {
     /*
       render both the main scene, and the debug/ui over scene
     */
-    // this.renderer.clear();
     this.renderer.render(this.scene, this.camera.getCamera());
-    // this.renderer.clearDepth();
     this.renderer.render(this.overScene, this.ortho);
   }
 

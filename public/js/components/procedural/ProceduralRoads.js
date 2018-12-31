@@ -64,6 +64,9 @@ export default class ProceduralRoads {
     this.labels = [];
 
     this.verbose = true;
+
+    this.chooserID = null;
+    this.chooserObjects = [];
   }
 
   setup() {
@@ -80,17 +83,18 @@ export default class ProceduralRoads {
 
   setupPointsMesh() {
     let material = new THREE.PointsMaterial({
-      color: 'blue',
+      vertexColors: THREE.VertexColors,
       size: 12,
       sizeAttenuation: false,
       depthTest: false
     });
 
-    if (this.verbose) console.log("PLACED", this.placed);
-
     for (let a of this.placed) {
       this.pointsGeometry.vertices.push(a.node);
+      this.pointsGeometry.colors.push(new THREE.Color(0,0,1));
     }
+
+    this.pointsGeometry.colorsNeedUpdate = true;
 
     this.pointsMesh = new THREE.Points(this.pointsGeometry, material);
     this.world.manager.scene.add(this.pointsMesh);
@@ -113,7 +117,7 @@ export default class ProceduralRoads {
   }
 
   setupLineSegments() {
-    this.lineGeometry = new THREE.BufferGeometry();
+    let lineGeometry = new THREE.BufferGeometry();
     let points = [];
 
     for (let a of this.placed) {
@@ -124,12 +128,12 @@ export default class ProceduralRoads {
       }
     }
 
-    this.lineGeometry.addAttribute('position', new THREE.Float32BufferAttribute(points, 3));
-    this.lineMaterial = new THREE.LineBasicMaterial({
+    lineGeometry.addAttribute('position', new THREE.Float32BufferAttribute(points, 3));
+    let material = new THREE.LineBasicMaterial({
       color: 'yellow',
-      linewidth: 2
+      linewidth: 1.0
     });
-    this.lineSegmentsMesh = new THREE.LineSegments(this.lineGeometry, this.lineMaterial);
+    this.lineSegmentsMesh = new THREE.LineSegments(lineGeometry, material);
     this.world.manager.scene.add(this.lineSegmentsMesh);
   }
 
@@ -175,21 +179,56 @@ export default class ProceduralRoads {
     }
   }
 
-  setupDebug() {
-    // let div = document.createElement("div");
-    // div.classList.add("roadDebug");
-    //
-    // let ul = document.createElement("ul");
-    //
-    // let li = document.createElement("li");
-    // let num_nodes = document.createTextNode("Number of nodes in placed: "+this.placed.length);
-    // li.appendChild(num_nodes);
-    // ul.appendChild(li);
-    //
-    // div.appendChild(ul);
-    //
-    // document.body.appendChild(div);
+  updateSiblingDebug(mouse) {
+    let camera = this.world.manager.camera.getCamera();
 
+    this.world.raycaster.setFromCamera(mouse, camera);
+
+    let intersects = this.world.raycaster.intersectObject(this.pointsMesh, true);
+
+    if(intersects.length > 0){
+      if(this.chooserID != intersects[0].index){
+        this.chooserID = intersects[0].index;
+        this.pointsMesh.geometry.colors[this.chooserID] = new THREE.Color('orange');
+        this.pointsMesh.geometry.colorsNeedUpdate = true;
+
+        // create line to all siblings
+        for(let sib of this.placed[this.chooserID].siblings){
+          let geo = new THREE.Geometry();
+          geo.vertices.push(this.placed[this.chooserID].node, sib.node);
+          let line = new THREE.Line(geo, new THREE.LineBasicMaterial({
+            color: 'purple'
+          }));
+          this.chooserObjects.push(line);
+          this.world.manager.scene.add(line);
+        }
+        // create line to prev
+        // if(this.placed[this.chooserID].prev){
+        //   let geo = new THREE.Geometry();
+        //   geo.vertices.push(this.placed[this.chooserID].node, this.placed[this.chooserID].prev.node);
+        //   let line = new THREE.Line(geo, new THREE.LineBasicMaterial({
+        //     color: 'green'
+        //   }));
+        //   this.chooserObjects.push(line);
+        //   this.world.manager.scene.add(line);
+        // }
+      }
+  	}else{
+      if(this.chooserID != null){
+        this.pointsMesh.geometry.colors[this.chooserID] = new THREE.Color('blue');
+        this.pointsMesh.geometry.colorsNeedUpdate = true;
+        this.chooserID = null;
+
+        for(let l of this.chooserObjects){
+          this.world.manager.scene.remove(l);
+        }
+
+        this.chooserObjects = [];
+      }
+    }
+  }
+
+  setupDebug() {
     let table = {};
     table.number_in_placed = this.placed.length;
     table.number_in_crossings = this.crossings.length;
@@ -212,17 +251,13 @@ export default class ProceduralRoads {
 
       let a = this.pending[0];
 
-      // if(a.node.x == 0 && a.node.y == 0){
-      //
-      //   for(let p of this.pending){
-      //     console.warn("PENDING", p);
-      //   }
-      // }
-
       let accepted = this.localConstraints(a);
 
       if (accepted) {
-        if (a.prev) a.prev.siblings.push(a);
+        if (a.prev) {
+          a.prev.siblings.push(a);
+          a.siblings.push(a.prev); // TEMP: this is experimental
+        }
 
         this.placed.push(a);
         this.pending.shift();
@@ -230,10 +265,6 @@ export default class ProceduralRoads {
         let mode = 1;
 
         for (let b of this.globalGoals(a, mode)) {
-          // if(b.node.x == 0 && b.node.y == 0){
-          //   console.warn("WOAH OH NO", b);
-          // }
-
           this.pending.push(b);
         }
       } else {
@@ -293,7 +324,7 @@ export default class ProceduralRoads {
     if (!a.prev) return true;
 
     let crossings = this.checkForCrossings(a);
-    let dedupe = this.checkForDuplicates(a);
+    let dedupe = this.checkForDuplicates(a, 10);
 
     return dedupe;
   }
@@ -331,7 +362,14 @@ export default class ProceduralRoads {
       let match = crossings[0];
       this.crossings.push(match.location);
       a.node = match.location;
+
       // TODO: set siblings once a crossing is found
+      match.b.removeSibling(match.c);
+      match.c.removeSibling(match.b);
+      a.addSibling(match.b);
+      a.addSibling(match.c);
+      match.b.addSibling(a);
+      match.c.addSibling(a);
 
       return true;
     }
@@ -343,26 +381,27 @@ export default class ProceduralRoads {
    * Checks for any roads that duplicate the end point of Road a. If there is a
    * duplicate, a will be rejected, and a.prev will be bound to the match.
    * @param {Road} a - the current road, recently having passed localConstraints.
+   * @param {Float} thresh - how far a node can be for being merged.
    * @returns {Bool} returns success value.
    *
-   * FIXME: Appears that there might still be duplicates at the end.
    */
-  checkForDuplicates(a) {
+  checkForDuplicates(a, thresh) {
     let ok = true;
 
     for (let b of this.placed) {
-      if (b.prev) {
-        if (a.node.distanceTo(b.node) == 0) {
-          a.prev.addSibling(b);
+      if (a.node.distanceTo(b.node) <= thresh) {
+        a.prev.addSibling(b); // a is still orphaned in some places...
+        b.addSibling(a.prev);
 
-          for (let sib in a.siblings) {
-            b.addSibling(sib);
-          }
-
-          if (this.verbose) console.warn("duplicate found, a has failed.");
-          ok = false;
-          break;
+        for (let sib of a.siblings) {
+          b.addSibling(sib);
+          sib.addSibling(b);
+          sib.removeSibling(a);
         }
+
+        if (this.verbose) console.warn("duplicate found, a has failed.");
+        ok = false;
+        break;
       }
     }
 
@@ -380,9 +419,9 @@ export default class ProceduralRoads {
 
     switch (mode) {
       case 0:
-        return this.angleGoal(a, 20, 90);
+        return this.angleGoal(a, 0, 90);
       case 1:
-        return this.populationGoal(a, 30);
+        return this.populationGoal(a, 90);
     }
   }
 
@@ -491,10 +530,10 @@ export default class ProceduralRoads {
             let samp = ray.at((1.0 / numSample) * k);
 
             if (this.terrain.globalBoundsCheck(samp)) {
-              let xcoord = ((samp.x + this.terrain.width/2) / this.terrain.width); //normalized 0-1
+              let xcoord = ((samp.x + this.terrain.width / 2) / this.terrain.width); //normalized 0-1
               xcoord *= this.population.width;
 
-              let ycoord = ((samp.y + this.terrain.height/2) / this.terrain.height); //normalized 0-1
+              let ycoord = ((samp.y + this.terrain.height / 2) / this.terrain.height); //normalized 0-1
               ycoord *= this.population.height;
 
               // NOTE VERY POSSIBLE THIS IS SOLVED
@@ -505,7 +544,7 @@ export default class ProceduralRoads {
             }
           }
 
-          if(raySum > highestSum){
+          if (raySum > highestSum) {
             highestSum = raySum;
             final_ray = ray;
           }
@@ -514,7 +553,7 @@ export default class ProceduralRoads {
         const endpoint = final_ray.at(1); // BAD
 
         if (this.terrain.globalBoundsCheck(endpoint)) {
-          if(endpoint.x == 0 && endpoint.y == 0){
+          if (endpoint.x == 0 && endpoint.y == 0) {
             console.error("Major failure, you may be incorrectly sampling the population map.", endpoint);
           }
 
@@ -547,6 +586,10 @@ export default class ProceduralRoads {
     return t_pending;
   }
 
+  /**
+   * Uses finished road system to generate building 'blocks', which are to be
+   * divided into lots.
+   */
   buildBlocks() {
     for (let i = 0; i < this.placed.length; i++) {
       let geometry = new THREE.BufferGeometry();
@@ -556,93 +599,104 @@ export default class ProceduralRoads {
       let first = this.placed[i];
       let next = first;
 
-      let left = null;
-
-      let j = 0;
+      let j = 0; // TEMP
 
       do {
-        for (let sib of next.siblings) {
-          if (next.prev) {
-            let a = next.prev.node;
-            let b = next.node;
-            let p = sib.node;
-
-
-            /*
-            dy = ey - cy
-            dx = ex - cx
-            theta = arctan(dy/dx)
-            theta *= 180/pi // rads to degs
-
-            https://stackoverflow.com/questions/9614109/how-to-calculate-an-angle-from-points
-            */
-
-
-
-
-
-            let t_left = (p.x - a.x) * (b.y - a.y) - (p.y - a.y) * (b.x - a.x);
-
-            if (t_left >= left || !left) {
-              console.log("one found further left");
-
-              left = t_left;
-              next = sib;
-            }
-
-
-
-
-
-
-
-
-          } else {
-            console.log('hit');
-            next = next.siblings[0];
-            break;
-          }
-        }
-
-        console.log("NEXT", next);
         t_vertices.push(next.node.x, next.node.y, next.node.z);
 
-        j++; //TEMP
-        if (j == 10) break; // TEMP
+        if(next.siblings.length == 0){
+            console.warn("No more siblings! Ending.");
+            break;
+        }
 
-      } while (first != next);
+        // try sorting by dot product...
+        next.siblings.sort((a,b)=>{
+          let dot_a = (next.x * a.x) + (next.y * a.y);
+          let dot_b = (next.x * b.x) + (next.y * b.y);
+
+          return dot_a - dot_b;
+        });
+
+        console.log("SIBLINGS", next.siblings);
+
+        if(next.prev != next.siblings[0]){
+          next = next.siblings[0]; // choose leftmost
+        }else{
+          next = next.siblings[1]; // choose next leftmost
+        }
+
+
+        // it keeps going back over the same 'next'
+        // for (let sib of next.siblings) {
+        //   if(sib == next.prev) continue; // don't check on prev
+        //
+        //
+        //
+        //   /*
+        //   function angle(cx, cy, ex, ey) {
+        //     var dy = ey - cy;
+        //     var dx = ex - cx;
+        //     var theta = Math.atan2(dy, dx); // range (-PI, PI]
+        //     theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
+        //     //if (theta < 0) theta = 360 + theta; // range [0, 360)
+        //     return theta;
+        //   }
+        //
+        //   https://stackoverflow.com/questions/9614109/how-to-calculate-an-angle-from-points
+        //   */
+        //   let a = next.node;
+        //   let b = sib.node;
+        //
+        //   let t_theta = Math.atan2(b.y - a.y, b.x - a.x);
+        //
+        //   console.log("ATAN2", t_theta);
+        //
+        //   if (theta == null) theta = t_theta;
+        //
+        //   if (t_theta < theta) {
+        //     console.log("one found further left");
+        //
+        //     theta = t_theta;
+        //     next = sib;
+        //
+        //     // dont break! I have to check every sibling...
+        //   }
+        // }
+
+        j++; //TEMP
+        if (j == 500) break; // TEMP
+
+      } while (first != next); // and while next still has siblings!
 
       let vertices = new Float32Array(t_vertices); // NOTE: EMPTY
 
       geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
 
+      /* SETUP BLOCK DISPLAY */
       let material = new THREE.MeshBasicMaterial({
-        'wireframe': true,
-        'color': 'green'
+        'color': 'white'
       });
-      let mesh = new THREE.Mesh(geometry, material);
-
-      this.world.manager.scene.add(mesh);
-
-      /* FOR DEBUG */
-      console.log("COUNT", geometry);
-
-      /*
-        after first iteration, all subsequent points inserted into the geometry
-        are duplicates. FIXME
-      */
+      let line_material = new THREE.LineBasicMaterial({
+        color: 'green',
+        linewidth: 3.0,
+      });
       let point_material = new THREE.PointsMaterial({
         color: 'green',
         size: 14,
         sizeAttenuation: false,
         depthTest: false
       });
+
+      // let mesh = new THREE.Mesh(geometry, material);
+      let line_mesh = new THREE.Line(geometry, line_material);
       let point_mesh = new THREE.Points(geometry, point_material);
 
+      // this.world.manager.scene.add(mesh);
+      this.world.manager.scene.add(line_mesh);
       this.world.manager.scene.add(point_mesh);
       /* */
 
-      break;
+      break; // DEBUG
     }
   }
 }
