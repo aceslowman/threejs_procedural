@@ -19,7 +19,11 @@ class Road {
   }
 
   addSibling(a) {
-    this.siblings.push(a);
+    if(!this.siblings.includes(a) && a != this){
+      this.siblings.push(a);
+    }else{
+      console.warn('attempted to add a duplicate sibling');
+    }
   }
 
   removeSibling(a) {
@@ -67,6 +71,8 @@ export default class ProceduralRoads {
 
     this.chooserID = null;
     this.chooserObjects = [];
+
+    this.debugArrows = [];
   }
 
   setup() {
@@ -255,11 +261,12 @@ export default class ProceduralRoads {
 
       if (accepted) {
         if (a.prev) {
-          a.prev.siblings.push(a);
-          a.siblings.push(a.prev); // TEMP: this is experimental
+          a.prev.addSibling(a);
+          a.addSibling(a.prev); // TEMP: this is experimental
         }
 
         this.placed.push(a);
+        a.id = this.placed.length - 1;
         this.pending.shift();
 
         let mode = 1;
@@ -390,6 +397,8 @@ export default class ProceduralRoads {
 
     for (let b of this.placed) {
       if (a.node.distanceTo(b.node) <= thresh) {
+        // NOTE
+
         a.prev.addSibling(b); // a is still orphaned in some places...
         b.addSibling(a.prev);
 
@@ -597,76 +606,121 @@ export default class ProceduralRoads {
       let t_vertices = [];
 
       let first = this.placed[i];
-      let next = first;
+
+      let prev  = first.siblings[0];
+      let next  = first;
 
       let j = 0; // TEMP
 
+      t_vertices.push(next.node.x, next.node.y, next.node.z);
+
+
+
       do {
-        t_vertices.push(next.node.x, next.node.y, next.node.z);
+        if(next.siblings.length <= 1) break;
 
-        if(next.siblings.length == 0){
-            console.warn("No more siblings! Ending.");
-            break;
-        }
+        let direction = new THREE.Vector3().subVectors(next.node, prev.node).normalize();
 
-        // try sorting by dot product...
-        next.siblings.sort((a,b)=>{
-          let dot_a = (next.x * a.x) + (next.y * a.y);
-          let dot_b = (next.x * b.x) + (next.y * b.y);
+        let a = prev.node.x - next.node.x;
+        let b = prev.node.y - next.node.y;
+        let length = Math.sqrt( a*a + b*b );
 
-          return dot_a - dot_b;
+        let arrow = new THREE.ArrowHelper(direction, prev.node, length, 'pink', 5.0, 5.0);
+        this.debugArrows.push(arrow);
+
+        next.siblings.sort((a, b)=>{
+          /*
+            What I think is going on
+
+              angleTo cannot differentiate between a positive or negative angle
+              two roads that branch in near opposite directions will have near
+              identical angles.
+
+              trying this:
+              https://stackoverflow.com/questions/2663570/how-to-calculate-both-positive-and-negative-angle-between-two-lines
+
+              I still don't think its quite there.
+          */
+
+            // TODO: USE NORMALIZED UNIT VECTORS!!!
+
+          let n_a = a.node.clone().normalize();
+          let n_b = b.node.clone().normalize();
+
+          let n_next = next.node.clone().normalize();
+          let n_prev = prev.node.clone().normalize();
+
+          // prev->next
+          let _a = n_next.x - n_prev.x;
+          let _b = n_next.y - n_prev.y;
+
+          // next->a
+          let _c = n_a.x - n_next.x;
+          let _d = n_a.y - n_next.y;
+
+          // next->b
+          let _e = n_b.x - n_next.x;
+          let _f = n_b.y - n_next.y;
+
+          let atan = Math.atan2(_a, _b);
+          let atanA = Math.atan2(_c, _d);
+          let atanB = Math.atan2(_e, _f);
+
+          // a.angle = Math.abs(atan - atanA);
+          // b.angle = Math.abs(atan - atanB);
+
+          a.angle = atan - atanA;
+          b.angle = atan - atanB;
+
+          a.left = Math.sign(a.angle) == -1 ? true : false;
+          b.left = Math.sign(b.angle) == -1 ? true : false;
+
+          // return (b.angle * b.left) - (a.angle * a.left); // desc
+
         });
 
-        console.log("SIBLINGS", next.siblings);
+        console.group("CHECK");
+        console.log("Currently pointing from r" + prev.id + " to r" + next.id);
+        console.log("The current options are: ");
 
-        if(next.prev != next.siblings[0]){
-          next = next.siblings[0]; // choose leftmost
+        console.group("r" + next.id + " siblings");
+        for(let sib of next.siblings){
+          if(sib.left){
+            console.log(sib.id + " to the left " + sib.angle)
+          }else{
+            console.log(sib.id + " to the right " + sib.angle)
+          }
+        }
+        console.groupEnd();
+
+        if(next.siblings[0] != prev){
+          console.log("the chosen road was r" + next.siblings[0].id);
+          prev = next;
+          next = next.siblings[0];
         }else{
-          next = next.siblings[1]; // choose next leftmost
+          console.log("the chosen road was r" + next.siblings[1].id);
+          prev = next;
+          next = next.siblings[1];
         }
 
 
-        // it keeps going back over the same 'next'
-        // for (let sib of next.siblings) {
-        //   if(sib == next.prev) continue; // don't check on prev
-        //
-        //
-        //
-        //   /*
-        //   function angle(cx, cy, ex, ey) {
-        //     var dy = ey - cy;
-        //     var dx = ex - cx;
-        //     var theta = Math.atan2(dy, dx); // range (-PI, PI]
-        //     theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
-        //     //if (theta < 0) theta = 360 + theta; // range [0, 360)
-        //     return theta;
-        //   }
-        //
-        //   https://stackoverflow.com/questions/9614109/how-to-calculate-an-angle-from-points
-        //   */
-        //   let a = next.node;
-        //   let b = sib.node;
-        //
-        //   let t_theta = Math.atan2(b.y - a.y, b.x - a.x);
-        //
-        //   console.log("ATAN2", t_theta);
-        //
-        //   if (theta == null) theta = t_theta;
-        //
-        //   if (t_theta < theta) {
-        //     console.log("one found further left");
-        //
-        //     theta = t_theta;
-        //     next = sib;
-        //
-        //     // dont break! I have to check every sibling...
-        //   }
-        // }
+        console.groupEnd();
 
-        j++; //TEMP
-        if (j == 500) break; // TEMP
+        t_vertices.push(next.node.x, next.node.y, next.node.z);
 
+        j++;
+        if(j > 1000) break;
+        if(first == next) console.log("BIG BREAK!");
+        if(!next) console.warn("there is no next, (BAD HIT)");
       } while (first != next); // and while next still has siblings!
+
+
+
+
+
+
+
+
 
       let vertices = new Float32Array(t_vertices); // NOTE: EMPTY
 
@@ -678,7 +732,7 @@ export default class ProceduralRoads {
       });
       let line_material = new THREE.LineBasicMaterial({
         color: 'green',
-        linewidth: 3.0,
+        linewidth: 1.0,
       });
       let point_material = new THREE.PointsMaterial({
         color: 'green',
@@ -694,7 +748,11 @@ export default class ProceduralRoads {
       // this.world.manager.scene.add(mesh);
       this.world.manager.scene.add(line_mesh);
       this.world.manager.scene.add(point_mesh);
-      /* */
+
+      for(let arrow of this.debugArrows){
+        this.world.manager.scene.add(arrow);
+      }
+      /* END BLOCK DISPLAY */
 
       break; // DEBUG
     }
