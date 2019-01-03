@@ -2,6 +2,7 @@ import * as THREE from "three";
 import * as ASMATH from "../../utilities/Math";
 import ProceduralMap from './ProceduralMap';
 import TessellateModifier from "../../utilities/modifiers/TesselateModifier";
+import { Earcut } from '../../../../node_modules/three/src/extras/Earcut.js';
 
 class Block {
   constructor() {
@@ -603,80 +604,49 @@ export default class ProceduralRoads {
     for (let i = 0; i < this.placed.length; i++) {
       let geometry = new THREE.BufferGeometry();
 
-      let t_vertices = [];
+      let contour = [];
 
       let first = this.placed[i];
 
       let prev  = first.siblings[0];
       let next  = first;
 
-      let j = 0; // TEMP
+      let j = 0;
+      let terminated = false;
 
-      t_vertices.push(next.node.x, next.node.y, next.node.z);
-
-
+      contour.push(next.node.x, next.node.y, next.node.z);
 
       do {
-        if(next.siblings.length <= 1) break;
+        if(next.siblings.length <= 1){
+          terminated = true;
+          console.log("chain ended without return");
+          break;
+        }
 
         let direction = new THREE.Vector3().subVectors(next.node, prev.node).normalize();
+        let reverse_direction = new THREE.Vector3().subVectors(prev.node, next.node).normalize();
 
         let a = prev.node.x - next.node.x;
         let b = prev.node.y - next.node.y;
         let length = Math.sqrt( a*a + b*b );
 
-        let arrow = new THREE.ArrowHelper(direction, prev.node, length, 'pink', 5.0, 5.0);
+        let arrow = new THREE.ArrowHelper(direction, prev.node, length, 'red', 5.0, 5.0);
         this.debugArrows.push(arrow);
 
         next.siblings.sort((a, b)=>{
-          /*
-            What I think is going on
+          // NOTE: after much trial and error, this seems to work.
+          //https://stackoverflow.com/questions/21483999/using-atan2-to-find-angle-between-two-vectors/21486462
 
-              angleTo cannot differentiate between a positive or negative angle
-              two roads that branch in near opposite directions will have near
-              identical angles.
+          let v_a = new THREE.Vector3().subVectors(a.node, next.node).normalize();
+          let v_b = new THREE.Vector3().subVectors(b.node, next.node).normalize();
 
-              trying this:
-              https://stackoverflow.com/questions/2663570/how-to-calculate-both-positive-and-negative-angle-between-two-lines
+          a.angle = Math.atan2(v_a.y, v_a.x) - Math.atan2(reverse_direction.y, reverse_direction.x);
+          if (a.angle < 0) a.angle += 2 * Math.PI;
 
-              I still don't think its quite there.
-          */
+          b.angle = Math.atan2(v_b.y, v_b.x) - Math.atan2(reverse_direction.y, reverse_direction.x);
+          if (b.angle < 0) b.angle += 2 * Math.PI;
 
-            // TODO: USE NORMALIZED UNIT VECTORS!!!
-
-          let n_a = a.node.clone().normalize();
-          let n_b = b.node.clone().normalize();
-
-          let n_next = next.node.clone().normalize();
-          let n_prev = prev.node.clone().normalize();
-
-          // prev->next
-          let _a = n_next.x - n_prev.x;
-          let _b = n_next.y - n_prev.y;
-
-          // next->a
-          let _c = n_a.x - n_next.x;
-          let _d = n_a.y - n_next.y;
-
-          // next->b
-          let _e = n_b.x - n_next.x;
-          let _f = n_b.y - n_next.y;
-
-          let atan = Math.atan2(_a, _b);
-          let atanA = Math.atan2(_c, _d);
-          let atanB = Math.atan2(_e, _f);
-
-          // a.angle = Math.abs(atan - atanA);
-          // b.angle = Math.abs(atan - atanB);
-
-          a.angle = atan - atanA;
-          b.angle = atan - atanB;
-
-          a.left = Math.sign(a.angle) == -1 ? true : false;
-          b.left = Math.sign(b.angle) == -1 ? true : false;
-
-          // return (b.angle * b.left) - (a.angle * a.left); // desc
-
+          return b.angle - a.angle;
         });
 
         console.group("CHECK");
@@ -685,11 +655,8 @@ export default class ProceduralRoads {
 
         console.group("r" + next.id + " siblings");
         for(let sib of next.siblings){
-          if(sib.left){
-            console.log(sib.id + " to the left " + sib.angle)
-          }else{
-            console.log(sib.id + " to the right " + sib.angle)
-          }
+          if(sib == prev) continue
+          console.log(sib.id + " @ " + (sib.angle * (180/Math.PI)));
         }
         console.groupEnd();
 
@@ -702,33 +669,55 @@ export default class ProceduralRoads {
           prev = next;
           next = next.siblings[1];
         }
-
-
         console.groupEnd();
 
-        t_vertices.push(next.node.x, next.node.y, next.node.z);
+        contour.push(next.node.x, next.node.y, next.node.z);
 
         j++;
-        if(j > 1000) break;
+        if(j > 1000) break; // TEMP
         if(first == next) console.log("BIG BREAK!");
         if(!next) console.warn("there is no next, (BAD HIT)");
       } while (first != next); // and while next still has siblings!
 
+      if(terminated) continue; // skip if it doesn't fully enclose //TEMP commented out
 
+      let vertices = [];
 
+      let t_vertices = contour.slice(0);
 
+      for(let v = 2; v <= t_vertices.length; v+=2){
+        t_vertices.splice(v, 1);
+      }
 
+      let triangles = Earcut.triangulate(t_vertices);
 
+      for(let t = 0; t < triangles.length; t++){
+        let ind = triangles[t] * 3
+        vertices.push(contour[ind]);
+        vertices.push(contour[ind + 1]);
+        vertices.push(contour[ind + 2]);
+      }
 
+      // I need the vertices to match at least ONE of the contour
+      // vertices is just shuffled.
 
+      vertices = new Float32Array(vertices);
 
-      let vertices = new Float32Array(t_vertices); // NOTE: EMPTY
+      console.group();
+      console.log("TRIANGLES", triangles);
+      console.log("CONTOUR", contour);
+      console.log("T VERTICES", t_vertices);
+      console.log("VERTICES", vertices);
+      console.groupEnd();
 
       geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
 
       /* SETUP BLOCK DISPLAY */
       let material = new THREE.MeshBasicMaterial({
-        'color': 'white'
+        'color': new THREE.Color(0xffffff).setHex(Math.random() * 0xffffff),
+        'transparent': true,
+        'opacity': 0.8,
+        // 'wireframe': true
       });
       let line_material = new THREE.LineBasicMaterial({
         color: 'green',
@@ -741,20 +730,20 @@ export default class ProceduralRoads {
         depthTest: false
       });
 
-      // let mesh = new THREE.Mesh(geometry, material);
+      let mesh = new THREE.Mesh(geometry, material);
       let line_mesh = new THREE.Line(geometry, line_material);
       let point_mesh = new THREE.Points(geometry, point_material);
 
-      // this.world.manager.scene.add(mesh);
-      this.world.manager.scene.add(line_mesh);
-      this.world.manager.scene.add(point_mesh);
+      this.world.manager.scene.add(mesh);
+      // this.world.manager.scene.add(line_mesh);
+      // this.world.manager.scene.add(point_mesh);
 
       for(let arrow of this.debugArrows){
         this.world.manager.scene.add(arrow);
       }
       /* END BLOCK DISPLAY */
 
-      break; // DEBUG
+      // break; // DEBUG
     }
   }
 }
