@@ -1,12 +1,14 @@
 import * as THREE from "three";
 import * as ASMATH from "../../utilities/Math";
 import ProceduralMap from './ProceduralMap';
-import TessellateModifier from "../../utilities/modifiers/TesselateModifier";
 import { Earcut } from '../../../../node_modules/three/src/extras/Earcut.js';
 
 class Block {
   constructor() {
-    this.polygon = new THREE.Mesh();
+    this.mesh    = new THREE.Mesh();
+    this.contour = new THREE.Mesh();
+    this.points  = new THREE.Points();
+    this.arrows  = [];
   }
 }
 
@@ -47,55 +49,48 @@ class Crossing {
 
 export default class ProceduralRoads {
   constructor(world, options) {
-    this.world = world;
-    this.terrain = options.terrain;
+    this.world      = world;
+    this.terrain    = options.terrain;
     this.population = this.terrain.elevation;
 
-    this.placed = [];
-    this.pending = [];
+    this.placed    = [];
+    this.pending   = [];
     this.crossings = [];
-    this.blocks = [];
+    this.blocks    = [];
 
-    this.road_limit = 50;
+    this.road_limit  = 50;
     this.road_scalar = 50;
 
-    this.pointsGeometry = new THREE.Geometry();
+    this.pointsGeometry    = new THREE.Geometry();
     this.crossingsGeometry = new THREE.Geometry();
 
-    this.pointsMesh = new THREE.Points();
-    this.crossingsMesh = new THREE.Points();
+    this.pointsMesh       = new THREE.Points();
+    this.crossingsMesh    = new THREE.Points();
     this.lineSegmentsMesh = new THREE.LineSegments();
 
-    this.labels = [];
+    this.labels  = [];
 
     this.verbose = true;
 
-    this.chooserID = null;
+    this.chooserID      = null;
     this.chooserObjects = [];
 
-    this.debugArrows = [];
+    this.blocks = [];
   }
 
   setup() {
+    // ROADS
     this.buildRoads();
     this.postBuildRoads();
 
-    this.setupLineSegments();
-    this.setupPointsMesh();
-    this.setupCrossingsMesh();
-    this.setupDebugNumbers();
-
+    // BLOCKS
     this.buildBlocks();
+
+    this.setupMeshes();
+    this.setupDebugNumbers();
   }
 
-  setupPointsMesh() {
-    let material = new THREE.PointsMaterial({
-      vertexColors: THREE.VertexColors,
-      size: 12,
-      sizeAttenuation: false,
-      depthTest: false
-    });
-
+  setupMeshes(){
     for (let a of this.placed) {
       this.pointsGeometry.vertices.push(a.node);
       this.pointsGeometry.colors.push(new THREE.Color(0,0,1));
@@ -103,28 +98,24 @@ export default class ProceduralRoads {
 
     this.pointsGeometry.colorsNeedUpdate = true;
 
-    this.pointsMesh = new THREE.Points(this.pointsGeometry, material);
-    this.world.manager.scene.add(this.pointsMesh);
-  }
-
-  setupCrossingsMesh() {
-    let material = new THREE.PointsMaterial({
-      color: 'red',
-      size: 7,
+    this.pointsMesh = new THREE.Points(this.pointsGeometry, new THREE.PointsMaterial({
+      vertexColors: THREE.VertexColors,
+      size: 12,
       sizeAttenuation: false,
       depthTest: false
-    });
+    }));
 
     for (let a of this.crossings) {
       this.crossingsGeometry.vertices.push(a);
     }
 
-    this.crossingsMesh = new THREE.Points(this.crossingsGeometry, material);
-    this.world.manager.scene.add(this.crossingsMesh);
-  }
+    this.crossingsMesh = new THREE.Points(this.crossingsGeometry, new THREE.PointsMaterial({
+      color: 'red',
+      size: 7,
+      sizeAttenuation: false,
+      depthTest: false
+    }));
 
-  setupLineSegments() {
-    let lineGeometry = new THREE.BufferGeometry();
     let points = [];
 
     for (let a of this.placed) {
@@ -135,13 +126,27 @@ export default class ProceduralRoads {
       }
     }
 
+    let lineGeometry = new THREE.BufferGeometry();
     lineGeometry.addAttribute('position', new THREE.Float32BufferAttribute(points, 3));
-    let material = new THREE.LineBasicMaterial({
-      color: 'yellow',
-      linewidth: 1.0
-    });
-    this.lineSegmentsMesh = new THREE.LineSegments(lineGeometry, material);
+
+    this.lineSegmentsMesh = new THREE.LineSegments(lineGeometry, new THREE.LineBasicMaterial({
+      color: 'white',
+      linewidth: 2.0,
+      depthTest: false
+    }));
+
+    for(let block of this.blocks){
+      this.world.manager.scene.add(block.mesh);
+      // this.world.manager.scene.add(block.contour);
+      // this.world.manager.scene.add(block.points);
+      // for(let arrow of block.arrows){
+      //   this.world.manager.scene.add(arrow);
+      // }
+    }
+
     this.world.manager.scene.add(this.lineSegmentsMesh);
+    this.world.manager.scene.add(this.pointsMesh);
+    this.world.manager.scene.add(this.crossingsMesh);
   }
 
   setupDebugNumbers() {
@@ -186,7 +191,7 @@ export default class ProceduralRoads {
     }
   }
 
-  updateSiblingDebug(mouse) {
+  updateRoadChooser(mouse) {
     let camera = this.world.manager.camera.getCamera();
 
     this.world.raycaster.setFromCamera(mouse, camera);
@@ -231,6 +236,34 @@ export default class ProceduralRoads {
         }
 
         this.chooserObjects = [];
+      }
+    }
+  }
+
+  updateBlockChooser(mouse){
+    let camera = this.world.manager.camera.getCamera();
+
+    this.world.raycaster.setFromCamera(mouse, camera);
+
+    let objects = [];
+
+    for(let block of this.blocks){
+      objects.push(block.mesh);
+    }
+
+    let intersects = this.world.raycaster.intersectObjects(objects, true);
+
+    if(intersects.length > 0){
+      console.log("CHOOSER", intersects);
+      if(this.chooserID != intersects[0].index){
+        this.chooserID = intersects[0].index;
+        this.chooserColor = intersects[0].object.material.color;
+        intersects[0].object.material.color = new THREE.Color('orange');
+      }
+    }else{
+      if(this.chooserID != null){
+        intersects[0].object.material.color = this.chooserColor;
+        this.chooserID = null;
       }
     }
   }
@@ -602,6 +635,8 @@ export default class ProceduralRoads {
    */
   buildBlocks() {
     for (let i = 0; i < this.placed.length; i++) {
+      let block = new Block();
+
       let geometry = new THREE.BufferGeometry();
 
       let contour = [];
@@ -619,7 +654,7 @@ export default class ProceduralRoads {
       do {
         if(next.siblings.length <= 1){
           terminated = true;
-          console.log("chain ended without return");
+          // console.log("chain ended without return");
           break;
         }
 
@@ -631,8 +666,9 @@ export default class ProceduralRoads {
         let length = Math.sqrt( a*a + b*b );
 
         let arrow = new THREE.ArrowHelper(direction, prev.node, length, 'red', 5.0, 5.0);
-        this.debugArrows.push(arrow);
+        block.arrows.push(arrow);
 
+        /********************** SORT BY LEFTMOST SIBLING **********************/
         next.siblings.sort((a, b)=>{
           // NOTE: after much trial and error, this seems to work.
           //https://stackoverflow.com/questions/21483999/using-atan2-to-find-angle-between-two-vectors/21486462
@@ -649,23 +685,23 @@ export default class ProceduralRoads {
           return b.angle - a.angle;
         });
 
-        console.group("CHECK");
-        console.log("Currently pointing from r" + prev.id + " to r" + next.id);
-        console.log("The current options are: ");
-
-        console.group("r" + next.id + " siblings");
-        for(let sib of next.siblings){
-          if(sib == prev) continue
-          console.log(sib.id + " @ " + (sib.angle * (180/Math.PI)));
-        }
-        console.groupEnd();
+        // console.group("CHECK");
+        // console.log("Currently pointing from r" + prev.id + " to r" + next.id);
+        // console.log("The current options are: ");
+        //
+        // console.group("r" + next.id + " siblings");
+        // for(let sib of next.siblings){
+        //   if(sib == prev) continue
+        //   console.log(sib.id + " @ " + (sib.angle * (180/Math.PI)));
+        // }
+        // console.groupEnd();
 
         if(next.siblings[0] != prev){
-          console.log("the chosen road was r" + next.siblings[0].id);
+          // console.log("the chosen road was r" + next.siblings[0].id);
           prev = next;
           next = next.siblings[0];
         }else{
-          console.log("the chosen road was r" + next.siblings[1].id);
+          // console.log("the chosen road was r" + next.siblings[1].id);
           prev = next;
           next = next.siblings[1];
         }
@@ -675,12 +711,13 @@ export default class ProceduralRoads {
 
         j++;
         if(j > 1000) break; // TEMP
-        if(first == next) console.log("BIG BREAK!");
-        if(!next) console.warn("there is no next, (BAD HIT)");
+        // if(first == next) console.log("BIG BREAK!");
+        // if(!next) console.warn("there is no next, (BAD HIT)");
       } while (first != next); // and while next still has siblings!
 
-      if(terminated) continue; // skip if it doesn't fully enclose //TEMP commented out
+      if(terminated) continue;
 
+      /*************************** TRIANGULATE MESH ***************************/
       let vertices = [];
 
       let t_vertices = contour.slice(0);
@@ -698,52 +735,30 @@ export default class ProceduralRoads {
         vertices.push(contour[ind + 2]);
       }
 
-      // I need the vertices to match at least ONE of the contour
-      // vertices is just shuffled.
-
       vertices = new Float32Array(vertices);
-
-      console.group();
-      console.log("TRIANGLES", triangles);
-      console.log("CONTOUR", contour);
-      console.log("T VERTICES", t_vertices);
-      console.log("VERTICES", vertices);
-      console.groupEnd();
 
       geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
 
-      /* SETUP BLOCK DISPLAY */
-      let material = new THREE.MeshBasicMaterial({
+      /**************************** SETUP DISPLAY *****************************/
+      block.mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
         'color': new THREE.Color(0xffffff).setHex(Math.random() * 0xffffff),
         'transparent': true,
-        'opacity': 0.8,
-        // 'wireframe': true
-      });
-      let line_material = new THREE.LineBasicMaterial({
+        'opacity': 0.6
+      }));
+
+      block.contour = new THREE.Line(geometry, new THREE.LineBasicMaterial({
         color: 'green',
         linewidth: 1.0,
-      });
-      let point_material = new THREE.PointsMaterial({
+      }));
+
+      block.points = new THREE.Points(geometry, new THREE.PointsMaterial({
         color: 'green',
         size: 14,
         sizeAttenuation: false,
         depthTest: false
-      });
+      }));
 
-      let mesh = new THREE.Mesh(geometry, material);
-      let line_mesh = new THREE.Line(geometry, line_material);
-      let point_mesh = new THREE.Points(geometry, point_material);
-
-      this.world.manager.scene.add(mesh);
-      // this.world.manager.scene.add(line_mesh);
-      // this.world.manager.scene.add(point_mesh);
-
-      for(let arrow of this.debugArrows){
-        this.world.manager.scene.add(arrow);
-      }
-      /* END BLOCK DISPLAY */
-
-      // break; // DEBUG
+      this.blocks.push(block);
     }
   }
 }
