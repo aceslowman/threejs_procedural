@@ -33,7 +33,7 @@ export default class World{
   }
 
   update(){
-    this.world.roads.updateDebugNumbers();
+    this.world.roads.updateDebug();
   }
 
   addToScene(){
