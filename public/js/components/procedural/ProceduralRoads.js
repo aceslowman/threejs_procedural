@@ -1,24 +1,31 @@
 import * as THREE from "three";
+import { MeshLine, MeshLineMaterial } from "three.meshline";
 import * as ASMATH from "../../utilities/Math";
 import ProceduralMap from './ProceduralMap';
 import { Earcut } from '../../../../node_modules/three/src/extras/Earcut.js';
 
 class Block {
   constructor() {
+    this.id      = null;
     this.mesh    = new THREE.Mesh();
     this.contour = new THREE.Mesh();
     this.points  = new THREE.Points();
     this.arrows  = [];
+
+    this.mesh_color = new THREE.Color(0xffffff).setHex(Math.random() * 0xffffff);
   }
 }
 
 class Road {
   constructor(it, prev, end) {
-    this.node = end;
-    this.prev = prev;
+    this.id       = null;
+    this.node     = end;
+    this.prev     = prev;
     this.siblings = [];
 
-    this.it = it;
+    this.it       = it;
+
+    this.chosen   = false;
   }
 
   addSibling(a) {
@@ -72,7 +79,9 @@ export default class ProceduralRoads {
 
     this.verbose = true;
 
-    this.chooserID      = null;
+    this.road_chooser_id = null;
+    this.block_chooser_id = null;
+
     this.chooserObjects = [];
 
     this.blocks = [];
@@ -129,13 +138,17 @@ export default class ProceduralRoads {
     let lineGeometry = new THREE.BufferGeometry();
     lineGeometry.addAttribute('position', new THREE.Float32BufferAttribute(points, 3));
 
+    // RETURN HERE
     this.lineSegmentsMesh = new THREE.LineSegments(lineGeometry, new THREE.LineBasicMaterial({
-      color: 'white',
+      color: 'black',
       linewidth: 2.0,
       depthTest: false
     }));
 
+    this.lineSegmentsMesh.renderOrder = 30;
+
     for(let block of this.blocks){
+      block.mesh.renderOrder = 25;
       this.world.manager.scene.add(block.mesh);
       // this.world.manager.scene.add(block.contour);
       // this.world.manager.scene.add(block.points);
@@ -143,6 +156,9 @@ export default class ProceduralRoads {
       //   this.world.manager.scene.add(arrow);
       // }
     }
+
+    this.pointsMesh.renderOrder = 100;
+    this.crossingsMesh.renderOrder = 100;
 
     this.world.manager.scene.add(this.lineSegmentsMesh);
     this.world.manager.scene.add(this.pointsMesh);
@@ -156,14 +172,6 @@ export default class ProceduralRoads {
       let cont = document.createElement("div");
       let label = document.createElement("h6");
       label.appendChild(document.createTextNode(i));
-
-      label.style.margin = "0px";
-      label.style.color = "white";
-      label.style.fontSize = "1.2em";
-
-      // cont.style.backgroundColor = "black"; // NOTE: difficult to see overlaps
-      cont.style.position = "absolute";
-      cont.style.zIndex = 100;
 
       cont.appendChild(label);
       cont.classList.add("road_label");
@@ -186,50 +194,111 @@ export default class ProceduralRoads {
 
       let loc = ASMATH.world2Screen(node, cam, canvas);
 
-      element.style.left = (loc.x) + "px";
-      element.style.top = (loc.y) + "px";
+      element.style.left = (loc.x - 15) + "px";
+      element.style.top = (loc.y + 5) + "px";
     }
   }
 
-  updateRoadChooser(mouse) {
+  updateMousePicker(mouse, block_chooser, show_textbox) {
     let camera = this.world.manager.camera.getCamera();
 
+    // first, check for road intersections.
     this.world.raycaster.setFromCamera(mouse, camera);
 
-    let intersects = this.world.raycaster.intersectObject(this.pointsMesh, true);
+    let intersects_road = this.world.raycaster.intersectObject(this.pointsMesh, true);
 
-    if(intersects.length > 0){
-      if(this.chooserID != intersects[0].index){
-        this.chooserID = intersects[0].index;
-        this.pointsMesh.geometry.colors[this.chooserID] = new THREE.Color('orange');
+    if(intersects_road.length > 0){
+      if(this.road_chooser_id != intersects_road[0].index){
+        this.road_chooser_id = intersects_road[0].index;
+        this.pointsMesh.geometry.colors[this.road_chooser_id] = new THREE.Color('orange');
         this.pointsMesh.geometry.colorsNeedUpdate = true;
 
         // create line to all siblings
-        for(let sib of this.placed[this.chooserID].siblings){
+        for(let sib of this.placed[this.road_chooser_id].siblings){
           let geo = new THREE.Geometry();
-          geo.vertices.push(this.placed[this.chooserID].node, sib.node);
-          let line = new THREE.Line(geo, new THREE.LineBasicMaterial({
-            color: 'purple'
-          }));
-          this.chooserObjects.push(line);
-          this.world.manager.scene.add(line);
+          geo.vertices.push(this.placed[this.road_chooser_id].node, sib.node);
+
+          let line = new MeshLine();
+          line.setGeometry( geo );
+
+          let material = new MeshLineMaterial({
+            color: 'purple',
+            resolution: new THREE.Vector2(this.world.manager.width, this.world.manager.height),
+            sizeAttenuation: 1,
+            lineWidth: 0.008
+          });
+
+          let meshline = new THREE.Mesh(line.geometry, material);
+          meshline.renderOrder = 50;
+          this.chooserObjects.push(meshline);
+          this.world.manager.scene.add(meshline);
         }
-        // create line to prev
-        // if(this.placed[this.chooserID].prev){
-        //   let geo = new THREE.Geometry();
-        //   geo.vertices.push(this.placed[this.chooserID].node, this.placed[this.chooserID].prev.node);
-        //   let line = new THREE.Line(geo, new THREE.LineBasicMaterial({
-        //     color: 'green'
-        //   }));
-        //   this.chooserObjects.push(line);
-        //   this.world.manager.scene.add(line);
-        // }
+
+        // create line to prev node
+        if(this.placed[this.road_chooser_id].prev){
+          let geo = new THREE.Geometry();
+          geo.vertices.push(this.placed[this.road_chooser_id].node, this.placed[this.road_chooser_id].prev.node);
+
+          let line = new MeshLine();
+          line.setGeometry( geo );
+
+          let material = new MeshLineMaterial({
+            color: 'yellow',
+            resolution: new THREE.Vector2(this.world.manager.width, this.world.manager.height),
+            sizeAttenuation: 1,
+            lineWidth: 0.003
+          });
+
+          let meshline = new THREE.Mesh(line.geometry, material);
+          meshline.renderOrder = 50;
+          this.chooserObjects.push(meshline);
+          this.world.manager.scene.add(meshline);
+        }
+
+        // display text box with full information
+        if(show_textbox){
+          let container = document.createElement("div");
+          container.appendChild(document.createTextNode("Siblings: "));
+
+          let sib_ul = document.createElement("ul");
+
+          for(let sib of this.placed[this.road_chooser_id].siblings){
+            let sib_li = document.createElement("li");
+            sib_li.innerHTML = sib.id;
+            sib_ul.appendChild(sib_li);
+          }
+
+          container.appendChild(sib_ul);
+
+          container.appendChild(document.createTextNode("Previous: " + this.placed[this.road_chooser_id].prev.id));
+
+          container.classList.add("road_textbox");
+          container.id = "t"+this.road_chooser_id;
+          container.style.backgroundColor = "black";
+          container.style.position = "absolute";
+          container.style.padding = "15px";
+          container.style.margin = "15px";
+          container.style.border = "1px solid white";
+
+          let node = this.placed[this.road_chooser_id].node;
+          let cam = this.world.manager.camera.getCamera();
+          let canvas = this.world.manager.renderer.context.canvas;
+
+          container.style.left = "0px";
+          container.style.top = "0px";
+          container.style.zIndex = 200000;
+
+          document.body.appendChild(container);
+        }
       }
   	}else{
-      if(this.chooserID != null){
-        this.pointsMesh.geometry.colors[this.chooserID] = new THREE.Color('blue');
+      if(this.road_chooser_id != null){
+        if(show_textbox){
+          document.getElementById("t"+this.road_chooser_id).remove();
+        }
+        this.pointsMesh.geometry.colors[this.road_chooser_id] = new THREE.Color('blue');
         this.pointsMesh.geometry.colorsNeedUpdate = true;
-        this.chooserID = null;
+        this.road_chooser_id = null;
 
         for(let l of this.chooserObjects){
           this.world.manager.scene.remove(l);
@@ -238,34 +307,41 @@ export default class ProceduralRoads {
         this.chooserObjects = [];
       }
     }
-  }
 
-  updateBlockChooser(mouse){
-    let camera = this.world.manager.camera.getCamera();
+    /*
+      NOTE:
 
-    this.world.raycaster.setFromCamera(mouse, camera);
+      there is a way that I can refactor this that uses member variables in the
+      roads and blocks classes.
 
-    let objects = [];
+      mesh_color and chosen
+    */
 
-    for(let block of this.blocks){
-      objects.push(block.mesh);
-    }
-
-    let intersects = this.world.raycaster.intersectObjects(objects, true);
-
-    if(intersects.length > 0){
-      console.log("CHOOSER", intersects);
-      if(this.chooserID != intersects[0].index){
-        this.chooserID = intersects[0].index;
-        this.chooserColor = intersects[0].object.material.color;
-        intersects[0].object.material.color = new THREE.Color('orange');
-      }
-    }else{
-      if(this.chooserID != null){
-        intersects[0].object.material.color = this.chooserColor;
-        this.chooserID = null;
-      }
-    }
+    // if(block_chooser){
+    //   this.world.raycaster.setFromCamera(mouse, camera);
+    //
+    //   let objects = [];
+    //
+    //   for(let block of this.blocks){
+    //     objects.push(block.mesh);
+    //   }
+    //
+    //   let intersects_blocks = this.world.raycaster.intersectObjects(objects, true);
+    //
+    //   if(intersects_blocks.length > 0){
+    //     if(intersects_blocks.length > 1){
+    //       console.log("OVERLAPPING POLYGONS!", intersects_blocks);
+    //     }
+    //
+    //     for(let block of intersects_blocks){
+    //       block.object.material.color = new THREE.Color('yellow');
+    //     }
+    //   }else{
+    //     for(let block of this.blocks){
+    //         block.mesh.material.color = new THREE.Color('green');
+    //     }
+    //   }
+    // }
   }
 
   setupDebug() {
@@ -632,6 +708,9 @@ export default class ProceduralRoads {
   /**
    * Uses finished road system to generate building 'blocks', which are to be
    * divided into lots.
+   *
+   * consider this reference
+   * https://stackoverflow.com/questions/9804127/finding-polygons-within-an-undirected-graph
    */
   buildBlocks() {
     for (let i = 0; i < this.placed.length; i++) {
@@ -741,9 +820,8 @@ export default class ProceduralRoads {
 
       /**************************** SETUP DISPLAY *****************************/
       block.mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
-        'color': new THREE.Color(0xffffff).setHex(Math.random() * 0xffffff),
-        'transparent': true,
-        'opacity': 0.6
+        'color': block.mesh_color,
+        'depthTest': false
       }));
 
       block.contour = new THREE.Line(geometry, new THREE.LineBasicMaterial({
@@ -759,6 +837,7 @@ export default class ProceduralRoads {
       }));
 
       this.blocks.push(block);
+      block.id = this.blocks.length;
     }
   }
 }

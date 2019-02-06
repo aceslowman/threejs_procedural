@@ -10,16 +10,12 @@ import OrthographicCamera from "./entities/OrthographicCamera";
 let manager, debug, capturer, p_cam, o_cam, light;
 let world;
 
-/*
-  main.js is to assemble all of the entities for the scene.
-
-  entities are each individual object.
-
-  components are what make those objects up.
-*/
-
 const setup = () => {
-  manager = new StandardManager();
+  manager = new StandardManager({
+    scene: {
+      background: 'white'
+    }
+  });
   manager.gui.close();
 
   p_cam = new PerspectiveCamera(manager);
@@ -80,7 +76,7 @@ const onDocumentKeyDown = (event) => {
     o_cam.enable = false;
     p_cam.enable = true;
   }
-  if(keyCode = 192){
+  if(keyCode == 192){
     p_cam.orbitControls.reset();
     o_cam.orbitControls.reset();
   }
