@@ -6,7 +6,6 @@ import ProceduralWorld from '../components/procedural/ProceduralWorld';
 */
 
 export default class World{
-
   constructor(manager){
     this.manager = manager;
     this.clock   = manager.clock;
@@ -42,9 +41,9 @@ export default class World{
 
   setupGUI(){
     this.gui.roads = this.gui.addFolder("Road");
-    this.gui.roads.add(this.world.roads.pointsMesh,"visible").name("pointsMesh");
-    this.gui.roads.add(this.world.roads.crossingsMesh,"visible").name("crossingsMesh");
-    this.gui.roads.add(this.world.roads.lineSegmentsMesh,"visible").name("lineSegmentsMesh");
+    this.gui.roads.add(this.world.roads.mesh.points,"visible").name("pointsMesh");
+    this.gui.roads.add(this.world.roads.mesh.crossings,"visible").name("crossingsMesh");
+    this.gui.roads.add(this.world.roads.mesh.lineSegments,"visible").name("lineSegmentsMesh");
 
     this.gui.terrain = this.gui.addFolder("Terrain");
     this.world.terrain.mesh.visible = false;

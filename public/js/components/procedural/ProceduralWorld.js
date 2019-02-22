@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import ProceduralRoads from './ProceduralRoads';
+import RoadSystem from './roads/RoadSystem';
 import ProceduralTerrain from './ProceduralTerrain';
 import ProceduralMap from './ProceduralMap';
 
@@ -19,9 +19,7 @@ export default class ProceduralWorld{
       amplitude: 300
     });
 
-    this.roads = new ProceduralRoads(this, {
-      terrain: this.terrain
-    });
+    this.roads = new RoadSystem(this,this.terrain);
 
     window.addEventListener('mousemove', (e)=>this.onMouseMove(e), false);
   }
