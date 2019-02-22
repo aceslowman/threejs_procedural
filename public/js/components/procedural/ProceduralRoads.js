@@ -1,10 +1,8 @@
-import * as THREE from "three";
-import { MeshLine, MeshLineMaterial } from "three.meshline";
-import * as ASMATH from "../../utilities/Math";
-import ProceduralMap from './ProceduralMap';
+import * as THREE from 'three';
+import * as ASMATH from '../../utilities/Math';
+import { MeshLine, MeshLineMaterial } from 'three.meshline';
 
 /*
-
   Current thoughts:
 
   this shouldn't really be responsible for EVERYTHING. The ProceduralRoads class
@@ -18,6 +16,14 @@ import ProceduralMap from './ProceduralMap';
 
   there are still problems with the core algorithm, and I need to fix them
   before moving on
+
+  QUESTION: Can I somehow generate the same road structure each time? seeding?
+  ANSWER: doesn't sound possible in normal JS, but implementable for sure.
+
+  ONHOLD TODO: checkForDuplicates should allow for thresholds.
+  it actually seems like this works... on hold
+
+  TODO: reject roads too close together
 */
 
 class Road {
@@ -33,14 +39,18 @@ class Road {
   }
 
   connect(a) {
+    // connect (this) to (a)
     if(!this.siblings.includes(a) && a != this){
       this.siblings.push(a);
+    }
+
+    // connect (a) to (this)
+    if(!a.siblings.includes(this) && this != a){
+      a.siblings.push(this);
     }
   }
 
   sever(a) {
-    // There should never be orphaned connections
-
     // remove (this) from (a)
     for (let i = 0; i < a.siblings.length; i++) {
       if (this == a.siblings[i]) {
@@ -155,18 +165,18 @@ export default class ProceduralRoads {
 
     //TODO: this is not especially useful. it would be nice to have billboarding
     for (let i = 0; i < this.placed.length; i++) {
-      let cont = document.createElement("div");
-      let label = document.createElement("h6");
+      let cont = document.createElement('div');
+      let label = document.createElement('h6');
       label.appendChild(document.createTextNode(i));
 
       cont.appendChild(label);
-      cont.classList.add("road_label");
+      cont.classList.add('road_label');
       cont.id = i;
 
       document.body.appendChild(cont);
     }
 
-    this.debug_elements = document.getElementsByClassName("road_label");
+    this.debug_elements = document.getElementsByClassName('road_label');
   }
 
   updateDebug() {
@@ -180,8 +190,8 @@ export default class ProceduralRoads {
 
       let loc = ASMATH.world2Screen(node, cam, canvas);
 
-      element.style.left = (loc.x - 15) + "px";
-      element.style.top = (loc.y + 5) + "px";
+      element.style.left = (loc.x - 15) + 'px';
+      element.style.top = (loc.y + 5) + 'px';
     }
   }
 
@@ -243,44 +253,40 @@ export default class ProceduralRoads {
 
         // display text box with full information
         if(show_textbox){
-          let container = document.createElement("div");
-          container.appendChild(document.createTextNode("Siblings: "));
+          let container = document.createElement('div');
+          container.appendChild(document.createTextNode('Siblings: '));
 
-          let sib_ul = document.createElement("ul");
+          let sib_ul = document.createElement('ul');
 
           for(let sib of this.placed[this.road_chooser_id].siblings){
-            let sib_li = document.createElement("li");
+            let sib_li = document.createElement('li');
             sib_li.innerHTML = sib.id;
             sib_ul.appendChild(sib_li);
           }
 
           container.appendChild(sib_ul);
 
-          container.appendChild(document.createTextNode("Previous: " + this.placed[this.road_chooser_id].prev.id));
+          container.appendChild(document.createTextNode('Previous: ' + this.placed[this.road_chooser_id].prev.id));
 
-          container.classList.add("road_textbox");
-          container.id = "t"+this.road_chooser_id;
-          container.style.backgroundColor = "black";
-          container.style.position = "absolute";
-          container.style.padding = "15px";
-          container.style.margin = "15px";
-          container.style.border = "1px solid white";
+          container.classList.add('road_textbox');
+          container.id = 't'+this.road_chooser_id;
+          container.style.backgroundColor = 'black';
+          container.style.position = 'absolute';
+          container.style.padding = '15px';
+          container.style.margin = '15px';
+          container.style.border = '1px solid white';
 
-          let node = this.placed[this.road_chooser_id].node;
-          let cam = this.world.manager.camera.getCamera();
-          let canvas = this.world.manager.renderer.context.canvas;
-
-          container.style.left = "0px";
-          container.style.top = "0px";
+          container.style.left = '0px';
+          container.style.top = '0px';
           container.style.zIndex = 200000;
 
           document.body.appendChild(container);
         }
       }
-  	}else{
+    } else {
       if(this.road_chooser_id != null){
         if(show_textbox){
-          document.getElementById("t"+this.road_chooser_id).remove();
+          document.getElementById('t'+this.road_chooser_id).remove();
         }
         this.pointsMesh.geometry.colors[this.road_chooser_id] = new THREE.Color('blue');
         this.pointsMesh.geometry.colorsNeedUpdate = true;
@@ -336,12 +342,10 @@ export default class ProceduralRoads {
    * TODO: implement slope threshold
    * Checks for elevation. If it is too steep, it will be rejected. If not, the
    * a.z value will be defined.
-   * @param {Float} thresh - the maximum incline allowed
+   *
    * @returns {Bool} returns success value.
    */
   elevate() {
-    let thresh = 0.1; // FIXME: parameterize threshold!
-
     const raycaster = new THREE.Raycaster();
     const direction = new THREE.Vector3(0, 0, 1);
 
@@ -365,11 +369,10 @@ export default class ProceduralRoads {
   localConstraints(a) {
     if (!a.prev) return true;
 
-    let crossings = this.checkForCrossings(a);
-    // let dedupe = this.checkForDuplicates(a, 10);
+    this.checkForCrossings(a);
+    let valid = this.checkForDuplicates(a, 10);
 
-    // return dedupe;
-    return true;
+    return valid;
   }
 
   /**
@@ -381,23 +384,22 @@ export default class ProceduralRoads {
   checkForCrossings(a) {
     let crossings = [];
 
-    // loop through all placed roads (b), and check for intersection with (a)
     for (let b of this.placed) {
-      if (!b.prev || a.prev.node == b.prev.node || a.prev.node == b.node) {
-        continue;
-      }
+      if(a.prev == b){ continue; }
 
-      let c = b.prev;
+      for(let c of b.siblings){
+        if(a.prev == c){ continue; }
 
-      let intersect = ASMATH.getLineIntersection(a.prev.node, a.node, b.node, c.node);
+        let intersection = ASMATH.getLineIntersection(a.prev.node, a.node, b.node, c.node);
+        console.log('intersection', intersection);
 
-      if (intersect) {
-        crossings.push(new Crossing(a, b, c, intersect));
+        if(intersection){
+          crossings.push(new Crossing(a, b, c, intersection));
+        }
       }
     }
 
     if (crossings.length > 0) {
-
       // sort by distance from start
       crossings.sort((A, B) => {
         return (
@@ -415,11 +417,7 @@ export default class ProceduralRoads {
       match.b.sever(match.c);
       match.b.connect(a);
       match.c.connect(a);
-
-      return true;
     }
-
-    return false;
   }
 
   /**
@@ -428,26 +426,20 @@ export default class ProceduralRoads {
    * @param {Road} a - the current road, recently having passed localConstraints.
    * @param {Float} thresh - how far a node can be for being merged.
    * @returns {Bool} returns success value.
-   *
-   * FIXME:
    */
   checkForDuplicates(a, thresh) {
     let ok = true;
 
     for (let b of this.placed) {
       if (a.node.distanceTo(b.node) <= thresh) {
-        // NOTE
-
-        a.prev.connect(b); // a is still orphaned in some places...
-        b.connect(a.prev);
+        a.prev.connect(b);
 
         for (let sib of a.siblings) {
           b.connect(sib);
-          sib.connect(b);
           sib.sever(a);
         }
 
-        if (this.verbose) console.warn("duplicate found, a has failed.");
+        if (this.verbose) console.warn('duplicate found, a has failed.');
         ok = false;
         break;
       }
@@ -584,8 +576,6 @@ export default class ProceduralRoads {
               let ycoord = ((samp.y + this.terrain.height / 2) / this.terrain.height); //normalized 0-1
               ycoord *= this.population.height;
 
-              // NOTE VERY POSSIBLE THIS IS SOLVED
-
               let pop = this.population.getSample(xcoord, ycoord);
 
               raySum += pop;
@@ -602,14 +592,14 @@ export default class ProceduralRoads {
 
         if (this.terrain.globalBoundsCheck(endpoint)) {
           if (endpoint.x == 0 && endpoint.y == 0) {
-            console.error("Major failure, you may be incorrectly sampling the population map.", endpoint);
+            console.error('Major failure, you may be incorrectly sampling the population map.', endpoint);
           }
 
           t_pending.push(new Road(a.it + 1, a, endpoint));
         }
 
       } else {
-        //OK
+
         let direction = new THREE.Vector3(
           THREE.Math.randFloat(-1, 1),
           THREE.Math.randFloat(-1, 1),
