@@ -115,7 +115,7 @@ export default class RoadSystem {
     let valid = this.removeDuplicates(a, 10);
 
     if(!valid){
-      // remove a from all in placed...
+      // TEMP: this shouldn't be necessary.
       for(let b of this.placed){
         b.sever(a);
       }
@@ -185,6 +185,7 @@ export default class RoadSystem {
     }
   }
 
+  // FIXME: I am currently removing a from all after rejection, but
   removeDuplicates(a, thresh) {
     let ok = true;
 
