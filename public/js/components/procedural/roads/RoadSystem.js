@@ -13,6 +13,10 @@ import Crossing from './Crossing';
 
   FIXME: elevate() results in odd roads being drawn to crossings (which are
   anchored to z)
+
+  FIXME: somewhere, there are siblings not being removed, resulting in orphaned
+  nodes existing in siblings. I believe this is due to removeDuplicates().
+  it means something that was rejected didn't get removed from siblings.
 */
 
 export default class RoadSystem {
@@ -107,8 +111,15 @@ export default class RoadSystem {
   localConstraints(a) {
     if (!a.prev) return true;
 
-    this.trimToCrossing(a, 10);
+    this.trimToCrossing(a, 50);
     let valid = this.removeDuplicates(a, 10);
+
+    if(!valid){
+      // remove a from all in placed...
+      for(let b of this.placed){
+        b.sever(a);
+      }
+    }
 
     return valid;
   }
@@ -122,21 +133,19 @@ export default class RoadSystem {
       for(let c of b.siblings){
         if(a.prev == c){ continue; }
 
-        let limit = this.terrain.width; // TEMP: I need a better way to set bounds
-
-        let a_vector = new THREE.Vector3();
-        a_vector.subVectors(a.node,a.prev.node); // FIXME: I don't think this is right
-        a_vector.add(a.node).multiplyScalar(limit);
+        // TEMP: I need a better way to set bounds
+        let limit = this.terrain.width;
+        let ray = new THREE.Vector3().subVectors(a.node,a.prev.node);
+        ray.multiplyScalar(limit).add(a.node);
 
         let intersection = ASMATH.getLineIntersection(
           a.prev.node,
-          a_vector, // QUESTION: Is this actually working?
+          ray,
           b.node,
           c.node
         );
 
         if(intersection){
-          this.crossings.push(intersection);
           crossings.push(new Crossing(a, b, c, intersection));
         }
       }
@@ -152,10 +161,6 @@ export default class RoadSystem {
 
       let match = crossings[0];
 
-      // FIXME: currently generating illegal overlaps
-      // there must be some logical error here, even with the threshold at 0
-      // it still fails
-
       // check to see if the match actually intersects
       let intersects = ASMATH.getLineIntersection(
         a.prev.node,
@@ -167,13 +172,15 @@ export default class RoadSystem {
       let within_thresh = a.node.distanceToSquared(match.location) < thresh;
 
       if(intersects || within_thresh){
+        this.crossings.push(match.location);
+
         // move (a) to the crossing location
         a.node = match.location;
 
         // sever siblings
         match.b.sever(match.c);
-        match.b.connect(a);
-        match.c.connect(a);
+        match.b.connect(a); // NOTE: related to orphan bug
+        match.c.connect(a); // NOTE: related to orphan bug
       }
     }
   }
@@ -182,15 +189,17 @@ export default class RoadSystem {
     let ok = true;
 
     for (let b of this.placed) {
+      if(a.prev == b){ continue; }
+
       if (a.node.distanceTo(b.node) <= thresh) {
         a.prev.connect(b);
+        b.sever(a);
 
         for (let sib of a.siblings) {
+          a.sever(sib);
           b.connect(sib);
-          sib.sever(a);
         }
 
-        if (this.debug.verbose) console.warn('duplicate found, a has failed.');
         ok = false;
         break;
       }
@@ -388,6 +397,7 @@ export default class RoadSystem {
 
     let points = [];
 
+    // core build loop for lineGeometry
     for (let a of this.placed) {
       for (let b of a.siblings) {
         if (b.prev) {

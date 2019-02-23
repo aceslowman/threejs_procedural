@@ -12,11 +12,11 @@ function scale(num, in_min, in_max, out_min, out_max){
  * @param {Array} a items An array containing the items.
  */
 function shuffle(a) {
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 function getLineIntersection(p0, p1, p2, p3){
@@ -49,29 +49,29 @@ function world2Screen(node, camera, canvas){
   xy.x = Math.round( (   xy.x + 1 ) * canvas.width  / 2 );
   xy.y = Math.round( ( - xy.y + 1 ) * canvas.height / 2 );
 
-  return xy
+  return xy;
 }
 
 // TODO: this should be phased out
 //https://stackoverflow.com/questions/27409074/converting-3d-position-to-2d-screen-position-r69
 function toScreenPosition(obj, camera, renderer){
-    var vector = new THREE.Vector3();
+  var vector = new THREE.Vector3();
 
-    var widthHalf = 0.5*renderer.context.canvas.width;
-    var heightHalf = 0.5*renderer.context.canvas.height;
+  var widthHalf = 0.5*renderer.context.canvas.width;
+  var heightHalf = 0.5*renderer.context.canvas.height;
 
-    obj.updateMatrixWorld();
-    vector.setFromMatrixPosition(obj.matrixWorld);
-    vector.project(camera);
+  obj.updateMatrixWorld();
+  vector.setFromMatrixPosition(obj.matrixWorld);
+  vector.project(camera);
 
-    vector.x = ( vector.x * widthHalf ) + widthHalf;
-    vector.y = - ( vector.y * heightHalf ) + heightHalf;
+  vector.x = ( vector.x * widthHalf ) + widthHalf;
+  vector.y = - ( vector.y * heightHalf ) + heightHalf;
 
-    return {
-        x: vector.x,
-        y: vector.y
-    };
-};
+  return {
+    x: vector.x,
+    y: vector.y
+  };
+}
 
 module.exports = {
   scale,
@@ -79,4 +79,4 @@ module.exports = {
   getLineIntersection,
   toScreenPosition,
   world2Screen
-}
+};

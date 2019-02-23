@@ -12,12 +12,12 @@ export default class Road {
 
   connect(a) {
     // connect (this) to (a)
-    if(!this.siblings.includes(a) && a != this){
+    if(!this.siblings.includes(a) && a !== this){
       this.siblings.push(a);
     }
 
     // connect (a) to (this)
-    if(!a.siblings.includes(this) && this != a){
+    if(!a.siblings.includes(this) && this !== a){
       a.siblings.push(this);
     }
   }
