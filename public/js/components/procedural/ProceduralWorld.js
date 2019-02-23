@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import RoadSystem from './roads/RoadSystem';
+import RoadMesh from './roads/RoadMesh';
 import ProceduralTerrain from './ProceduralTerrain';
 import ProceduralMap from './ProceduralMap';
 
@@ -19,7 +20,9 @@ export default class ProceduralWorld{
       amplitude: 300
     });
 
-    this.roads = new RoadSystem(this,this.terrain);
+    this.roadSystem = new RoadSystem(this,this.terrain);
+
+    this.roadMesh = new RoadMesh(this,this.roadSystem);
 
     window.addEventListener('mousemove', (e)=>this.onMouseMove(e), false);
   }
@@ -28,8 +31,8 @@ export default class ProceduralWorld{
     this.terrain.setup();
     this.terrain.setupDebug();
 
-    this.roads.setup();
-    this.roads.setupDebug();
+    this.roadSystem.setup();
+    this.roadSystem.setupDebug();
   }
 
   onMouseMove(e){
@@ -39,6 +42,6 @@ export default class ProceduralWorld{
     mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
     mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
-    this.roads.updateMousePicker(mouse, true, true);
+    this.roadSystem.updateMousePicker(mouse, true, true);
   }
 }

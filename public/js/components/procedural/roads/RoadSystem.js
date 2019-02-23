@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import * as ASMATH from '../../../utilities/Math';
 import { MeshLine, MeshLineMaterial } from 'three.meshline';
 
-import Road from './Road';
-import Crossing from './Crossing';
+import Node from './Node';
+import NodeCrossing from './NodeCrossing';
 
 /*
   TODO: reject roads too close together
@@ -59,7 +59,7 @@ export default class RoadSystem {
   }
 
   build() {
-    this.pending.push(new Road(0, null, new THREE.Vector3(0, 0, 0)));
+    this.pending.push(new Node(0, null, new THREE.Vector3(0, 0, 0)));
 
     while (this.pending.length > 0) {
       this.pending.sort((a, b) => {
@@ -146,7 +146,7 @@ export default class RoadSystem {
         );
 
         if(intersection){
-          crossings.push(new Crossing(a, b, c, intersection));
+          crossings.push(new NodeCrossing(a, b, c, intersection));
         }
       }
     }
@@ -174,7 +174,7 @@ export default class RoadSystem {
       if(intersects || within_thresh){
         this.crossings.push(match.location);
 
-        // move (a) to the crossing location
+        // move (a) to the NodeCrossing location
         a.node = match.location;
 
         // sever siblings
@@ -248,7 +248,7 @@ export default class RoadSystem {
         let endpoint = new THREE.Vector3().addVectors(a.node, new_node);
 
         if (this.terrain.globalBoundsCheck(endpoint)) {
-          let new_road = new Road(a.it + 1, a, endpoint);
+          let new_road = new Node(a.it + 1, a, endpoint);
           t_pending.push(new_road);
         }
       } else { // define default point
@@ -264,7 +264,7 @@ export default class RoadSystem {
         let endpoint = new THREE.Vector3().addVectors(a.node, new_node);
 
         if (this.terrain.globalBoundsCheck(endpoint)) {
-          let new_road = new Road(a.it + 1, a, endpoint);
+          let new_road = new Node(a.it + 1, a, endpoint);
           t_pending.push(new_road);
         }
 
@@ -339,7 +339,7 @@ export default class RoadSystem {
             console.error('Major failure, you may be incorrectly sampling the population map.', endpoint);
           }
 
-          t_pending.push(new Road(a.it + 1, a, endpoint));
+          t_pending.push(new Node(a.it + 1, a, endpoint));
         }
 
       } else {
@@ -359,7 +359,7 @@ export default class RoadSystem {
         const endpoint = new THREE.Vector3().addVectors(a.node, direction.multiply(scalar));
 
         if (this.terrain.globalBoundsCheck(endpoint)) {
-          let new_road = new Road(a.it + 1, a, endpoint);
+          let new_road = new Node(a.it + 1, a, endpoint);
           t_pending.push(new_road);
         }
       }
@@ -460,7 +460,7 @@ export default class RoadSystem {
   updateMousePicker(mouse, block_chooser, show_textbox) {
     let camera = this.world.manager.camera.getCamera();
 
-    // first, check for road intersections.
+    // first, check for Node intersections.
     this.world.raycaster.setFromCamera(mouse, camera);
 
     let intersects_road = this.world.raycaster.intersectObject(this.mesh.points, true);

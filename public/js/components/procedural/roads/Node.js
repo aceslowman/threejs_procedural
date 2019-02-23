@@ -1,4 +1,4 @@
-export default class Road {
+export default class Node {
   constructor(it, prev, end) {
     this.id       = null;
     this.node     = end;
