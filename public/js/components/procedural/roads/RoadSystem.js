@@ -107,13 +107,13 @@ export default class RoadSystem {
   localConstraints(a) {
     if (!a.prev) return true;
 
-    this.trimToCrossing(a);
+    this.trimToCrossing(a, 10);
     let valid = this.removeDuplicates(a, 10);
 
     return valid;
   }
 
-  trimToCrossing(a) {
+  trimToCrossing(a, thresh) {
     let crossings = [];
 
     for (let b of this.placed) {
@@ -122,10 +122,21 @@ export default class RoadSystem {
       for(let c of b.siblings){
         if(a.prev == c){ continue; }
 
-        let intersection = ASMATH.getLineIntersection(a.prev.node, a.node, b.node, c.node);
-        if(this.debug.verbose) console.log('intersection', intersection);
+        let limit = this.terrain.width; // TEMP: I need a better way to set bounds
+
+        let a_vector = new THREE.Vector3();
+        a_vector.subVectors(a.node,a.prev.node); // FIXME: I don't think this is right
+        a_vector.add(a.node).multiplyScalar(limit);
+
+        let intersection = ASMATH.getLineIntersection(
+          a.prev.node,
+          a_vector, // QUESTION: Is this actually working?
+          b.node,
+          c.node
+        );
 
         if(intersection){
+          this.crossings.push(intersection);
           crossings.push(new Crossing(a, b, c, intersection));
         }
       }
@@ -141,14 +152,29 @@ export default class RoadSystem {
 
       let match = crossings[0];
 
-      // move (a) to the crossing location
-      this.crossings.push(match.location);
-      a.node = match.location;
+      // FIXME: currently generating illegal overlaps
+      // there must be some logical error here, even with the threshold at 0
+      // it still fails
 
-      // sever siblings
-      match.b.sever(match.c);
-      match.b.connect(a);
-      match.c.connect(a);
+      // check to see if the match actually intersects
+      let intersects = ASMATH.getLineIntersection(
+        a.prev.node,
+        a.node,
+        match.b.node,
+        match.c.node
+      );
+
+      let within_thresh = a.node.distanceToSquared(match.location) < thresh;
+
+      if(intersects || within_thresh){
+        // move (a) to the crossing location
+        a.node = match.location;
+
+        // sever siblings
+        match.b.sever(match.c);
+        match.b.connect(a);
+        match.c.connect(a);
+      }
     }
   }
 
@@ -171,17 +197,6 @@ export default class RoadSystem {
     }
 
     return ok;
-  }
-
-  checkForProximity(a, thresh){
-    // 1. ends close to an existing crossing -> extend street to reach crossing
-
-    /*
-      this is being placed here, instead of trimToCrossing, because
-    */
-
-
-    // 2. close to intersecting -> extend street to form intersection
   }
 
   // ---------------------------------------------------------------------------

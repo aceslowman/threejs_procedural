@@ -41,8 +41,6 @@ function getLineIntersection(p0, p1, p2, p3){
     intersection.y = p0.y + (t * s1_y);
     return intersection;
   }
-
-  return false;
 }
 
 function world2Screen(node, camera, canvas){
