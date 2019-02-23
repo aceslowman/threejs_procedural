@@ -8,12 +8,6 @@ import NodeCrossing from './NodeCrossing';
 /*
   TODO: reject roads too close together
 
-  FIXME: under certain conditions, some roads might be orphaned, particularly
-  where it intersects.
-
-  FIXME: elevate() results in odd roads being drawn to crossings (which are
-  anchored to z)
-
   FIXME: somewhere, there are siblings not being removed, resulting in orphaned
   nodes existing in siblings. I believe this is due to removeDuplicates().
   it means something that was rejected didn't get removed from siblings.
@@ -54,7 +48,6 @@ export default class RoadSystem {
 
   setup() {
     this.build();
-    this.elevate();
     this.setupDebug();
   }
 
@@ -91,21 +84,6 @@ export default class RoadSystem {
     }
   }
 
-  elevate() {
-    const raycaster = new THREE.Raycaster();
-    const direction = new THREE.Vector3(0, 0, 1);
-
-    for (let endpoint of this.placed) {
-      raycaster.set(endpoint.node, direction);
-      let intersects = raycaster.intersectObject(this.terrain.mesh);
-
-      if (intersects.length > 0) {
-        let pI = intersects[0].point;
-        endpoint.node = pI;
-      }
-    }
-  }
-
   // ---------------------------------------------------------------------------
 
   localConstraints(a) {
@@ -115,7 +93,7 @@ export default class RoadSystem {
     let valid = this.removeDuplicates(a, 10);
 
     if(!valid){
-      // TEMP: this shouldn't be necessary.
+      // HACK: this shouldn't be necessary.
       for(let b of this.placed){
         b.sever(a);
       }
@@ -134,7 +112,7 @@ export default class RoadSystem {
         if(a.prev == c){ continue; }
 
         // TEMP: I need a better way to set bounds
-        let limit = this.terrain.width;
+        let limit = this.world.width;
         let ray = new THREE.Vector3().subVectors(a.node,a.prev.node);
         ray.multiplyScalar(limit).add(a.node);
 
@@ -185,7 +163,7 @@ export default class RoadSystem {
     }
   }
 
-  // FIXME: I am currently removing a from all after rejection, but
+  // FIXME: I am currently removing a from all (in localConstraints) after rejection, but this is a hack
   removeDuplicates(a, thresh) {
     let ok = true;
 
@@ -200,6 +178,9 @@ export default class RoadSystem {
           a.sever(sib);
           b.connect(sib);
         }
+
+        this.crossings.pop();
+        this.crossings.push(b.node);
 
         ok = false;
         break;
@@ -460,7 +441,6 @@ export default class RoadSystem {
   updateMousePicker(mouse, block_chooser, show_textbox) {
     let camera = this.world.manager.camera.getCamera();
 
-    // first, check for Node intersections.
     this.world.raycaster.setFromCamera(mouse, camera);
 
     let intersects_road = this.world.raycaster.intersectObject(this.mesh.points, true);

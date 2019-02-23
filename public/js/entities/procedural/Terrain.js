@@ -33,8 +33,6 @@ export default class Terrain{
 
     this.displace(this.elevation);
     this.generateMesh();
-
-    this.world.manager.scene.add(this.mesh);
   }
 
   setupDebug(){
@@ -95,6 +93,8 @@ export default class Terrain{
     });
 
     this.mesh = new THREE.Mesh( this.geometry, this.material );
+
+    this.world.manager.scene.add(this.mesh);
   }
 
   /**
@@ -112,5 +112,14 @@ export default class Terrain{
     }
 
     return true;
+  }
+
+  setupGUI(){
+    this.gui = this.world.manager.gui;
+    this.gui.terrain = this.gui.addFolder('Terrain');
+    this.gui.terrain.add(this.mesh,'visible');
+    this.gui.terrain.add(this.material,'wireframe');
+    this.gui.terrain.add(this.elev_uniforms.draw_elev,'value',0,1).name('Show Elev');
+    this.gui.terrain.add(this.elev_uniforms.draw_topo,'value',0,1).name('Show Topo');
   }
 }

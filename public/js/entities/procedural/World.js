@@ -9,11 +9,15 @@ import Terrain from './Terrain';
 export default class World{
   constructor(manager){
     this.manager = manager;
+
+    this.width = 500;
+    this.height = 500;
+
     this.raycaster = new THREE.Raycaster();
     this.raycaster.params.Points.threshold = 5;
 
     this.terrain = new Terrain(this, {
-      size: [500,500],
+      size: [this.width,this.height],
       detail: 128.0,
       amplitude: 300
     });
@@ -33,14 +37,14 @@ export default class World{
     this.roads.setup();
     this.roads.setupDebug();
 
-    this.terrain.elevation.setupDisplay(
-      'elevation',
-      new THREE.Vector2((-this.manager.width/2.0) + 148,-128)
-    );
-    this.roads.system.population.setupDisplay(
-      'population',
-      new THREE.Vector2((-this.manager.width/2.0) + 148,128)
-    );
+    // this.terrain.elevation.setupDisplay(
+    //   'elevation',
+    //   new THREE.Vector2((-this.manager.width/2.0) + 148,-128)
+    // );
+    // this.roads.system.population.setupDisplay(
+    //   'population',
+    //   new THREE.Vector2((-this.manager.width/2.0) + 148,128)
+    // );
 
     this.setupGUI();
   }
@@ -64,16 +68,7 @@ export default class World{
   }
 
   setupGUI(){
-    this.manager.gui.system = this.manager.gui.addFolder('Road System');
-    this.manager.gui.system.add(this.roads.system.mesh.points,'visible').name('pointsMesh');
-    this.manager.gui.system.add(this.roads.system.mesh.crossings,'visible').name('crossingsMesh');
-    this.manager.gui.system.add(this.roads.system.mesh.lineSegments,'visible').name('lineSegmentsMesh');
-
-    this.manager.gui.terrain = this.manager.gui.addFolder('Terrain');
-    this.terrain.mesh.visible = false;
-    this.manager.gui.terrain.add(this.terrain.mesh,'visible');
-    this.manager.gui.terrain.add(this.terrain.material,'wireframe');
-    this.manager.gui.terrain.add(this.terrain.elev_uniforms.draw_elev,'value',0,1).name('Show Elev');
-    this.manager.gui.terrain.add(this.terrain.elev_uniforms.draw_topo,'value',0,1).name('Show Topo');
+    this.roads.setupGUI();
+    this.terrain.setupGUI();
   }
 }
