@@ -1,23 +1,22 @@
-import * as THREE from "three";
-import * as ASMATH from "../../utilities/Math";
-import ProceduralMap from "./ProceduralMap";
-import SimplexNoise from "simplex-noise";
-import * as elevation from "../../shaders/elevation";
+import * as THREE from 'three';
+import * as elevation from '../../shaders/elevation';
 
-export default class ProceduralTerrain{
+import Map from './Map';
+
+export default class Terrain{
   constructor(world, options){
     this.world = world;
     this.width = options.size[0];
     this.height = options.size[1];
     this.detail = options.detail;
-    this.elevation = new ProceduralMap(this.world.manager, {
-        size: [256,256],
-        time: Math.random()*1000,
-        bSmooth: true,
-        map: [-1,1],
-        scale: [0.2,0.2],
-        offset: [0,0],
-        octaves: 8
+    this.elevation = new Map(this.world.manager, {
+      size: [256,256],
+      time: Math.random()*1000,
+      bSmooth: true,
+      map: [-1,1],
+      scale: [0.2,0.2],
+      offset: [0,0],
+      octaves: 8
     });
     this.amplitude = options.amplitude;
 
@@ -44,8 +43,8 @@ export default class ProceduralTerrain{
   }
 
   /**
-  * Displace the buffer geometry using a given ProceduralMap
-  * @param {ProceduralMap} map - a map representing a grayscale elevation map.
+  * Displace the buffer geometry using a given Map
+  * @param {Map} map - a map representing a grayscale elevation map.
   */
   displace(map){
     const displacement_buffer = map.getBufferArray();
@@ -54,17 +53,17 @@ export default class ProceduralTerrain{
     const count = this.geometry.getAttribute('position').count;
 
     for (let i = 0; i < count; i++) {
-    	const u = uvs[i * 2];
-    	const v = uvs[i * 2 + 1];
+      const u = uvs[i * 2];
+      const v = uvs[i * 2 + 1];
       const x = Math.floor(u * (map.width-1.0));
       const y = Math.floor(v * (map.height-1.0));
       const d_index = (y * map.height + x) * 4;
-    	let r = displacement_buffer[d_index];
+      let r = displacement_buffer[d_index];
 
-    	positions[i * 3 + 2] = (r * this.amplitude);
+      positions[i * 3 + 2] = (r * this.amplitude);
 
       if(!r){
-        console.error("cannot find value in displacement buffer");
+        console.error('cannot find value in displacement buffer');
       }
     }
 

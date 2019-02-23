@@ -1,14 +1,11 @@
-import * as THREE from "three";
+import StandardManager from './system/StandardManager';
+import Capture from './utilities/Capture';
+import Debug from './utilities/Debug';
+import World from './entities/procedural/World';
+import PerspectiveCamera from './entities/PerspectiveCamera';
+import OrthographicCamera from './entities/OrthographicCamera';
 
-import StandardManager from "./system/StandardManager";
-import Capture from "./utilities/Capture";
-import Debug from "./utilities/Debug";
-import World from "./entities/World";
-import PerspectiveCamera from "./entities/PerspectiveCamera";
-import OrthographicCamera from "./entities/OrthographicCamera";
-
-let manager, debug, capturer, p_cam, o_cam, light;
-let world;
+let manager, debug, capturer, p_cam, o_cam;
 
 const setup = () => {
   manager = new StandardManager({
@@ -23,7 +20,7 @@ const setup = () => {
 
   manager.setCamera(o_cam);
 
-  world = new World(manager);
+  new World(manager);
 
   debug = new Debug(manager, {
     stats: true,
@@ -37,7 +34,7 @@ const setup = () => {
     format: 'png',
     workersPath: 'js/utils/'
   });
-}
+};
 
 const render = () => {
   requestAnimationFrame(render);
@@ -47,7 +44,7 @@ const render = () => {
   debug.stats.end();
 
   capturer.capture( manager.canvas );
-}
+};
 
 const bindEventListeners = () => {
   window.addEventListener(
@@ -57,11 +54,11 @@ const bindEventListeners = () => {
   );
 
   document.addEventListener(
-    "keydown",
+    'keydown',
     onDocumentKeyDown,
-    false
+    'keydown'
   );
-}
+};
 
 const onDocumentKeyDown = (event) => {
   let keyCode = event.which;
@@ -80,7 +77,7 @@ const onDocumentKeyDown = (event) => {
     p_cam.orbitControls.reset();
     o_cam.orbitControls.reset();
   }
-}
+};
 
 setup();
 bindEventListeners();
