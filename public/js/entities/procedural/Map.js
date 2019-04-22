@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import * as fbm from '../../shaders/fbm';
-import * as invert from '../../shaders/invert';
+import * as fbm from './shaders/fbm';
+import * as invert from './shaders/invert';
 import * as ASMATH from "../../utilities/Math";
 import _ from "lodash";
 

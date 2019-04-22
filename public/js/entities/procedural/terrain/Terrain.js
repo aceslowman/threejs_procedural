@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import * as elevation from '../../shaders/elevation';
+import * as elevation from '../shaders/elevation';
 
-import Map from './Map';
+import Map from '../Map';
 
 export default class Terrain{
   constructor(world, options){
@@ -74,7 +74,7 @@ export default class Terrain{
     this.geometry.translate(0,0,-this.geometry.boundingBox.min.z);
   }
 
-  /**
+  /*
   * Generates terrain mesh, and utilizes custom shaders.
   */
   generateMesh(){

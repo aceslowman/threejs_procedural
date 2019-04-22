@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import Roads from './roads/Roads';
-import Terrain from './Terrain';
+import Terrain from './terrain/Terrain';
 
 /*
   World
@@ -10,8 +10,8 @@ export default class World{
   constructor(manager){
     this.manager = manager;
 
-    this.width = 500;
-    this.height = 500;
+    this.width = 500; // in worldspace
+    this.height = 500; // in worldspace
 
     this.raycaster = new THREE.Raycaster();
     this.raycaster.params.Points.threshold = 5;
@@ -22,7 +22,7 @@ export default class World{
       amplitude: 300
     });
 
-    this.roads = new Roads(this);
+    // this.roads = new Roads(this);
 
     this.setup();
     this.addToScene();
@@ -34,8 +34,8 @@ export default class World{
     this.terrain.setup();
     this.terrain.setupDebug();
 
-    this.roads.setup();
-    this.roads.setupDebug();
+    // this.roads.setup();
+    // this.roads.setupDebug();
 
     // this.terrain.elevation.setupDisplay(
     //   'elevation',
@@ -56,7 +56,7 @@ export default class World{
     mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
     mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
-    this.roads.onMouseMove(e, mouse);
+    // this.roads.onMouseMove(e, mouse);
   }
 
   addToScene(){
@@ -64,11 +64,11 @@ export default class World{
   }
 
   update(){
-    this.roads.updateDebug();
+    // this.roads.updateDebug();
   }
 
   setupGUI(){
-    this.roads.setupGUI();
+    // this.roads.setupGUI();
     this.terrain.setupGUI();
   }
 }
