@@ -1,0 +1,40 @@
+body{
+  font: 10px 'Helvetica', sans-serif;
+  overflow:hidden;
+}
+canvas{
+  display:block;
+}
+.roadDebug{
+  position:absolute;
+  top:0px;
+  left:0px;
+  color:white;
+  border: 1px solid white;
+  padding:15px;
+  margin: 5px;
+}
+.roadDebug ul {
+  list-style:none;
+  padding:0px;
+  margin:0px;
+}
+.dg .ac {
+  z-index: 999 !important;
+}
+.road_textbox {
+  color:white;
+}
+
+.road_label {
+  background-color: rgba(255,255,255,0.5);
+  padding: 1px;
+  position: absolute;
+  z-index:: 100;
+}
+
+.road_label h6 {
+  margin: 0px;
+  color: black;
+  font-size: 1.2em;
+}

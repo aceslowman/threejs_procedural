@@ -22,7 +22,7 @@ import dat from "dat.gui";
 export default class asStandardManager {
   constructor({
     scene = {
-      background: 0x000000
+      background: 'red'
     },
     renderer = {
       antialias: true,
@@ -44,7 +44,7 @@ export default class asStandardManager {
     this.renderer = new THREE.WebGLRenderer(renderer);
     this.renderer.setSize(this.width, this.height);
     this.renderer.autoClear = false; // for overlay
-    document.body.appendChild(this.renderer.domElement);
+    document.getElementById('root').appendChild(this.renderer.domElement);
 
     /*
       the main assumed scene for anything other than ui or debug
@@ -100,9 +100,9 @@ export default class asStandardManager {
     this.entities.push(entity);
   }
 
-  onWindowResize() {
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
+  onWindowResize(width, height) {
+    this.width = width;
+    this.height = height;
 
     this.camera.getCamera().aspect = this.width / this.height;
     this.camera.getCamera().updateProjectionMatrix();

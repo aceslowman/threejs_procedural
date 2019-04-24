@@ -4,56 +4,44 @@
     <meta charset="utf-8">
     <title></title>
     <style>
-      body{
-        padding:0px;
-        margin:0px;
-        font: 10px 'Helvetica', sans-serif;
-        overflow:hidden;
-      }
-      canvas{
-        display:block;
-      }
-      .roadDebug{
-        position:absolute;
-        top:0px;
-        left:0px;
-        color:white;
-        border: 1px solid white;
-        padding:15px;
-        margin: 5px;
-      }
-      .roadDebug ul {
-        list-style:none;
-        padding:0px;
-        margin:0px;
-      }
-      .dg .ac {
-        z-index: 999 !important;
-      }
-      .road_textbox {
-        color:white;
-      }
+    html {
+      box-sizing: border-box;
+    }
 
-      .road_label {
-        background-color: rgba(255,255,255,0.5);
-        padding: 1px;
-        position: absolute;
-        z-index:: 100;
-      }
+    *,
+    *:before,
+    *:after {
+      box-sizing: inherit;
+    }
 
-      .road_label h6 {
-        margin: 0px;
-        color: black;
-        font-size: 1.2em;
-      }
+    body {
+      font-family: sans-serif;
+      padding: 0;
+      margin: 0;
+      color: white;
+    }
+
+    .panel-left{
+      padding:15px;
+    }
+
+
+
+    .vis {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: -1;
+    }
     </style>
   </head>
   <body>
     <noscript>
       You need to enable JavaScript to see anything!
     </noscript>
-    <div class="container">
-
+    <div id="root">
       <!--
         Not ideal, but CCapture is currently not bundled correctly for NPM.
         https://github.com/spite/ccapture.js/issues/36

@@ -3,7 +3,7 @@ const path = require('path');
 const webpack = require('webpack');
 let WebpackNotifierPlugin = require('webpack-notifier');
 
-var entry = './public/js/main.js',
+var entry = './public/js/App.js',
     destination = path.join(__dirname, 'public/js/dist');
 
 module.exports = {
@@ -23,8 +23,16 @@ module.exports = {
                 exclude: [/node_modules/],
                 loader: 'babel-loader',
                 options: {
-                  presets:['env']
+                  presets:['env', 'react', 'stage-2']
                 }
+            },
+            {
+              test: /\.(glsl|vs|fs|vert|frag)$/,
+              exclude: [/node_modules/],
+              use: [
+                'raw-loader',
+                'glslify-loader'
+              ]
             }
         ]
     },

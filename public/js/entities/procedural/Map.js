@@ -1,68 +1,69 @@
 import * as THREE from "three";
-import * as fbm from './shaders/fbm';
-import * as invert from './shaders/invert';
 import * as ASMATH from "../../utilities/Math";
 import _ from "lodash";
 
+import { EffectComposer } from '../../utilities/EffectComposer/EffectComposer.js';
+
 export default class ProceduralMap{
   constructor(manager, options){
-      this.manager = manager;
-      this.size = options.size;
+    this.manager = manager;
 
-      this.fbm = {
-        time: options.time,
-        bSmooth: options.bSmooth,
-        map: options.map,
-        scale: options.scale,
-        offset: options.offset,
-        octaves: options.octaves,
-      };
+    this.width  = options.width  || 256;
+    this.height = options.height || 256;
 
-      this.width = this.size[0];
-      this.height = this.size[1];
-
-      this.generate();
+    this.initialize();
   }
 
-  generate(){
-    this.camera = new THREE.OrthographicCamera(
-        this.width / - 2,
-        this.width / 2,
-        this.height / 2,
-        this.height / -2,
-        1,
-        1000
-    );
+  initialize(){
+    this.uniforms = {};
 
-    this.camera.position.z = 1;
+        this.target = new THREE.WebGLRenderTarget(this.width, this.height, {
+          format: THREE.RGBAFormat,
+          type: THREE.FloatType
+        });
 
-    this.uniforms = {
-      time: { value: this.fbm.time },
-      bSmooth: { value: this.fbm.bSmooth },
-      map: { value: this.fbm.map },
-      scale: { value: this.fbm.scale },
-      offset: { value: this.fbm.offset },
-      octaves: { value: this.fbm.octaves }
-    };
+    // TODO: use EffectComposer
+    this.composer = new THREE.EffectComposer(this.manager.renderer, this.target);
+    this.composer.setSize(this.width, this.height);
 
-    const geometry = new THREE.PlaneBufferGeometry( 2., 2.);
-    const material = new THREE.ShaderMaterial({
+    this.shader = new THREE.ShaderMaterial({
       uniforms: this.uniforms,
-      vertexShader: fbm.vert,
-      fragmentShader: fbm.frag
+      vertexShader: `
+        varying vec2 vUv;
+
+        void main()	{
+            vUv = uv;
+            gl_Position = vec4( position, 1.0 );
+        }
+        `,
+      fragmentShader: `
+        void main() {
+          gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+        }
+      `
     });
 
-    this.quad = new THREE.Mesh( geometry, material );
+    const shaderPass = new THREE.ShaderPass(this.shader, "shader");
+    this.composer.addPass(shaderPass);
 
+    //--------------------------------------------------------------------------
+
+    this.quad = new THREE.Mesh(this.geometry, this.material);
     this.scene = new THREE.Scene();
-    this.scene.add( this.quad );
+    this.scene.add(this.quad);
 
-    this.target = new THREE.WebGLRenderTarget(this.width,this.height, {
-      format: THREE.RGBAFormat,
-      type: THREE.FloatType
-    });
+    this.camera = new THREE.OrthographicCamera(
+      this.width / - 2,
+      this.width / 2,
+      this.height / 2,
+      this.height / - 2,
+      0,
+      1
+    );
+  }
 
-    this.manager.renderer.render(this.scene, this.camera, this.target);
+  render(){
+    this.composer.render();
   }
 
   setupDisplay(name, position){
@@ -76,7 +77,7 @@ export default class ProceduralMap{
     this.outputQuad.position.x = position.x;
     this.outputQuad.position.y = position.y;
 
-    this.manager.overScene.add( this.outputQuad );
+    this.manager.scene.add( this.outputQuad );
 
     //setup label
     let labelPos = ASMATH.world2Screen(this.outputQuad.position, this.manager.ortho, this.manager.renderer.context.canvas);
@@ -89,8 +90,8 @@ export default class ProceduralMap{
 
     cont.style.position = "absolute";
     cont.style.zIndex = 100;
-    cont.style.width = this.width  + "px";
-    cont.style.height = this.height  + "px";
+    cont.style.width = this.width + "px";
+    cont.style.height = this.height + "px";
 
     cont.style.left = (labelPos.x - (this.width/2.0)) + "px";
     cont.style.top = (labelPos.y - (this.height/2.0)) + "px";
@@ -99,18 +100,11 @@ export default class ProceduralMap{
     document.body.appendChild(cont);
   }
 
-  /**
-  * copies the current ProceduralMap, but inverted.
-  * utilizes lodash cloneDeep
-  * @returns {ProceduralMap} returns new ProceduralMap
-  */
-  invert(){
-
-  }
+  //----------------------------------------------------------------------------
 
   getSample(x, y){
     const buffer = new Float32Array(4); // NOTE: can't use floats in Safari!
-    if(x > this.width || y > this.height || x < 0 || y < 0) console.warn("sampling out of bounds")
+    if (x > this.width || y > this.height || x < 0 || y < 0) console.warn("sampling out of bounds")
     this.manager.renderer.readRenderTargetPixels(this.target, x, y, 1, 1, buffer);
     return buffer[0];
   }
