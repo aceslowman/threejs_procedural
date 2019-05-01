@@ -17,6 +17,10 @@ import dat from "dat.gui";
     default camera is used, unless separate camera is passed using setCamera()
   renderer
   entities
+
+  TODO:
+  i need to do something about the overlay scene, I usually just end up
+  commenting it out.
 */
 
 export default class asStandardManager {
@@ -26,7 +30,7 @@ export default class asStandardManager {
     },
     renderer = {
       antialias: true,
-      alpha: true
+      // alpha: true
     }
   } = {}) {
     this.width = window.innerWidth;
@@ -34,7 +38,9 @@ export default class asStandardManager {
 
     this.entities = [];
 
-    this.gui = new dat.GUI();
+    // this.gui = new dat.GUI({ autoPlace: false });
+    // document.getElementById('DATGUI').appendChild(this.gui.domElement);
+    // document.getElementById('DATGUI').appendChild(this.gui.domElement);
     this.eventBus = new EventBus();
     this.clock = new THREE.Clock();
 
@@ -43,7 +49,7 @@ export default class asStandardManager {
     */
     this.renderer = new THREE.WebGLRenderer(renderer);
     this.renderer.setSize(this.width, this.height);
-    this.renderer.autoClear = false; // for overlay
+    // this.renderer.autoClear = false; // for overlay
     document.getElementById('root').appendChild(this.renderer.domElement);
 
     /*
@@ -55,7 +61,7 @@ export default class asStandardManager {
     /*
       the scene for debug information to be drawn on top of the main scene
     */
-    this.overScene = new THREE.Scene();
+    // this.overScene = new THREE.Scene();
     // this.scene.background = new THREE.Color("red");
 
     this.camera = new Camera(this);
@@ -93,7 +99,7 @@ export default class asStandardManager {
       render both the main scene, and the debug/ui over scene
     */
     this.renderer.render(this.scene, this.camera.getCamera());
-    this.renderer.render(this.overScene, this.ortho);
+    // this.renderer.render(this.overScene, this.ortho);
   }
 
   addEntity(entity) {

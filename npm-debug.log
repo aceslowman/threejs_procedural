@@ -7,7 +7,7 @@
 6 silly lifecycle threejs_node@1.0.0~prestart:dev: no script for prestart:dev, continuing
 7 info lifecycle threejs_node@1.0.0~start:dev: threejs_node@1.0.0
 8 verbose lifecycle threejs_node@1.0.0~start:dev: unsafe-perm in lifecycle true
-9 verbose lifecycle threejs_node@1.0.0~start:dev: PATH: /usr/share/npm/bin/node-gyp-bin:/home/aceslowman/Dropbox/Code/_JS/_THREEJS/threejs_procedural/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+9 verbose lifecycle threejs_node@1.0.0~start:dev: PATH: /usr/share/npm/bin/node-gyp-bin:/home/aceslowman/Dropbox/Code/_JS/_THREEJS/threejs_procedural/node_modules/.bin:/home/aceslowman/anaconda3/bin:/home/aceslowman/anaconda3/condabin:/home/aceslowman/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/aceslowman/bin:/home/aceslowman/bin
 10 verbose lifecycle threejs_node@1.0.0~start:dev: CWD: /home/aceslowman/Dropbox/Code/_JS/_THREEJS/threejs_procedural
 11 silly lifecycle threejs_node@1.0.0~start:dev: Args: [ '-c',
 11 silly lifecycle   'webpack-dev-server --config webpack.dev.config.js --mode development --hot' ]
@@ -25,7 +25,7 @@
 14 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:209:5)
 15 verbose pkgid threejs_node@1.0.0
 16 verbose cwd /home/aceslowman/Dropbox/Code/_JS/_THREEJS/threejs_procedural
-17 error Linux 4.18.0-17-generic
+17 error Linux 4.18.0-18-generic
 18 error argv "/usr/bin/node" "/usr/bin/npm" "run" "start:dev"
 19 error node v8.10.0
 20 error npm  v3.5.2

@@ -30,5 +30,4 @@ export default class StandardEntity{
     this.scene.add(this.mesh);
     this.manager.addEntity(this);
   }
-
 }

@@ -1,44 +1,39 @@
 import * as THREE from 'three';
 import React from 'react';
-import StandardManager from '../system/StandardManager';
-import ProceduralMap from '../entities/procedural/Map';
 
-export default class MapSandbox extends React.Component {
+export default class TemplateView extends React.Component {
+  constructor(props) {
+    console.log(props);
+    super(props);
+
+    this.state = {
+      manager: props.manager
+    }
+  }
+
   componentDidMount() {
     const width = this.mount.clientWidth;
     const height = this.mount.clientHeight;
 
-    this.manager = new StandardManager({
-      scene: {
-        background: 'black'
-      }
-    });
-
-    const map = new ProceduralMap(this.manager, {
-      width: 256,
-      height: 256,
-    });
-
-    map.render();
-    map.setupDisplay("Test Map", new THREE.Vector3(0,0,0));
+    // do stuff
 
     window.addEventListener('resize', this.handleResize);
 
-    this.mount.appendChild(this.manager.renderer.domElement);
+    this.mount.appendChild(this.state.manager.renderer.domElement);
     this.start();
   }
 
   componentWillUnmount() {
-    this.manager.gui.destroy();
+    this.state.manager.gui.destroy();
     window.removeEventListener('resize', this.handleResize);
     this.stop();
-    this.mount.removeChild(this.manager.renderer.domElement);
+    this.mount.removeChild(this.state.manager.renderer.domElement);
   }
 
   handleResize = () => {
     const width = this.mount.clientWidth;
     const height = this.mount.clientHeight;
-    this.manager.onWindowResize(width, height);
+    this.state.manager.onWindowResize(width, height);
   }
 
   start = () => {
@@ -57,13 +52,13 @@ export default class MapSandbox extends React.Component {
   }
 
   renderScene = () => {
-    this.manager.update();
+    this.state.manager.update();
   }
 
   render() {
     return (
       <div
-        className="vis"
+        id="APP"
         ref={mount => {
           this.mount = mount
         }}
