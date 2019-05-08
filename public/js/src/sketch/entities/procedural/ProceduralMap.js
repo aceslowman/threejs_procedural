@@ -19,10 +19,6 @@ export default class ProceduralMap{
 			stencilBuffer: false
     });
 
-    this.initializeComposer();
-  }
-
-  initializeComposer(){
     this.composer = new THREE.EffectComposer(this.manager.renderer, this.target);
     this.composer.setSize(this.width, this.height);
   }

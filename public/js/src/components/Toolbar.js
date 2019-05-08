@@ -3,11 +3,16 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { toolbar_style } from './styles/toolbar';
 
-export default class Toolbar extends React.Component {
-  constructor() {
-    super();
+import MapGUIContainer from '../containers/MapGUIContainer';
 
-    this.state = {open: true};
+export default class Toolbar extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      open: true,
+      maps: props.maps
+    };
     this.style = toolbar_style;
 
     this.handle = {
@@ -22,11 +27,11 @@ export default class Toolbar extends React.Component {
 
   componentDidMount() {
     this.handle.elem = document.getElementById('TOOLBAR_HANDLE');
+    
     this.toolbar.elem = document.getElementById('TOOLBAR');
     this.toolbar.elem.addEventListener("touchstart", (e)=>this.dragStart(e), false);
     this.toolbar.elem.addEventListener("touchend", (e)=>this.dragEnd(e), false);
     this.toolbar.elem.addEventListener("touchmove", (e)=>this.drag(e), false);
-
     this.toolbar.elem.addEventListener("mousedown", (e)=>this.dragStart(e), false);
     this.toolbar.elem.addEventListener("mouseup", (e)=>this.dragEnd(e), false);
     this.toolbar.elem.addEventListener("mousemove", (e)=>this.drag(e), false);
@@ -61,20 +66,17 @@ export default class Toolbar extends React.Component {
     }
   }
 
-  // TODO: Now, toggle when dbl clicked.
   togglePanel(e) {
     if(this.state.open){
       this.toolbar.elem.style.transition = 'width 1000ms ease';
       this.toolbar.elem.style.width = '35px';
       document.getElementById('DATGUI').style.opacity = '0';
       this.setState({open: false});
-      // this.toolbar.elem.style.transition = 'none';
     }else{
       this.toolbar.elem.style.transition = 'width 1000ms ease';
       this.toolbar.elem.style.width = '300px';
       setInterval(()=>document.getElementById('DATGUI').style.opacity = '1', 500);
       this.setState({open: true});
-      // this.toolbar.elem.style.transition = 'none';
     }
   };
 
@@ -98,7 +100,10 @@ export default class Toolbar extends React.Component {
               </ul>
             </nav>
           </div>
-          <div id="DATGUI"></div>
+          <div id="DATGUI">
+            <MapGUIContainer />
+            {/* might be able to use routers */}
+          </div>
           <div id="TOOLBAR_HANDLE" style={this.style.handle}></div>
         </div>
       </Router>

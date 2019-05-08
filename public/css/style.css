@@ -32,6 +32,10 @@ html, body, .container {
   position:inherit;
 }
 
+#DATGUI div {
+  position: relative !important; /* NOTE: important for dis-gui */
+}
+
 #NAV{
   padding-bottom:15px;
 }

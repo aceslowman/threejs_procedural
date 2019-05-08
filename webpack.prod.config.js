@@ -2,7 +2,7 @@ const path = require('path');
 const CompressionPlugin = require("compression-webpack-plugin");
 const webpack = require('webpack');
 
-var entry = './public/js/App.js',
+var entry = './public/js/src/App.js',
     destination = path.join(__dirname, 'public/js/dist');
 
 module.exports = {
@@ -24,14 +24,6 @@ module.exports = {
                 options: {
                   presets:['env', 'react', 'stage-2'],
                 }
-            },
-            {
-                test: /\.scss$/,
-                use: [
-                    "style-loader", // creates style nodes from JS strings
-                    "css-loader", // translates CSS into CommonJS
-                    "sass-loader" // compiles Sass to CSS, using Node Sass by default
-                ]
             }
         ]
     },

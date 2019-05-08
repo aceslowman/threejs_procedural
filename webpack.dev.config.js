@@ -1,9 +1,7 @@
-const Dotenv = require('dotenv-webpack');
 const path = require('path');
 const webpack = require('webpack');
-let WebpackNotifierPlugin = require('webpack-notifier');
 
-var entry = './public/js/App.js',
+var entry = './public/js/src/App.js',
     destination = path.join(__dirname, 'public/js/dist');
 
 module.exports = {
@@ -25,14 +23,6 @@ module.exports = {
                 options: {
                   presets:['env', 'react', 'stage-2']
                 }
-            },
-            {
-                test: /\.scss$/,
-                use: [
-                    "style-loader", // creates style nodes from JS strings
-                    "css-loader", // translates CSS into CommonJS
-                    "sass-loader" // compiles Sass to CSS, using Node Sass by default
-                ]
             }
         ]
     },
@@ -51,13 +41,9 @@ module.exports = {
     node: {
       fs: 'empty',
     },
-    plugins: [
-      new Dotenv()
-    ],
     devServer: {
       contentBase: path.join(__dirname, 'public'),
       publicPath: '/js/dist',
-      port: 3000,
       overlay: true
     },
     devtool: 'source-map'

@@ -1,0 +1,18 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { createStore } from 'redux'
+import { Provider } from 'react-redux'
+
+import SketchContainer from './containers/SketchContainer';
+import { reducer } from './reducers/reducer';
+
+import devToolsEnhancer from 'remote-redux-devtools';
+
+const store = createStore(reducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+
+ReactDOM.render(
+  <Provider store={store}>
+    <SketchContainer />
+  </Provider>,
+  document.getElementById('root')
+);

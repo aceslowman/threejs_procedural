@@ -3,15 +3,15 @@ import React from 'react';
 import dat from "dat.gui";
 import Toolbar from './Toolbar'
 
-import StandardManager from './system/StandardManager';
+import StandardManager from '../sketch/system/StandardManager';
 
 // PROCEDURAL TOOLS IMPORTS
-import ProceduralMap from './entities/procedural/ProceduralMap';
-import ProceduralTerrain from './entities/procedural/terrain/ProceduralTerrain';
+import ProceduralMap from '../sketch/entities/procedural/ProceduralMap';
+import ProceduralTerrain from '../sketch/entities/procedural/terrain/ProceduralTerrain';
 
 // SHADER IMPORTS
-import FractalNoise from "./shaders/fractalnoise.js";
-import FractalWarp from "./shaders/fractalwarp.js";
+import FractalNoise from "../sketch/shaders/fractalnoise.js";
+import FractalWarp from "../sketch/shaders/fractalwarp.js";
 
 export default class Sketch extends React.Component {
   constructor(props) {
@@ -22,29 +22,37 @@ export default class Sketch extends React.Component {
     this.state = {
       manager: manager,
       map: {
-        elevation: new ProceduralMap(manager, {width: 512, height: 512})
+        elevation: ''
       }
     }
+  }
+
+  componentDidUpdate(){
+    console.log("PROP NUMBER", this.props.number);
   }
 
   componentDidMount() {
     const width = this.mount.clientWidth;
     const height = this.mount.clientHeight;
 
-    this.setupShaderPasses(this.state.map.elevation, [
+    let map = new ProceduralMap(this.state.manager, {width: 512, height: 512});
+
+    this.setupShaderPasses(map, [
       new FractalNoise(8),
       new FractalWarp(4)
     ]);
 
-    this.state.map.elevation.render();
+    this.props.mapAdded("Elevation", map);
+
+    map.render();
 
     // SETUP TERRAIN
     this.terrain = new ProceduralTerrain(this.state.manager, {
-      width: 256,
-      height: 256,
-      detail: 256.0,
+      width: 512,
+      height: 512,
+      detail: 512.0,
       amplitude: 300,
-      elevation: this.state.map.elevation
+      elevation: map
     });
 
     // SETUP LISTENERS
@@ -55,6 +63,12 @@ export default class Sketch extends React.Component {
 
     this.terrain.setup();
     this.terrain.setupDebug();
+
+    this.setState({
+      map: {
+        elevation: map
+      }
+    });
   }
 
   setupShaderPasses(map, passes) {
@@ -65,7 +79,7 @@ export default class Sketch extends React.Component {
 
     map.composer.swapBuffers();
 
-    this.setupShaderGraphDisplay(map);
+    // this.setupShaderGraphDisplay(map);
   }
 
   // this is primarily TOOLBOX relevant
@@ -105,8 +119,6 @@ export default class Sketch extends React.Component {
       gui.pass.uniforms = gui.pass.addFolder('Uniforms');
       let uniforms = pass.material.uniforms;
       for(let uniform in uniforms){
-        console.log();
-        // if(uniforms[uniform] )
         let isNumber = typeof uniforms[uniform].value === 'number';
         if(isNumber){
           gui.pass.add(uniforms[uniform], "value").step(0.001).name(uniform)
@@ -165,7 +177,7 @@ export default class Sketch extends React.Component {
   render() {
     return (
       <div className="container">
-        <Toolbar manager={this.state.manager} />
+        <Toolbar/>
         <div id="APP" ref={mount => { this.mount = mount }}/>
       </div>
     )
