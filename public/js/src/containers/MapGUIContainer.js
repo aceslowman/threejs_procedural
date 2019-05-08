@@ -3,31 +3,30 @@ import { connect } from 'react-redux';
 import MapGUI from '../components/gui/MapGUI';
 
 // send some sort of message along to the store, to be utilized by the reducer.
-const guiChanged = (id, key, value) => {
-  console.log('value', value)
-
+const updatePassDefine = (map, key, val) => {
+  console.log('CHECK', [map, key, val]);
   return ({
-    type: 'UPDATE_MAP',
+    type: 'UPDATE_PASS_DEFINE',
     key: key,
-    value, value
+    value,val
   });
 };
 
-const guiAdd = (name) => ({
-  type: 'GUI_ADDED',
-  name: name
-})
+// the documentation states that mapStateToProps should RESHAPE the state data.
+// currently this is returning everything I believe I will need.
+const mapStateToProps = state => {
+  const { maps } = state;
+  const { passes } = state;
 
-const mapStateToProps = state => ({
-  maps: state.maps
-});
+  return ({
+    maps: maps.byId,
+    passes: passes.byId
+  })
+};
 
 const mapDispatchToProps = dispatch => ({
-  guiChanged: (id, key, value) => {
-    dispatch(guiChanged(id, key, value)); // send action containing the key and value
-  },
-  guiAdd: (name) => {
-    dispatch(guiAdd(name));
+  updatePassDefine: (id, key, value) => {
+    dispatch(updatePassDefine(id, key, value)); // send action containing the key and value
   }
 });
 

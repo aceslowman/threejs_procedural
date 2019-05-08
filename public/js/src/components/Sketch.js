@@ -28,7 +28,7 @@ export default class Sketch extends React.Component {
   }
 
   componentDidUpdate(){
-    console.log("PROP NUMBER", this.props.number);
+    // console.log("PROP NUMBER", this.props.number);
   }
 
   componentDidMount() {

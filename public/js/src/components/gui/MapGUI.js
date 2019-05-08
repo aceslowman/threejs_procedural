@@ -5,8 +5,6 @@ export default class MapGUI extends React.Component {
   constructor(props){
     super(props);
 
-    this.guiChanged = props.guiChanged;
-
     this.state = {
       maps: props.data,
       elements: []
@@ -14,56 +12,54 @@ export default class MapGUI extends React.Component {
   }
 
   handleUniformChange(uniform, value){
-    console.log(uniform, value);
+    // console.log(uniform, value);
   }
 
   handleDefineChange(define, value){
-    console.log(define, value);
+    // console.log(define, value);
   }
 
   assembleShaderGraph() {
     let elements = [];
-    let k = 0;
+    
+    for(let m in this.props.maps){
+      let map = this.props.maps[m];
 
-    for(let map of this.props.maps){
-      for(let pass of map.composer.passes){
-        
-        // assemble uniform gui elements
+      for(let p in map.passes){
+        let pass = this.props.passes[map.passes[p]];
+
+        let define_elements = [];
+        for(let d in pass.defines){
+          let define = pass.defines[d];
+          define_elements.push(<dg.Number label={d} value={define} min={0} max={20} step={1} onChange={(val)=>this.props.updatePassDefine(m, d, val)} />);
+        }
+
         let uniform_elements = [];
-        let uniforms = pass.material.uniforms;
-        for(let uniform in uniforms){
-          let isNumber = typeof uniforms[uniform].value === 'number';
+        for(let u in pass.uniforms){
+          let uniform = pass.uniforms[u];
+          let isNumber = typeof uniform.value === 'number';
           if (isNumber) {
-            uniform_elements.push(<dg.Number label={uniform} value={uniforms[uniform].value} step={0.001} onChange={(val)=>this.handleUniformChange(uniform, val)}/>);
+            uniform_elements.push(<dg.Number label={u} value={uniform.value} step={0.001} onChange={(val)=>this.props.updatePassUniform(val)}/>);
           } else {
-            uniform_elements.push(<dg.Number label={uniform} value={uniforms[uniform].value} onChange={(val)=>this.handleUniformChange(uniform, val)}/>);
+            uniform_elements.push(<dg.Number label={u} value={uniform.value} onChange={(val)=>this.props.updatePassUniform(val)}/>);
           }
         }
-      
-        // assemble define gui elements
-        let define_elements = [];
-        let defines = pass.material.defines;
-        for (let define in defines) {
-          console.log(defines[define])
-          define_elements.push(<dg.Number label={define} value={defines[define]} min={0} max={20} step={1} onChange={(val)=>this.handleDefineChange(define, val)}/>);
-        }
-        
+
         elements.push(
-          <dg.Folder key={k} label={pass.material.name}>
+          <dg.Folder label={pass.id}>
             {define_elements}
             {uniform_elements}
           </dg.Folder>
         );
-
-        k++;
       }
-      
-      this.elements = elements;
     }
+
+    // TODO currently not organizing multiple maps, focusing on getting elevation first
+    this.elements = elements;
   }
 
   render(){
-    // this.assembleShaderGraph();
+    this.assembleShaderGraph();
 
     return (
       <dg.GUI style={{position: 'relative', left: 0, top:0}}>

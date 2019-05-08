@@ -63,8 +63,6 @@ function reducer(state = initial, action) {
         passes[action.passes[pass].id] = action.passes[pass] 
       }
 
-      console.log("CHECK PASS", passes)
-
       // TODO the data looks good now, and the next challenge will be connecting it to the gui elements.
 
       return (
