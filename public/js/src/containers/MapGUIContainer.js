@@ -3,12 +3,21 @@ import { connect } from 'react-redux';
 import MapGUI from '../components/gui/MapGUI';
 
 // send some sort of message along to the store, to be utilized by the reducer.
-const updatePassDefine = (map, key, val) => {
-  console.log('CHECK', [map, key, val]);
+const updatePassDefine = (pId, dId, val) => {
   return ({
     type: 'UPDATE_PASS_DEFINE',
-    key: key,
-    value,val
+    passId: pId,
+    defineId: dId,
+    value: val
+  });
+};
+
+const updatePassUniform = (pId, uId, val) => {
+  return ({
+    type: 'UPDATE_PASS_UNIFORM',
+    passId: pId,
+    uniformId: uId,
+    value: val
   });
 };
 
@@ -25,8 +34,11 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  updatePassDefine: (id, key, value) => {
-    dispatch(updatePassDefine(id, key, value)); // send action containing the key and value
+  updatePassDefine: (pId, dId, val) => {
+    dispatch(updatePassDefine(pId, dId, val));
+  },
+  updatePassUniform: (pId, uId, val) => {
+    dispatch(updatePassUniform(pId, uId, val));
   }
 });
 

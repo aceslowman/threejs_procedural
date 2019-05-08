@@ -11,16 +11,9 @@ export default class MapGUI extends React.Component {
     }
   }
 
-  handleUniformChange(uniform, value){
-    // console.log(uniform, value);
-  }
-
-  handleDefineChange(define, value){
-    // console.log(define, value);
-  }
-
   assembleShaderGraph() {
     let elements = [];
+    let k = 0;
     
     for(let m in this.props.maps){
       let map = this.props.maps[m];
@@ -29,32 +22,62 @@ export default class MapGUI extends React.Component {
         let pass = this.props.passes[map.passes[p]];
 
         let define_elements = [];
+        let d_k = 0;
         for(let d in pass.defines){
           let define = pass.defines[d];
-          define_elements.push(<dg.Number label={d} value={define} min={0} max={20} step={1} onChange={(val)=>this.props.updatePassDefine(m, d, val)} />);
+          define_elements.push(
+            <dg.Number
+              key={d_k} 
+              label={d} 
+              value={define} 
+              min={0} 
+              max={20} 
+              step={1} 
+              onFinishChange={(val)=>this.props.updatePassDefine(map.passes[p], d, val)}
+            />);
+
+          d_k++;
         }
 
         let uniform_elements = [];
+        let u_k = 0;
         for(let u in pass.uniforms){
           let uniform = pass.uniforms[u];
-          let isNumber = typeof uniform.value === 'number';
-          if (isNumber) {
-            uniform_elements.push(<dg.Number label={u} value={uniform.value} step={0.001} onChange={(val)=>this.props.updatePassUniform(val)}/>);
+          if (typeof uniform.value === 'number') {
+            uniform_elements.push(
+              <dg.Number 
+                key={u_k}
+                label={u} 
+                value={uniform.value} 
+                step={0.01} 
+                onChange={(val)=>this.props.updatePassUniform(map.passes[p], u, val)}
+              />);
           } else {
-            uniform_elements.push(<dg.Number label={u} value={uniform.value} onChange={(val)=>this.props.updatePassUniform(val)}/>);
+            // TODO: how should other types be handled?
+            // uniform_elements.push(
+            //   <dg.Number 
+            //     key={u_k}
+            //     label={u} 
+            //     value={uniform.value} 
+            //     onChange={(val)=>this.props.updatePassUniform(val)}
+            //   />);
           }
+
+          u_k++;
         }
 
         elements.push(
-          <dg.Folder label={pass.id}>
+          <dg.Folder key={k} label={pass.id} expanded={true}>
             {define_elements}
             {uniform_elements}
           </dg.Folder>
         );
+
+        k++;
       }
     }
 
-    // TODO currently not organizing multiple maps, focusing on getting elevation first
+    // TODO: currently not organizing multiple maps, focusing on getting elevation first
     this.elements = elements;
   }
 

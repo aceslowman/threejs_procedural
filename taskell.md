@@ -5,7 +5,7 @@
 
 ## Doing
 
-- Connect GUI elements to store, and get interactions working between the GUI and the Sketch.
+- Update forked dis-gui
 
 ## Done
 
@@ -13,3 +13,4 @@
 - Attempt to use dis-gui, instead of dat-gui.
 - Observe state, and identify the pattern that will allow this gui system to work.
 - Fill state up with values from Sketch.
+- Connect GUI elements to store, and get interactions working between the GUI and the Sketch.

@@ -1,5 +1,5 @@
 /*
-  NOTE: this might require multiple reducers, but for now, I'll be
+  TODO: this might require multiple reducers, but for now, I'll be
   implementing them all in one below.
 */
 
@@ -63,7 +63,7 @@ function reducer(state = initial, action) {
         passes[action.passes[pass].id] = action.passes[pass] 
       }
 
-      // TODO the data looks good now, and the next challenge will be connecting it to the gui elements.
+      // TODO: the data looks good now, and the next challenge will be connecting it to the gui elements.
 
       return (
         {
@@ -84,26 +84,49 @@ function reducer(state = initial, action) {
           }
         }
       )
-
-    case 'GUI_ADDED':
-      // console.log(`added the ${action.name} gui element`, action);
+    case 'UPDATE_PASS_DEFINE':
+      // TODO: I will need to generate some sort of UNIQUE id for each pass, appending to the end of the sanitized name.
       return (
         {
           ...state,
-          gui: [...state.gui, { name: action.name }]
-        }
-      )
-    case 'GUI_CHANGED':
-      // console.log(`gui changed, value is: ${action.value}`);
-      return (
-        {
-          ...state,
-          key: action.key,
-          value: action.value
+          passes: {
+            ...state.passes,
+            byId: {
+              ...state.passes.byId,
+              [action.passId]: {
+                ...state.passes.byId[action.passId],
+                defines: {
+                  ...state.passes.byId.defines,
+                  [action.defineId]: action.value
+                }
+              }
+            }
+          }
         }
       );
+    case 'UPDATE_PASS_UNIFORM':
+      // TODO: I will need to generate some sort of UNIQUE id for each pass, appending to the end of the sanitized name.
+      return (
+        {
+          ...state,
+          passes: {
+            ...state.passes,
+            byId: {
+              ...state.passes.byId,
+              [action.passId]: {
+                ...state.passes.byId[action.passId],
+                uniforms: {
+                  ...state.passes.byId[action.passId].uniforms,
+                  [action.uniformId]: { 
+                    value: action.value 
+                  }
+                }
+              }
+            }
+          }
+        }
+      );      
     default:
-      // console.log('DEFAULT REDUCER')
       return state;
   }
 }
