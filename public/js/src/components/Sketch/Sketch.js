@@ -1,17 +1,16 @@
 import * as THREE from 'three';
 import React from 'react';
-import dat from "dat.gui";
-import Toolbar from './Toolbar'
+import Toolbar from '../Toolbar/Toolbar'
 
-import StandardManager from '../sketch/system/StandardManager';
+import StandardManager from '../../sketch/system/StandardManager';
 
 // PROCEDURAL TOOLS IMPORTS
-import ProceduralMap from '../sketch/entities/procedural/ProceduralMap';
-import ProceduralTerrain from '../sketch/entities/procedural/terrain/ProceduralTerrain';
+import ProceduralMap from '../../sketch/entities/procedural/ProceduralMap';
+import ProceduralTerrain from '../../sketch/entities/procedural/terrain/ProceduralTerrain';
 
 // SHADER IMPORTS
-import FractalNoise from "../sketch/shaders/fractalnoise.js";
-import FractalWarp from "../sketch/shaders/fractalwarp.js";
+import FractalNoise from "../../sketch/shaders/fractalnoise.js";
+import FractalWarp from "../../sketch/shaders/fractalwarp.js";
 
 export default class Sketch extends React.Component {
   constructor(props) {

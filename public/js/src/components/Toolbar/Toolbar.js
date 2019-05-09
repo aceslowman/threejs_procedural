@@ -1,10 +1,9 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { HashRouter, Route, Link } from "react-router-dom";
-import { toolbar_style } from './styles/toolbar';
+import { toolbar_style } from './ToolbarStyle';
 
-import MapGUIContainer from '../containers/MapGUIContainer';
-import CameraGUIContainer from '../containers/CameraGUIContainer';
+import MapGUIContainer from '../MapGUI/MapGUIContainer';
+import CameraGUIContainer from '../CameraGUI/CameraGUIContainer';
 
 export default class Toolbar extends React.Component {
   constructor(props) {

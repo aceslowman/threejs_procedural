@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 //import actions
-import MapGUI from '../components/gui/MapGUI';
+import MapGUI from './MapGUI';
 
 // send some sort of message along to the store, to be utilized by the reducer.
 const updatePassDefine = (pId, dId, val) => {

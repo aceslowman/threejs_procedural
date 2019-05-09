@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 //import actions
-import Sketch from '../components/Sketch';
+import Sketch from './Sketch';
 
 // send an action
 const mapAdded = (id, map) => {

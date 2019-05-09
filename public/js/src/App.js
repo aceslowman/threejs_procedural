@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 
-import SketchContainer from './containers/SketchContainer';
+import SketchContainer from './components/Sketch/SketchContainer';
 // import { reducer } from './reducers/reducer';
-import reducer from './reducers'; //TODO: working on simplifying reducer structure
+import reducer from './reducer'; //TODO: working on simplifying reducer structure
 
 import devToolsEnhancer from 'remote-redux-devtools';
 

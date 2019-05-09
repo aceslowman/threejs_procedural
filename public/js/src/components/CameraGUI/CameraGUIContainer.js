@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 //import actions
-import CameraGUI from '../components/gui/CameraGUI';
+import CameraGUI from './CameraGUI';
 
 // send some sort of message along to the store, to be utilized by the reducer.
 const updateCamera = (camId, param, val) => {
