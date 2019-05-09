@@ -4,7 +4,6 @@ import CameraGUI from '../components/gui/CameraGUI';
 
 // send some sort of message along to the store, to be utilized by the reducer.
 const updateCamera = (camId, param, val) => {
-  console.log('hit');
   return ({
     type: 'UPDATE_CAMERA',
     cameraId: camId,
