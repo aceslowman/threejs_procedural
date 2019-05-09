@@ -2,10 +2,12 @@
 
 - Start planning the 'first-person' mode.
 - Prune unneeded git branches.
+- Correct FBM artifact issue.
+- Throttle the GUI update to sync with framerate.
 
 ## Doing
 
-- Update forked dis-gui
+- Correct ReactRouter refresh issue.
 
 ## Done
 
@@ -14,3 +16,6 @@
 - Observe state, and identify the pattern that will allow this gui system to work.
 - Fill state up with values from Sketch.
 - Connect GUI elements to store, and get interactions working between the GUI and the Sketch.
+- Update forked dis-gui
+- Create 'CameraGUI' panel, and connect at least one parameter.
+    > Add focal length slider.

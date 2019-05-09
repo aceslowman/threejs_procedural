@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { toolbar_style } from './styles/toolbar';
 
 import MapGUIContainer from '../containers/MapGUIContainer';
+import CameraGUIContainer from '../containers/CameraGUIContainer';
 
 export default class Toolbar extends React.Component {
   constructor(props) {
@@ -97,11 +98,15 @@ export default class Toolbar extends React.Component {
                 <li>
                   <Link to="/maps/">🗺</Link>
                 </li>
+                <li>
+                  <Link to="/camera/">📷</Link>
+                </li>
               </ul>
             </nav>
           </div>
           <div id="DATGUI">
-            <MapGUIContainer />
+            <Route path="/" exact component={MapGUIContainer} />
+            <Route path="/camera/" exact component={CameraGUIContainer} />
             {/* might be able to use routers */}
           </div>
           <div id="TOOLBAR_HANDLE" style={this.style.handle}></div>

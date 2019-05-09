@@ -11,6 +11,10 @@ const initial = {
   passes: {
     byId: {},
     allIds: []
+  },
+  cameras: {
+    byId: {},
+    allIds: []
   }
 };
 
@@ -56,6 +60,18 @@ passes: {
 
 function reducer(state = initial, action) {
   switch (action.type) {
+    case 'ADD_CAMERA':
+      return ({
+        ...state,
+        cameras: {
+          byId: {
+            ...state.cameras.byId,
+            [action.camera.id]: action.camera
+          },
+          allIds: [...state.cameras.allIds, action.camera.id]
+        }
+      })
+
     case 'ADD_MAP':
       let passes = {};
 
@@ -63,69 +79,78 @@ function reducer(state = initial, action) {
         passes[action.passes[pass].id] = action.passes[pass] 
       }
 
-      // TODO: the data looks good now, and the next challenge will be connecting it to the gui elements.
-
-      return (
-        {
-          ...state,
-          maps: {
-            byId: {
-              ...state.maps.byId,
-              [action.map.id]: action.map
-            },
-            allIds: [...state.maps.allIds, action.map.id]
+      return ({
+        ...state,
+        maps: {
+          byId: {
+            ...state.maps.byId,
+            [action.map.id]: action.map
           },
-          passes: {
-            byId: {
-              ...state.passes.byId,
-              ...passes
-            },
-            allIds: [...state.passes.allIds, ...action.passes.map(a=>a.id)]
-          }
+          allIds: [...state.maps.allIds, action.map.id]
+        },
+        passes: {
+          byId: {
+            ...state.passes.byId,
+            ...passes
+          },
+          allIds: [...state.passes.allIds, ...action.passes.map(a=>a.id)]
         }
-      )
+      })
     case 'UPDATE_PASS_DEFINE':
       // TODO: I will need to generate some sort of UNIQUE id for each pass, appending to the end of the sanitized name.
-      return (
-        {
-          ...state,
-          passes: {
-            ...state.passes,
-            byId: {
-              ...state.passes.byId,
-              [action.passId]: {
-                ...state.passes.byId[action.passId],
-                defines: {
-                  ...state.passes.byId.defines,
-                  [action.defineId]: action.value
-                }
+      return ({
+        ...state,
+        passes: {
+          ...state.passes,
+          byId: {
+            ...state.passes.byId,
+            [action.passId]: {
+              ...state.passes.byId[action.passId],
+              defines: {
+                ...state.passes.byId.defines,
+                [action.defineId]: action.value
               }
             }
           }
         }
-      );
+      });
+
     case 'UPDATE_PASS_UNIFORM':
       // TODO: I will need to generate some sort of UNIQUE id for each pass, appending to the end of the sanitized name.
-      return (
-        {
-          ...state,
-          passes: {
-            ...state.passes,
-            byId: {
-              ...state.passes.byId,
-              [action.passId]: {
-                ...state.passes.byId[action.passId],
-                uniforms: {
-                  ...state.passes.byId[action.passId].uniforms,
-                  [action.uniformId]: { 
-                    value: action.value 
-                  }
+      return ({
+        ...state,
+        passes: {
+          ...state.passes,
+          byId: {
+            ...state.passes.byId,
+            [action.passId]: {
+              ...state.passes.byId[action.passId],
+              uniforms: {
+                ...state.passes.byId[action.passId].uniforms,
+                [action.uniformId]: { 
+                  value: action.value 
                 }
               }
             }
           }
         }
-      );      
+      });
+
+    case 'UPDATE_CAMERA':
+      return({
+        ...state,
+        cameras: {
+          ...state.cameras,
+          byId: {
+            ...state.cameras.byId,
+            [action.cameraId]: {
+              ...state.cameras.byId[action.cameraId],
+              [action.param]: action.value
+            }
+          }
+        }
+      });  
+
     default:
       return state;
   }

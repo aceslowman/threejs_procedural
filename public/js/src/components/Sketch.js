@@ -56,6 +56,10 @@ export default class Sketch extends React.Component {
       this.state.maps.elevation.render();
       this.terrain.displace();
     }
+
+    if(this.props.cameras != prevProps.cameras){ //TODO: insufficient
+      this.state.manager.camera.getCamera().setFocalLength(this.props.cameras["Primary Camera"].fov); 
+    }
   }
 
   componentDidMount() {
@@ -70,6 +74,9 @@ export default class Sketch extends React.Component {
     ]);
 
     this.props.mapAdded("Elevation", map);
+    console.log("CAMERA", this.state.manager.camera.getCamera())
+    this.state.manager.camera.getCamera().name = "Primary Camera";
+    this.props.cameraAdded(this.state.manager.camera.getCamera());
 
     map.render();
 

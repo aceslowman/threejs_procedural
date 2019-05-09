@@ -22,18 +22,34 @@ const mapAdded = (id, map) => {
     });
 };
 
+const cameraAdded = (camera) => {
+    // TODO: strip out only the necessary params.
+
+    return ({
+        type: 'ADD_CAMERA',
+        camera: {
+            'id': camera.name,
+            'fov': camera.getFocalLength()
+        }
+    });
+}
+
 const mapStateToProps = state => {
-    const { maps, passes } = state;
+    const { maps, passes, cameras } = state;
 
     return {
         maps: maps.byId,
-        passes: passes.byId
+        passes: passes.byId,
+        cameras: cameras.byId
     }
 };
 
 const mapDispatchToProps = dispatch => ({
     mapAdded: (id, map) => {
         dispatch(mapAdded(id, map)) // send action containing the key and value
+    },
+    cameraAdded: (camera) => {
+        dispatch(cameraAdded(camera))
     }
 });
 
