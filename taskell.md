@@ -1,13 +1,11 @@
 ## To Do
 
 - Start planning the 'first-person' mode.
-- Prune unneeded git branches.
 - Correct FBM artifact issue.
 - Throttle the GUI update to sync with framerate.
 
 ## Doing
 
-- Correct ReactRouter refresh issue.
 
 ## Done
 
@@ -19,3 +17,6 @@
 - Update forked dis-gui
 - Create 'CameraGUI' panel, and connect at least one parameter.
     > Add focal length slider.
+- Correct ReactRouter refresh issue.
+    * [ ] 
+- Prune unneeded git branches.

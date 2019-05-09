@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { HashRouter, Route, Link } from "react-router-dom";
 import { toolbar_style } from './styles/toolbar';
 
 import MapGUIContainer from '../containers/MapGUIContainer';
@@ -83,7 +83,7 @@ export default class Toolbar extends React.Component {
 
   render() {
     return (
-      <Router>
+      <HashRouter>
         <div id="TOOLBAR" style={this.style.toolbar}>
           <div id="NAV">
             <h1 style={this.style.h1}>Procedural Tools</h1>
@@ -107,11 +107,12 @@ export default class Toolbar extends React.Component {
           <div id="DATGUI">
             <Route path="/" exact component={MapGUIContainer} />
             <Route path="/camera/" exact component={CameraGUIContainer} />
+            <Route path="/maps/" exact component={MapGUIContainer} />
             {/* might be able to use routers */}
           </div>
           <div id="TOOLBAR_HANDLE" style={this.style.handle}></div>
         </div>
-      </Router>
+      </HashRouter>
     );
   }
 }
