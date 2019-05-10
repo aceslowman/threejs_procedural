@@ -12,6 +12,7 @@ export default class MapGUI extends React.Component {
   }
 
   assembleShaderGraph() {
+    // TODO: i believe this is being called too many times, should be checked for changes
     let elements = [];
     
     let map_elements = [];
@@ -69,7 +70,7 @@ export default class MapGUI extends React.Component {
         }
 
         map_elements.push(
-          <dg.Folder key={m_k} label={pass.id} expanded={false}>
+          <dg.Folder key={m_k} label={pass.id} expanded={true}>
             {pass_elements}
           </dg.Folder>
         );

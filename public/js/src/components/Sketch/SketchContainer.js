@@ -24,6 +24,16 @@ const mapAdded = (id, map) => {
     });
 };
 
+const terrainAdded = (terrain) => {
+    return ({
+        type: 'ADD_TERRAIN',
+        terrain: {
+            ...terrain,
+            elevation: terrain.elevation.target.texture.uuid
+        }
+    });
+}
+
 const cameraAdded = (camera) => {
     // TODO: strip out only the necessary params.
 
@@ -37,18 +47,22 @@ const cameraAdded = (camera) => {
 }
 
 const mapStateToProps = state => {
-    const { maps, passes, cameras } = state;
+    const { maps, passes, cameras, terrain } = state;
 
     return {
         maps: maps.byId,
         passes: passes.byId,
-        cameras: cameras.byId
+        cameras: cameras.byId,
+        terrain: terrain
     }
 };
 
 const mapDispatchToProps = dispatch => ({
     mapAdded: (id, map) => {
         dispatch(mapAdded(id, map)) // send action containing the key and value
+    },
+    terrainAdded: (terrain) => {
+        dispatch(terrainAdded(terrain))
     },
     cameraAdded: (camera) => {
         dispatch(cameraAdded(camera))

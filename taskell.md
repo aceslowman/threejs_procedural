@@ -1,10 +1,13 @@
 ## To Do
 
 - Start planning the 'first-person' mode.
+- Fix issue where CameraGUI fails to mount on first click.
 
 ## Doing
 
 - Correct FBM artifact issue.
+- Create TerrainGUI, TerrainGUIContainer, and TerrainReducer
+- add seed uniform on shaders.
 
 ## Done
 

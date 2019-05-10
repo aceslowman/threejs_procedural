@@ -78,6 +78,11 @@ export default class Sketch extends React.Component {
     if(this.props.cameras != prevProps.cameras){ //TODO: insufficient
       this.state.manager.camera.getCamera().setFocalLength(this.props.cameras["Primary Camera"].fov); 
     }
+
+    if(this.props.terrain != prevProps.terrain){
+      console.log('terrain changed!');
+      //TODO: change terrain parameters and reset mesh
+    }
   }
 
   componentDidMount() {
@@ -90,9 +95,6 @@ export default class Sketch extends React.Component {
       new FractalNoise(8),
       new FractalWarp(4)
     ]);
-
-    this.props.mapAdded("Elevation", map);
-    this.props.cameraAdded(this.state.manager.camera.getCamera());
 
     map.render();
 
@@ -121,6 +123,10 @@ export default class Sketch extends React.Component {
         elevation: map
       }
     });
+
+    this.props.mapAdded("Elevation", map);
+    this.props.cameraAdded(this.state.manager.camera.getCamera());
+    this.props.terrainAdded(this.terrain);
   }
 
   setupShaderPasses(map, passes) {

@@ -4,6 +4,7 @@ import { toolbar_style } from './ToolbarStyle';
 
 import MapGUIContainer from '../MapGUI/MapGUIContainer';
 import CameraGUIContainer from '../CameraGUI/CameraGUIContainer';
+import TerrainGUIContainer from '../TerrainGUI/TerrainGUIContainer';
 
 export default class Toolbar extends React.Component {
   constructor(props) {
@@ -107,6 +108,7 @@ export default class Toolbar extends React.Component {
             <Route path="/" exact component={MapGUIContainer} />
             <Route path="/camera/" exact component={CameraGUIContainer} />
             <Route path="/maps/" exact component={MapGUIContainer} />
+            <Route path="/terrain/" exact component={TerrainGUIContainer} />
             {/* might be able to use routers */}
           </div>
           <div id="TOOLBAR_HANDLE" style={this.style.handle}></div>
