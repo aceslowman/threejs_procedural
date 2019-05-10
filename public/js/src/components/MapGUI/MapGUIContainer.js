@@ -1,14 +1,15 @@
 import { connect } from 'react-redux';
-//import actions
 import MapGUI from './MapGUI';
 
-// send some sort of message along to the store, to be utilized by the reducer.
 const updatePassDefine = (pId, dId, val) => {
   return ({
     type: 'UPDATE_PASS_DEFINE',
     passId: pId,
     defineId: dId,
-    value: val
+    value: val,
+    meta: {
+      throttle: 40
+    }
   });
 };
 
@@ -17,12 +18,13 @@ const updatePassUniform = (pId, uId, val) => {
     type: 'UPDATE_PASS_UNIFORM',
     passId: pId,
     uniformId: uId,
-    value: val
+    value: val,
+    meta: {
+      throttle: 40
+    }
   });
 };
 
-// the documentation states that mapStateToProps should RESHAPE the state data.
-// currently this is returning everything I believe I will need.
 const mapStateToProps = state => {
   const { maps } = state;
   const { passes } = state;

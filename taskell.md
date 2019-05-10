@@ -2,7 +2,6 @@
 
 - Start planning the 'first-person' mode.
 - Correct FBM artifact issue.
-- Throttle the GUI update to sync with framerate.
 
 ## Doing
 
@@ -20,3 +19,4 @@
 - Correct ReactRouter refresh issue.
     * [ ] 
 - Prune unneeded git branches.
+- Throttle the GUI update to sync with framerate.

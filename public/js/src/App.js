@@ -1,15 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore } from 'redux'
+import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 
 import SketchContainer from './components/Sketch/SketchContainer';
-// import { reducer } from './reducers/reducer';
-import reducer from './reducer'; //TODO: working on simplifying reducer structure
+import reducer from './reducer';
 
-import devToolsEnhancer from 'remote-redux-devtools';
+// middleware
+import throttledMiddleware from './middleware/throttled';
 
-const store = createStore(reducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+const middlewares = [throttledMiddleware];
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
+const store = createStore(reducer, composeEnhancers(
+  applyMiddleware(...middlewares)
+));
 
 ReactDOM.render(
   <Provider store={store}>

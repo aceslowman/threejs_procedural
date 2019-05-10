@@ -13,6 +13,9 @@ export default class MapGUI extends React.Component {
 
   assembleShaderGraph() {
     let elements = [];
+    
+    let map_elements = [];
+    let m_k = 0;
     let k = 0;
     
     for(let m in this.props.maps){
@@ -43,6 +46,7 @@ export default class MapGUI extends React.Component {
         let u_k = 0;
         for(let u in pass.uniforms){
           let uniform = pass.uniforms[u];
+
           if (typeof uniform.value === 'number') {
             uniform_elements.push(
               <dg.Number 
@@ -51,33 +55,38 @@ export default class MapGUI extends React.Component {
                 value={uniform.value} 
                 step={0.01} 
                 onChange={(val)=>this.props.updatePassUniform(map.passes[p], u, val)}
-              />);
-          } else {
-            // TODO: how should other types be handled?
-            // uniform_elements.push(
-            //   <dg.Number 
-            //     key={u_k}
-            //     label={u} 
-            //     value={uniform.value} 
-            //     onChange={(val)=>this.props.updatePassUniform(val)}
-            //   />);
+              />
+            );
+          } else if (typeof uniform.value === 'object'){
+            uniform_elements.push(
+              <dg.Text 
+                key={u_k} 
+                label={u} 
+                value={uniform.value.name} 
+              />
+            );
           }
 
           u_k++;
         }
 
-        elements.push(
-          <dg.Folder key={k} label={pass.id} expanded={true}>
+        map_elements.push(
+          <dg.Folder key={m_k} label={pass.id} expanded={false}>
             {define_elements}
             {uniform_elements}
           </dg.Folder>
         );
 
-        k++;
+        m_k++;
       }
+
+      elements.push(
+        <dg.Folder key={k} label={map.id} expanded={true}>
+          {map_elements}
+        </dg.Folder>
+      )
     }
 
-    // TODO: currently not organizing multiple maps, focusing on getting elevation first
     this.elements = elements;
   }
 
