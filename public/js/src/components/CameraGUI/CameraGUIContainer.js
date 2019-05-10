@@ -8,7 +8,10 @@ const updateCamera = (camId, param, val) => {
     type: 'UPDATE_CAMERA',
     cameraId: camId,
     param: param,
-    value: val
+    value: val,
+    meta: {
+      throttle: 40
+    }
   });
 };
 
