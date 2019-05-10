@@ -1,10 +1,10 @@
 ## To Do
 
 - Start planning the 'first-person' mode.
-- Correct FBM artifact issue.
 
 ## Doing
 
+- Correct FBM artifact issue.
 
 ## Done
 
@@ -21,3 +21,4 @@
 - Prune unneeded git branches.
 - Throttle the GUI update to sync with framerate.
 - Add stats.js
+- Add pass parameters to MapGUI

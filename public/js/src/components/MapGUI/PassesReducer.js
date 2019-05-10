@@ -54,6 +54,22 @@ export default function passes(state = initial, action) {
                 }
             });
 
+        case 'UPDATE_PASS_PARAM':
+            // TODO: I will need to generate some sort of UNIQUE id for each pass, appending to the end of the sanitized name.
+            return ({
+                ...state,
+                byId: {
+                    ...state.byId,
+                    [action.passId]: {
+                        ...state.byId[action.passId],
+                        params: {
+                            ...state.byId[action.passId].params,
+                            [action.param]: action.value
+                        }
+                    }
+                }
+            });            
+
         default:
             return state;
     }

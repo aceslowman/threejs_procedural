@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import Camera from "../entities/PerspectiveCamera";
 import EventBus from "../utilities/EventBus";
-import dat from "dat.gui";
+// import dat from "dat.gui";
 
 /*
   The StandardTemplate is responsible for maintaining some core elements of

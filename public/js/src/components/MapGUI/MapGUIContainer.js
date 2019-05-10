@@ -1,6 +1,18 @@
 import { connect } from 'react-redux';
 import MapGUI from './MapGUI';
 
+const updatePassParam = (pId, param, val) => {
+  return ({
+    type: 'UPDATE_PASS_PARAM',
+    passId: pId,
+    param: param,
+    value: val,
+    meta: {
+      throttle: 40
+    }
+  });
+}
+
 const updatePassDefine = (pId, dId, val) => {
   return ({
     type: 'UPDATE_PASS_DEFINE',
@@ -41,6 +53,9 @@ const mapDispatchToProps = dispatch => ({
   },
   updatePassUniform: (pId, uId, val) => {
     dispatch(updatePassUniform(pId, uId, val));
+  },
+  updatePassParam: (pId, param, val) => {
+    dispatch(updatePassParam(pId, param, val));
   }
 });
 

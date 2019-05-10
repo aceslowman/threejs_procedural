@@ -23,14 +23,18 @@ export default class MapGUI extends React.Component {
 
       for(let p in map.passes){
         let pass = this.props.passes[map.passes[p]];
+        
+        let pass_elements = [];
+        let p_k = 0;
 
-        let define_elements = [];
-        let d_k = 0;
+        pass_elements.push(<dg.Checkbox key={p_k++} label='enabled' checked={pass.params.enabled} onChange={(val) => this.props.updatePassParam(map.passes[p], 'enabled', val)} />)
+        pass_elements.push(<dg.Checkbox key={p_k++} label='renderToScreen' checked={pass.params.renderToScreen} onChange={(val) => this.props.updatePassParam(map.passes[p], 'renderToScreen', val)} />)
+
         for(let d in pass.defines){
           let define = pass.defines[d];
-          define_elements.push(
+          pass_elements.push(
             <dg.Number
-              key={d_k} 
+              key={p_k++} 
               label={d} 
               value={define} 
               min={0} 
@@ -38,19 +42,15 @@ export default class MapGUI extends React.Component {
               step={1} 
               onFinishChange={(val)=>this.props.updatePassDefine(map.passes[p], d, val)}
             />);
-
-          d_k++;
         }
 
-        let uniform_elements = [];
-        let u_k = 0;
         for(let u in pass.uniforms){
           let uniform = pass.uniforms[u];
 
           if (typeof uniform.value === 'number') {
-            uniform_elements.push(
+            pass_elements.push(
               <dg.Number 
-                key={u_k}
+                key={p_k++}
                 label={u} 
                 value={uniform.value} 
                 step={0.01} 
@@ -58,22 +58,19 @@ export default class MapGUI extends React.Component {
               />
             );
           } else if (typeof uniform.value === 'object'){
-            uniform_elements.push(
+            pass_elements.push(
               <dg.Text 
-                key={u_k} 
+                key={p_k++} 
                 label={u} 
                 value={uniform.value.name} 
               />
             );
           }
-
-          u_k++;
         }
 
         map_elements.push(
           <dg.Folder key={m_k} label={pass.id} expanded={false}>
-            {define_elements}
-            {uniform_elements}
+            {pass_elements}
           </dg.Folder>
         );
 

@@ -18,6 +18,7 @@ export default class Sketch extends React.Component {
     super(props);
 
     let manager = new StandardManager({ scene: { background: 'black' } });
+    manager.camera.getCamera().name = "Primary Camera";
 
     this.state = {
       manager: manager,
@@ -25,16 +26,6 @@ export default class Sketch extends React.Component {
         elevation: ''
       }
     }
-  }
-
-  assembleStats() {
-    this.stats = new Stats();
-    this.stats.domElement.style.position = 'absolute';
-    this.stats.domElement.style.left = '0px';
-    this.stats.domElement.style.bottom = '0px';
-    this.stats.domElement.style.top = '';
-    this.stats.domElement.style.display = 'visible';
-    document.getElementById('APP').appendChild(this.stats.domElement);
   }
 
   getPassById(id){
@@ -50,21 +41,38 @@ export default class Sketch extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
+
     if(this.props.passes != prevProps.passes){ 
       for(let p in this.props.passes){ 
         let prop_pass = this.props.passes[p];
+        let prevPass = prevProps.passes[p];
 
-        if(prop_pass != prevProps.passes[p]){
+        if(prop_pass != prevPass && prevPass){
           let pass = this.getPassById(prop_pass.id);
 
-          Object.assign(pass.material.defines, prop_pass.defines);
-          Object.assign(pass.material.uniforms, prop_pass.uniforms);
-          pass.material.needsUpdate = true;
+          let params_changed   = prop_pass.params   != prevPass.params;
+          let defines_changed  = prop_pass.defines  != prevPass.defines;
+          let uniforms_changed = prop_pass.uniforms != prevPass.uniforms;
+
+          if (params_changed) {
+            pass.enabled = prop_pass.params.enabled;
+            pass.renderToScreen = prop_pass.params.renderToScreen;
+          }
+
+          if (defines_changed){
+            Object.assign(pass.material.defines, prop_pass.defines);
+            pass.material.needsUpdate = true;    
+          }
+
+          if (uniforms_changed) {
+            Object.assign(pass.material.uniforms, prop_pass.uniforms);
+          }
         }
       }
 
-      this.state.maps.elevation.render();
-      this.terrain.displace();
+      
+      this.state.maps.elevation.render(); //TODO: update only the map that changed.
+      this.terrain.displace(); //TODO: displace only if necessary
     }
 
     if(this.props.cameras != prevProps.cameras){ //TODO: insufficient
@@ -84,7 +92,6 @@ export default class Sketch extends React.Component {
     ]);
 
     this.props.mapAdded("Elevation", map);
-    this.state.manager.camera.getCamera().name = "Primary Camera";
     this.props.cameraAdded(this.state.manager.camera.getCamera());
 
     map.render();
@@ -107,7 +114,7 @@ export default class Sketch extends React.Component {
     this.terrain.setup();
     this.terrain.setupDebug();
 
-    this.assembleStats();
+    this.setupStats();
 
     this.setState({
       maps: {
@@ -123,6 +130,17 @@ export default class Sketch extends React.Component {
     }
 
     map.composer.swapBuffers();
+  }
+
+  setupStats() {
+    this.stats = new Stats();
+    this.stats.domElement.style.position = 'absolute';
+    this.stats.domElement.style.right = '0px';
+    this.stats.domElement.style.left = '';
+    this.stats.domElement.style.bottom = '0px';
+    this.stats.domElement.style.top = '';
+    this.stats.domElement.style.display = 'visible';
+    document.getElementById('APP').appendChild(this.stats.domElement);
   }
 
   componentWillUnmount() {

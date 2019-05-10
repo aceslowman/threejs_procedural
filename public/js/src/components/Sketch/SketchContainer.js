@@ -1,8 +1,6 @@
 import { connect } from 'react-redux';
-//import actions
 import Sketch from './Sketch';
 
-// send an action
 const mapAdded = (id, map) => {
     let d_map = {
         id: id,
@@ -11,6 +9,10 @@ const mapAdded = (id, map) => {
 
     let d_passes = map.composer.passes.map(a=>({
         id: a.material.name,
+        params: {
+            'enabled': a.enabled,
+            'renderToScreen': a.renderToScreen
+        },
         defines: a.material.defines,
         uniforms: a.material.uniforms
     }));
