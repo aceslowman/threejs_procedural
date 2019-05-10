@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import React from 'react';
 import Toolbar from '../Toolbar/Toolbar'
+import Stats from "stats-js";
 
 import StandardManager from '../../sketch/system/StandardManager';
 
@@ -24,6 +25,16 @@ export default class Sketch extends React.Component {
         elevation: ''
       }
     }
+  }
+
+  assembleStats() {
+    this.stats = new Stats();
+    this.stats.domElement.style.position = 'absolute';
+    this.stats.domElement.style.left = '0px';
+    this.stats.domElement.style.bottom = '0px';
+    this.stats.domElement.style.top = '';
+    this.stats.domElement.style.display = 'visible';
+    document.getElementById('APP').appendChild(this.stats.domElement);
   }
 
   getPassById(id){
@@ -73,7 +84,6 @@ export default class Sketch extends React.Component {
     ]);
 
     this.props.mapAdded("Elevation", map);
-    console.log("CAMERA", this.state.manager.camera.getCamera())
     this.state.manager.camera.getCamera().name = "Primary Camera";
     this.props.cameraAdded(this.state.manager.camera.getCamera());
 
@@ -96,6 +106,8 @@ export default class Sketch extends React.Component {
 
     this.terrain.setup();
     this.terrain.setupDebug();
+
+    this.assembleStats();
 
     this.setState({
       maps: {
@@ -142,8 +154,10 @@ export default class Sketch extends React.Component {
   }
 
   renderScene = () => {
+    this.stats.begin();
     this.state.manager.update();
     this.state.maps.elevation.render();
+    this.stats.end();
   }
 
   render() {

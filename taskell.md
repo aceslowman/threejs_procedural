@@ -20,3 +20,4 @@
     * [ ] 
 - Prune unneeded git branches.
 - Throttle the GUI update to sync with framerate.
+- Add stats.js
