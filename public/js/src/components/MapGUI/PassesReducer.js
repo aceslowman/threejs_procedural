@@ -29,7 +29,7 @@ export default function passes(state = initial, action) {
                     [action.passId]: {
                         ...state.byId[action.passId],
                         defines: {
-                            ...state.byId.defines,
+                            ...state.byId[action.passId].defines,
                             [action.defineId]: action.value
                         }
                     }

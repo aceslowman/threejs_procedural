@@ -21,6 +21,7 @@ export default class Sketch extends React.Component {
     manager.camera.getCamera().name = "Primary Camera";
 
     this.state = {
+      random_seed: Math.random() * 10000,
       manager: manager,
       maps: {
         elevation: ''
@@ -92,8 +93,8 @@ export default class Sketch extends React.Component {
     let map = new ProceduralMap(this.state.manager, {width: 512, height: 512});
 
     this.setupShaderPasses(map, [
-      new FractalNoise(8),
-      new FractalWarp(4)
+      new FractalNoise(8, this.state.random_seed),
+      new FractalWarp(4, this.state.random_seed)
     ]);
 
     map.render();

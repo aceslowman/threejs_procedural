@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 
 export default class FractalWarp {
-  constructor(octaves){
+  constructor(octaves, seed){
     this.shaderMaterial = new THREE.ShaderMaterial({
       defines: {
-        'NUM_OCTAVES': octaves
+        'NUM_OCTAVES': octaves,
+        'SEED': seed
       },
       uniforms: {
         tDiffuse: { value: '' },
@@ -128,7 +129,7 @@ export default class FractalWarp {
       float fbm(vec3 x) {
       	float v = 0.0;
       	float a = 0.5;
-      	vec3 shift = vec3(100.0);
+      	vec3 shift = vec3(SEED);
       	for (int i = 0; i < NUM_OCTAVES; ++i) {
       		v += a * snoise(x);
       		x = x * 2.0 + shift;

@@ -37,8 +37,6 @@ export default class ProceduralTerrain {
   * Displace the buffer geometry using a given Map
   */
   displace(){
-    // TODO: can I just use the MeshStandardMaterial.displacementMap?
-
     const displacement_buffer = this.elevation.getBufferArray();
     const positions = this.geometry.getAttribute('position').array;
     const uvs = this.geometry.getAttribute('uv').array;

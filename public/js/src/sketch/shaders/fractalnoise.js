@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 
 export default class FractalNoise {
-  constructor(octaves){
+  constructor(octaves, seed){
     this.shaderMaterial = new THREE.ShaderMaterial({
       defines: {
-        'NUM_OCTAVES': octaves
+        'NUM_OCTAVES': octaves,
+        'SEED': seed
       },
       uniforms: {
         o_x: { value: 0.00 },
@@ -137,7 +138,7 @@ export default class FractalNoise {
       float fbm(vec3 x) {
       	float v = 0.0;
       	float a = 0.5;
-      	vec3 shift = vec3(100.0);
+      	vec3 shift = vec3(SEED);
       	for (int i = 0; i < NUM_OCTAVES; ++i) {
       		v += a * snoise(x);
       		x = x * 2.0 + shift;
@@ -152,7 +153,6 @@ export default class FractalNoise {
 
         vec3 p = (vPosition * scale) + offset;
 
-        // float n = fbm(p + fbm(p + fbm(p)));
         float n = fbm(p);
 
         float c = map(n, -1.0, 1.0, map_min, map_max);

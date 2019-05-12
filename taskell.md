@@ -6,8 +6,7 @@
 ## Doing
 
 - Correct FBM artifact issue.
-- Create TerrainGUI, TerrainGUIContainer, and TerrainReducer
-- add seed uniform on shaders.
+- Create TerrainGUI, TerrainGUIContainer, and TerrainReducer, and populate with basic parameters.
 
 ## Done
 
@@ -25,3 +24,4 @@
 - Throttle the GUI update to sync with framerate.
 - Add stats.js
 - Add pass parameters to MapGUI
+- add seed uniform on shaders.
