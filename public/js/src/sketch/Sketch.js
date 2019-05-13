@@ -1,17 +1,17 @@
 import * as THREE from 'three';
 import React from 'react';
-import Toolbar from '../Toolbar/Toolbar'
+import Toolbar from '../gui/Toolbar/Toolbar'
 import Stats from "stats-js";
 
-import StandardManager from '../../sketch/system/StandardManager';
+import StandardManager from './system/StandardManager';
 
 // PROCEDURAL TOOLS IMPORTS
-import ProceduralMap from '../../sketch/entities/procedural/ProceduralMap';
-import ProceduralTerrain from '../../sketch/entities/procedural/terrain/ProceduralTerrain';
+import ProceduralMap from './entities/procedural/ProceduralMap';
+import ProceduralTerrain from './entities/procedural/terrain/ProceduralTerrain';
 
 // SHADER IMPORTS
-import FractalNoise from "../../sketch/shaders/fractalnoise.js";
-import FractalWarp from "../../sketch/shaders/fractalwarp.js";
+import FractalNoise from "./shaders/fractalnoise.js";
+import FractalWarp from "./shaders/fractalwarp.js";
 
 export default class Sketch extends React.Component {
   constructor(props) {
@@ -81,7 +81,7 @@ export default class Sketch extends React.Component {
     }
 
     if(this.props.terrain != prevProps.terrain){
-      console.log('terrain changed!');
+      // console.log('terrain changed!');
       //TODO: change terrain parameters and reset mesh
     }
   }

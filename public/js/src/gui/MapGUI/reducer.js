@@ -1,9 +1,21 @@
-const initial = {
-    byId: {},
-    allIds: []
+const maps = (state = { byId: {}, allIds: [] }, action) => {
+    switch (action.type) {
+        case 'ADD_MAP':
+            return ({
+                byId: {
+                    ...state.byId,
+                    [action.map.id]: action.map
+                },
+                allIds: [...state.allIds, action.map.id]
+            })
+        default:
+            return state;
+    }
 }
 
-export default function passes(state = initial, action) {
+//-------------------------------------------------------------------------
+
+const passes = (state = { byId: {}, allIds: [] }, action) => {
     switch (action.type) {
         case 'ADD_MAP':
             let passes = {};
@@ -74,3 +86,5 @@ export default function passes(state = initial, action) {
             return state;
     }
 }
+
+export {maps, passes};

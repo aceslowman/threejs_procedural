@@ -7,6 +7,9 @@
 
 - Correct FBM artifact issue.
 - Create TerrainGUI, TerrainGUIContainer, and TerrainReducer, and populate with basic parameters.
+- Rethink directory structure
+- Rethink current Manager system
+- 
 
 ## Done
 
