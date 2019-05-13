@@ -7,7 +7,6 @@
 
 - Correct FBM artifact issue.
 - Create TerrainGUI, TerrainGUIContainer, and TerrainReducer, and populate with basic parameters.
-- Rethink current Manager system
 
 ## Done
 
@@ -27,3 +26,4 @@
 - Add pass parameters to MapGUI
 - add seed uniform on shaders.
 - Rethink directory structure
+- Rethink current Manager system
