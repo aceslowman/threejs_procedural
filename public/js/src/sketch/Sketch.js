@@ -3,11 +3,11 @@ import React from 'react';
 import Toolbar from '../gui/Toolbar/Toolbar'
 import Stats from "stats-js";
 
-import StandardManager from './system/StandardManager';
+import OrbitControls from "./utilities/OrbitControls.js";
 
 // PROCEDURAL TOOLS IMPORTS
-import ProceduralMap from './entities/procedural/ProceduralMap';
-import ProceduralTerrain from './entities/procedural/terrain/ProceduralTerrain';
+import ProceduralMap from './procedural/ProceduralMap';
+import ProceduralTerrain from './procedural/terrain/ProceduralTerrain';
 
 // SHADER IMPORTS
 import FractalNoise from "./shaders/fractalnoise.js";
@@ -17,19 +17,32 @@ export default class Sketch extends React.Component {
   constructor(props) {
     super(props);
 
-    let manager = new StandardManager({ scene: { background: 'black' } });
-    manager.camera.getCamera().name = "Primary Camera";
+    // SETUP LISTENERS
+    window.addEventListener('resize', this.handleResize);
 
     this.state = {
       random_seed: Math.random() * 10000,
-      manager: manager,
       maps: {
         elevation: ''
       }
     }
   }
 
-  getPassById(id){
+  setupOrbit() {
+    this.orbitControls = new OrbitControls(
+      this.camera,
+      this.renderer.domElement
+    );
+    this.orbitControls.enableDamping = true;
+    this.orbitControls.dampingFactor = 0.8;
+    // this.orbitControls.panningMode = THREE.HorizontalPanning; // default is THREE.ScreenSpacePanning
+    this.orbitControls.minDistance = 0.1;
+    this.orbitControls.maxDistance = 1000;
+    // this.orbitControls.maxPolarAngle = Math.PI / 2;
+    // this.orbitControls.autoRotate = true;
+  }
+
+  getPassById(id){ // UTIL
     for(let m in this.state.maps){
       for(let p in this.state.maps[m].composer.passes){
         let pass = this.state.maps[m].composer.passes[p];
@@ -42,7 +55,6 @@ export default class Sketch extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-
     if(this.props.passes != prevProps.passes){ 
       for(let p in this.props.passes){ 
         let prop_pass = this.props.passes[p];
@@ -70,14 +82,13 @@ export default class Sketch extends React.Component {
           }
         }
       }
-
       
       this.state.maps.elevation.render(); //TODO: update only the map that changed.
       this.terrain.displace(); //TODO: displace only if necessary
     }
 
     if(this.props.cameras != prevProps.cameras){ //TODO: insufficient
-      this.state.manager.camera.getCamera().setFocalLength(this.props.cameras["Primary Camera"].fov); 
+      this.camera.setFocalLength(this.props.cameras["Primary Camera"].fov); 
     }
 
     if(this.props.terrain != prevProps.terrain){
@@ -87,10 +98,38 @@ export default class Sketch extends React.Component {
   }
 
   componentDidMount() {
-    const width = this.mount.clientWidth;
-    const height = this.mount.clientHeight;
+    this.width  = window.innerWidth;
+    this.height = window.innerHeight
 
-    let map = new ProceduralMap(this.state.manager, {width: 512, height: 512});
+    // TODO: deconstructing StandardManager
+    this.entities = [];
+
+    this.clock = new THREE.Clock();
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer.setSize(this.width, this.height);
+    this.mount.appendChild(this.renderer.domElement);
+    this.start();
+
+    this.scene = new THREE.Scene({
+      background: 'green'
+    });
+
+    this.camera = new THREE.PerspectiveCamera(
+      75,            // fov
+      this.width/this.height,   // aspect
+      0.01,          // near
+      2000           // far
+    );
+
+    this.camera.name = "Primary Camera";
+    this.camera.zoom = 2;
+    this.camera.position.z = 999;
+    this.camera.updateProjectionMatrix();
+
+    this.setupOrbit();
+    // END OF DECONSTRUCTION
+
+    let map = new ProceduralMap(this.renderer, {width: 512, height: 512});
 
     this.setupShaderPasses(map, [
       new FractalNoise(8, this.state.random_seed),
@@ -100,19 +139,13 @@ export default class Sketch extends React.Component {
     map.render();
 
     // SETUP TERRAIN
-    this.terrain = new ProceduralTerrain(this.state.manager, {
+    this.terrain = new ProceduralTerrain(this.renderer, this.scene, {
       width: 512,
       height: 512,
       detail: 512.0,
       amplitude: 300,
       elevation: map
     });
-
-    // SETUP LISTENERS
-    window.addEventListener('resize', this.handleResize);
-
-    this.mount.appendChild(this.state.manager.renderer.domElement);
-    this.start();
 
     this.terrain.setup();
     this.terrain.setupDebug();
@@ -125,9 +158,10 @@ export default class Sketch extends React.Component {
       }
     });
 
-    this.props.mapAdded("Elevation", map);
-    this.props.cameraAdded(this.state.manager.camera.getCamera());
-    this.props.terrainAdded(this.terrain);
+    // CALLING PROPS FOR REDUX
+    this.props.mapAdded("Elevation", map); // TODO: rename these (addMap)
+    this.props.terrainAdded(this.terrain); // TODO: rename these (addTerrain)
+    this.props.cameraAdded(this.camera); // TODO: rename these (addCamera)
   }
 
   setupShaderPasses(map, passes) {
@@ -151,16 +185,19 @@ export default class Sketch extends React.Component {
   }
 
   componentWillUnmount() {
-    this.state.manager.gui.destroy();
     window.removeEventListener('resize', this.handleResize);
     this.stop();
-    this.mount.removeChild(this.state.manager.renderer.domElement);
+    this.mount.removeChild(this.renderer.domElement);
   }
 
   handleResize = () => {
-    const width  = this.mount.clientWidth;
-    const height = this.mount.clientHeight;
-    this.state.manager.onWindowResize(width, height);
+    this.width  = this.mount.clientWidth;
+    this.height = this.mount.clientHeight;
+
+    this.camera.aspect = this.width / this.height;
+    this.camera.updateProjectionMatrix();
+
+    this.renderer.setSize(this.width, this.height);
   }
 
   start = () => {
@@ -180,8 +217,14 @@ export default class Sketch extends React.Component {
 
   renderScene = () => {
     this.stats.begin();
-    this.state.manager.update();
-    this.state.maps.elevation.render();
+
+      for (let i = 0; i < this.entities.length; i++) {
+        this.entities[i].update();
+      }
+
+      this.renderer.render(this.scene, this.camera);
+
+      this.state.maps.elevation.render();
     this.stats.end();
   }
 

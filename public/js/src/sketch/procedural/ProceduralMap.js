@@ -1,12 +1,12 @@
 import * as THREE from "three";
-import * as ASMATH from "../../utilities/Math";
+import * as ASMATH from "../utilities/Math";
 import _ from "lodash";
 
-import { EffectComposer } from '../../utilities/EffectComposer/EffectComposer.js';
+import { EffectComposer } from '../utilities/EffectComposer/EffectComposer.js';
 
 export default class ProceduralMap{
-  constructor(manager, options){
-    this.manager = manager;
+  constructor(renderer, options){
+    this.renderer = renderer;
 
     this.width  = options.width  || 256;
     this.height = options.height || 256;
@@ -19,7 +19,7 @@ export default class ProceduralMap{
 			stencilBuffer: false
     });
 
-    this.composer = new THREE.EffectComposer(this.manager.renderer, this.target);
+    this.composer = new THREE.EffectComposer(this.renderer, this.target);
     this.composer.setSize(this.width, this.height);
   }
 
@@ -31,13 +31,13 @@ export default class ProceduralMap{
   getSample(x, y){
     const buffer = new Float32Array(4); // NOTE: can't use floats in Safari!
     if (x > this.width || y > this.height || x < 0 || y < 0) console.warn("sampling out of bounds")
-    this.manager.renderer.readRenderTargetPixels(this.target, x, y, 1, 1, buffer);
+    this.renderer.readRenderTargetPixels(this.target, x, y, 1, 1, buffer);
     return buffer[0];
   }
 
   getBufferArray(){
     const buffer = new Float32Array(this.width*this.height*4); // NOTE: can't use floats in Safari!
-    this.manager.renderer.readRenderTargetPixels(this.target, 0, 0, this.width, this.height, buffer);
+    this.renderer.readRenderTargetPixels(this.target, 0, 0, this.width, this.height, buffer);
     return buffer;
   }
 }

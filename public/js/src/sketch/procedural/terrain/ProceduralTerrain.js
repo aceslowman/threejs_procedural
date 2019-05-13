@@ -4,8 +4,9 @@ import * as elevation from '../shaders/elevation';
 import Map from '../ProceduralMap';
 
 export default class ProceduralTerrain {
-  constructor(manager, options){
-    this.manager   = manager;
+  constructor(renderer, scene, options){
+    this.renderer  = renderer;
+    this.scene     = scene;
     this.width     = options.width;
     this.height    = options.height;
     this.detail    = options.detail;
@@ -30,7 +31,7 @@ export default class ProceduralTerrain {
 
   setupDebug(){
     var helper = new THREE.Box3Helper( this.geometry.boundingBox, 0xffff00 );
-    this.manager.scene.add( helper );
+    this.scene.add( helper );
   }
 
   /**
@@ -101,7 +102,7 @@ export default class ProceduralTerrain {
 
     this.mesh = new THREE.Mesh( this.geometry, this.material );
 
-    this.manager.scene.add(this.mesh);
+    this.scene.add(this.mesh);
   }
 
   /**

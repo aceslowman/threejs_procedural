@@ -15,7 +15,7 @@ export default class CameraGUI extends React.Component {
   assembleGUI(){
     this.elements = []; //clear
 
-    if (this.props.cameras) {
+    if (this.props.cameras && this.props.cameras["Primary Camera"]) {
       this.elements.push(<dg.Number key={0} label='FOV' value={this.props.cameras["Primary Camera"].fov} min={0} max={30} step={0.1} onChange={(v) => this.props.updateCamera("Primary Camera", 'fov', v)} />);
     }
   }
