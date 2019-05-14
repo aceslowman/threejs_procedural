@@ -24,7 +24,12 @@ export default class CameraGUI extends React.Component {
     this.assembleGUI();
 
     return (
-      <dg.GUI style={{position: 'relative', left: 0, top:0}}>
+      <dg.GUI style={{
+          position: 'relative', 
+          left: 0, 
+          top:0,
+          backgroundColor: '#000',
+        }}>
         {this.elements}
       </dg.GUI>
     );

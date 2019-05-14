@@ -1,7 +1,6 @@
 ## To Do
 
 - Start planning the 'first-person' mode.
-- Fix issue where CameraGUI fails to mount on first click.
 
 ## Doing
 
@@ -27,3 +26,5 @@
 - add seed uniform on shaders.
 - Rethink directory structure
 - Rethink current Manager system
+- Fix issue where CameraGUI fails to mount on first click.
+- Fix toolbar dragging.

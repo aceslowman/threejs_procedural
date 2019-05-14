@@ -92,8 +92,13 @@ export default class MapGUI extends React.Component {
     this.assembleShaderGraph();
 
     return (
-      <dg.GUI style={{position: 'relative', left: 0, top:0}}>
-        { this.elements }
+      <dg.GUI style={{
+          position: 'relative',
+          left: 0,
+          top: 0,
+          backgroundColor: '#000',
+        }}>
+        {this.elements}
       </dg.GUI>
     );
   }

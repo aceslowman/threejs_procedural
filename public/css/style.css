@@ -7,7 +7,7 @@ body{
   /* overflow-y: hidden; */
 }
 
-html, body, .container {
+html, body, .container, #root {
   height:100%;
   width:100%;
   background-color:black;
@@ -30,9 +30,11 @@ html, body, .container {
 #DATGUI {
   transition: opacity 1s;
   position:inherit;
+  display:flex;
 }
 
 #DATGUI div {
+  max-width: 300px;
   position: relative !important; /* NOTE: important for dis-gui */
 }
 

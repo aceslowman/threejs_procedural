@@ -2,11 +2,13 @@ let toolbar_style = {
   toolbar: {
     position: 'relative',
     padding:"30px",
-    width:"300px",
+    width:"370px",
+    height:"100%",
     borderRight: "1px solid rgb(100,100,100)",
     overflowWrap: "break-word",
     overflow: "hidden",
-    minWidth: "35px"
+    minWidth: "100px",
+    boxSizing: "border-box",
   },
   h1: {
     fontSize: "3em",
