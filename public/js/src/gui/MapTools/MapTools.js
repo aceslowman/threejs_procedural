@@ -1,7 +1,7 @@
 import React from 'react';
 import * as dg from "dis-gui";
 
-export default class MapGUI extends React.Component {
+export default class MapTools extends React.Component {
   constructor(props){
     super(props);
 

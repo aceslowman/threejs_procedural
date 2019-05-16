@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom';
 import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 
-import SketchContainer from './sketch/SketchContainer';
+import Sketch from './sketch/SketchContainer';
+import GUI from './gui/GUI';
 import RootReducer from './state/RootReducer';
 
 // middleware
@@ -19,7 +20,10 @@ const store = createStore(RootReducer, composeEnhancers(
 
 ReactDOM.render(
   <Provider store={store}>
-    <SketchContainer />
+    <div className="container">
+      <GUI />
+      <Sketch />
+    </div>
   </Provider>,
   document.getElementById('root')
 );

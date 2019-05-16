@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import TerrainGUI from './TerrainGUI';
+import TerrainTools from './TerrainTools';
 
 const updateTerrain = (param, val) => {
   return ({
@@ -29,4 +29,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(TerrainGUI);
+)(TerrainTools);

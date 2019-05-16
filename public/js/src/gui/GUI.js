@@ -2,9 +2,9 @@ import React from 'react';
 import { HashRouter, Route, Link } from "react-router-dom";
 import { toolbar_style } from './style';
 
-import MapGUIContainer from '../MapGUI/MapGUIContainer';
-import CameraGUIContainer from '../CameraGUI/CameraGUIContainer';
-import TerrainGUIContainer from '../TerrainGUI/TerrainGUIContainer';
+import MapToolsContainer from './MapTools/MapToolsContainer';
+import CameraToolsContainer from './CameraTools/CameraToolsContainer';
+import TerrainToolsContainer from './TerrainTools/TerrainToolsContainer';
 
 export default class Toolbar extends React.Component {
   constructor(props) {
@@ -121,10 +121,10 @@ export default class Toolbar extends React.Component {
             </nav>
           </div>
           <div id="DATGUI">
-            <Route path="/" exact component={MapGUIContainer} />
-            <Route path="/camera/" exact component={CameraGUIContainer} />
-            <Route path="/maps/" exact component={MapGUIContainer} />
-            <Route path="/terrain/" exact component={TerrainGUIContainer} />
+            <Route path="/" exact component={MapToolsContainer} />
+            <Route path="/camera/" exact component={CameraToolsContainer} />
+            <Route path="/maps/" exact component={MapToolsContainer} />
+            <Route path="/terrain/" exact component={TerrainToolsContainer} />
           </div>
           <div id="TOOLBAR_HANDLE" style={this.style.handle}></div>
         </div>

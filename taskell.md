@@ -28,3 +28,6 @@
 - Rethink current Manager system
 - Fix issue where CameraGUI fails to mount on first click.
 - Fix toolbar dragging.
+- Remove the GUI from the Sketch.
+- Rename Toolbar to GUI
+- Rename MapGUI to MapTools, and do so with the other GUI containers.

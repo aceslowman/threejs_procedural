@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 //import actions
-import CameraGUI from './CameraGUI';
+import CameraTools from './CameraTools';
 
 // send some sort of message along to the store, to be utilized by the reducer.
 const updateCamera = (camId, param, val) => {
@@ -32,4 +32,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(CameraGUI);
+)(CameraTools);

@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import MapGUI from './MapGUI';
+import MapTools from './MapTools';
 
 const updatePassParam = (pId, param, val) => {
   return ({
@@ -62,4 +62,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(MapGUI);
+)(MapTools);

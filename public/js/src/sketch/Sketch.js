@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import React from 'react';
-import Toolbar from '../gui/Toolbar/Toolbar'
+import Toolbar from '../gui/GUI'
 import Stats from "stats-js";
 
 import OrbitControls from "./utilities/OrbitControls.js";
@@ -230,10 +230,7 @@ export default class Sketch extends React.Component {
 
   render() {
     return (
-      <div className="container">
-        <Toolbar/>
-        <div id="APP" ref={mount => { this.mount = mount }}/>
-      </div>
+      <div id="APP" ref={mount => { this.mount = mount }}/>
     )
   }
 }
