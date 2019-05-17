@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import MapTools from './MapTools';
+import Terrain from './Terrain';
 
 const updatePassParam = (pId, param, val) => {
   return ({
@@ -37,17 +37,34 @@ const updatePassUniform = (pId, uId, val) => {
   });
 };
 
+const updateTerrain = (param, val) => {
+  return ({
+    type: 'UPDATE_TERRAIN',
+    param: param,
+    value: val,
+    meta: {
+      throttle: 40
+    }
+  });
+}
+
 const mapStateToProps = state => {
+  const { terrain } = state;
+
   const { maps } = state;
   const { passes } = state;
 
   return ({
+    terrain: terrain,
     maps: maps.byId,
     passes: passes.byId
   })
 };
 
 const mapDispatchToProps = dispatch => ({
+  updateTerrain: (pId, dId, val) => {
+    dispatch(updateTerrain(pId, dId, val));
+  },
   updatePassDefine: (pId, dId, val) => {
     dispatch(updatePassDefine(pId, dId, val));
   },
@@ -62,4 +79,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(MapTools);
+)(Terrain);

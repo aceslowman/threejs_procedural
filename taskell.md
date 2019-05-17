@@ -1,11 +1,11 @@
 ## To Do
 
 - Start planning the 'first-person' mode.
+- Begin incorporating MaterialUI
 
 ## Doing
 
 - Correct FBM artifact issue.
-- Create TerrainGUI, TerrainGUIContainer, and TerrainReducer, and populate with basic parameters.
 
 ## Done
 
@@ -31,3 +31,5 @@
 - Remove the GUI from the Sketch.
 - Rename Toolbar to GUI
 - Rename MapGUI to MapTools, and do so with the other GUI containers.
+- Merge MapTools into TerrainTools. MapTools is no longer.
+- Create TerrainGUI, TerrainGUIContainer, and TerrainReducer, and populate with basic parameters.

@@ -2,9 +2,9 @@ import React from 'react';
 import { HashRouter, Route, Link } from "react-router-dom";
 import { toolbar_style } from './style';
 
-import MapToolsContainer from './MapTools/MapToolsContainer';
-import CameraToolsContainer from './CameraTools/CameraToolsContainer';
-import TerrainToolsContainer from './TerrainTools/TerrainToolsContainer';
+import CameraContainer from './Camera/CameraContainer';
+import TerrainContainer from './Terrain/TerrainContainer';
+// TODO: FILL IN THE REST WHEN THE DESIGN IS FINALIZED
 
 export default class Toolbar extends React.Component {
   constructor(props) {
@@ -106,13 +106,16 @@ export default class Toolbar extends React.Component {
             <nav style={this.style.nav}>
               <ul>
                 <li>
-                  <Link to="/">🏠</Link>
-                </li>
-                <li>
                   <Link to="/terrain/">⛰</Link>
                 </li>
                 <li>
-                  <Link to="/maps/">🗺</Link>
+                  <Link to="/flora/">🌿</Link>
+                </li>
+                <li>
+                  <Link to="/fauna/">🐈</Link>
+                </li>
+                <li>
+                  <Link to="/city/">🏙</Link>
                 </li>
                 <li>
                   <Link to="/camera/">📷</Link>
@@ -121,10 +124,9 @@ export default class Toolbar extends React.Component {
             </nav>
           </div>
           <div id="DATGUI">
-            <Route path="/" exact component={MapToolsContainer} />
-            <Route path="/camera/" exact component={CameraToolsContainer} />
-            <Route path="/maps/" exact component={MapToolsContainer} />
-            <Route path="/terrain/" exact component={TerrainToolsContainer} />
+            <Route path="/" exact component={TerrainContainer} />
+            <Route path="/camera/" exact component={CameraContainer} />
+            <Route path="/terrain/" exact component={TerrainContainer} />
           </div>
           <div id="TOOLBAR_HANDLE" style={this.style.handle}></div>
         </div>

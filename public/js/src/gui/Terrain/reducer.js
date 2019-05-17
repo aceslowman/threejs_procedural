@@ -1,3 +1,35 @@
+const initial = {
+    width: '',
+    height: '',
+    detail: '',
+    amplitude: '',
+    elevation: ''
+}
+
+const terrain = (state = initial, action) => {
+    switch (action.type) {
+        case 'ADD_TERRAIN':
+            return ({
+                ...state,
+                width: action.terrain.width,
+                height: action.terrain.height,
+                detail: action.terrain.detail,
+                amplitude: action.terrain.amplitude,
+                elevation: action.terrain.elevation,
+            });     
+
+        case 'UPDATE_TERRAIN':
+            return ({
+                ...state,
+                ...action.terrain,
+                [action.param]: action.value
+            });
+
+        default:
+            return state;
+    }
+}
+
 const maps = (state = { byId: {}, allIds: [] }, action) => {
     switch (action.type) {
         case 'ADD_MAP':
@@ -31,7 +63,7 @@ const passes = (state = { byId: {}, allIds: [] }, action) => {
                     ...passes
                 },
                 allIds: [...state.allIds, ...action.passes.map(a => a.id)]
-            })        
+            })
         case 'UPDATE_PASS_DEFINE':
             // TODO: I will need to generate some sort of UNIQUE id for each pass, appending to the end of the sanitized name.
             return ({
@@ -80,11 +112,11 @@ const passes = (state = { byId: {}, allIds: [] }, action) => {
                         }
                     }
                 }
-            });            
+            });
 
         default:
             return state;
     }
 }
 
-export {maps, passes};
+export { terrain, maps, passes };
