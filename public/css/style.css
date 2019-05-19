@@ -1,10 +1,9 @@
 body{
-  color:white;
+  /* color:white; */
   background-color:white;
   padding:0px;
   margin:0px;
   font-family: Helvetica;
-  /* overflow-y: hidden; */
 }
 
 html, body, .container, #root {
@@ -18,68 +17,26 @@ html, body, .container, #root {
   align-items: stretch;
 }
 
-
 /* MAPS */
 #ShaderGraph ol{
   padding:0px;
   padding-left:15px;
 }
 
-
 /* GUI */
 .dg.main .close-button.close-bottom {
   position:static !important;
 }
 
-#subwrapper {
-  transition: opacity 1s;
-  position:inherit;
-  display:flex;
+/* DRAWER */
+.tooldrawer_open {
+  width: 360px;
+  transition: width 900ms ease;
 }
 
-#subwrapper div {
-  max-width: 300px;
-  position: relative !important; /* NOTE: important for dis-gui */
-}
-
-/* TITLE */
-#title {
-  font-size:  3em;
-  margin: 0px;
-  text-align: center;
-  justify-content: center;
-  background-color:red;
-}
-
-/* NAVIGATION */
-
-#navigation{
-  padding-bottom:15px;
-  background-color: green; /*TEMP*/
-}
-
-#navigation ul, .subnavigation ul {
-  padding:0px;
-  list-style: none;
-  text-align:center;
-}
-
-#navigation ul li, .subnavigation ul li{
-  text-align:center;
-  display:inline-block;
-  font-size:2em;
-  padding: 0px 5px;
-}
-
-.subnavigation ul li {
-  font-size: 1.5em;
-  background-color: yellow;
-}
-
-/* SUB CONTEXTUAL TOOLS */
-
-.subcontextual {
-  background-color:orange; /*TEMP*/
+.tooldrawer_closed {
+  width: 60px;
+  transition: width 900ms ease;
 }
 
 /* APP */

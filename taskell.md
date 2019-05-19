@@ -1,7 +1,6 @@
 ## To Do
 
 - Start planning the 'first-person' mode.
-- Begin incorporating MaterialUI
 - Research RayTracing Renderer
 
 ## Doing
@@ -11,8 +10,9 @@
 - Clean up and reformat the Terrain GUI component.
     > The terrain GUI has been isolated, but certain react+redux specific issues persist.
     * [ ] Fix issue where component doesn't receive updated store in time for initial render.
-- Add several new camera elements and figure out how to best handle them in state.
-    > So far I can see the use of a First Person, Ortho, and Perspective camera. Currently they seem to be well organized in state, but I currently don't have a plan for the GUI.
+- Begin incorporating MaterialUI into the CameraTools
+- Add new material ui drawer.
+- 
 
 ## Done
 
@@ -40,3 +40,5 @@
 - Rename MapGUI to MapTools, and do so with the other GUI containers.
 - Merge MapTools into TerrainTools. MapTools is no longer.
 - Create TerrainGUI, TerrainGUIContainer, and TerrainReducer, and populate with basic parameters.
+- Add several new camera elements and figure out how to best handle them in state.
+    > So far I can see the use of a First Person, Ortho, and Perspective camera. Currently they seem to be well organized in state, but I currently don't have a plan for the GUI.

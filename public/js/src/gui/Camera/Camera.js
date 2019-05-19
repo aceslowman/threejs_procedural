@@ -69,7 +69,7 @@ export default class Camera extends React.Component {
           </ul>
         </nav>
         <div className="subcontextual">
-          <Route path="/camera/" exact component={FirstPersonCameraTools} />
+          <Route path="/camera/" exact component={PerspectiveCameraTools} />
           <Route path="/camera/firstperson/" exact component={FirstPersonCameraTools} />
           <Route path="/camera/ortho/" exact component={OrthographicCameraTools} />
           <Route path="/camera/perspective/" exact component={PerspectiveCameraTools} />
