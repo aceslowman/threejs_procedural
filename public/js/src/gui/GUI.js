@@ -101,8 +101,8 @@ export default class Toolbar extends React.Component {
     return (
       <HashRouter>
         <div id="TOOLBAR" style={this.style.toolbar}>
-          <div id="NAV">
-            <h1 style={this.style.h1}>Procedural Tools</h1>
+          <h1 id="title">Procedural Tools</h1>
+          <div id="navigation">
             <nav style={this.style.nav}>
               <ul>
                 <li>
@@ -123,10 +123,10 @@ export default class Toolbar extends React.Component {
               </ul>
             </nav>
           </div>
-          <div id="DATGUI">
+          <div id="subwrapper">
             <Route path="/" exact component={TerrainContainer} />
-            <Route path="/camera/" exact component={CameraContainer} />
-            <Route path="/terrain/" exact component={TerrainContainer} />
+            <Route path="/camera/" component={CameraContainer} />
+            <Route path="/terrain/" component={TerrainContainer} />
           </div>
           <div id="TOOLBAR_HANDLE" style={this.style.handle}></div>
         </div>

@@ -28,6 +28,55 @@ export default class Sketch extends React.Component {
     }
   }
 
+  getPassById(id){ // UTIL
+    for(let m in this.state.maps){
+      for(let p in this.state.maps[m].composer.passes){
+        let pass = this.state.maps[m].composer.passes[p];
+
+        if(pass.material.name == id){
+          return pass;
+        }
+      }
+    }
+  }
+
+  setupCameras(){
+    let first_person_cam = new THREE.PerspectiveCamera(
+      75,            // fov
+      this.width / this.height,   // aspect
+      0.01,          // near
+      2000           // far
+    );
+    first_person_cam.name = "First Person";
+
+    this.props.addCamera(first_person_cam);
+
+    let ortho_cam = new THREE.OrthographicCamera();
+    ortho_cam.name = "Orthographic";
+
+    this.props.addCamera(ortho_cam);
+
+    let perspective_cam = new THREE.PerspectiveCamera(
+      75,            // fov
+      this.width / this.height,   // aspect
+      0.01,          // near
+      2000           // far
+    );
+    perspective_cam.name = "Perspective";
+    perspective_cam.zoom = 2;
+    perspective_cam.position.z = 999;
+    perspective_cam.updateProjectionMatrix();
+
+    this.props.addCamera(perspective_cam);
+
+    // set default camera
+    this.camera = perspective_cam;
+
+    this.setupOrbit();
+
+    // this.props.cameraAdded(this.camera); // TODO: rename these (addCamera)
+  }
+
   setupOrbit() {
     this.orbitControls = new OrbitControls(
       this.camera,
@@ -41,30 +90,38 @@ export default class Sketch extends React.Component {
     // this.orbitControls.maxPolarAngle = Math.PI / 2;
     // this.orbitControls.autoRotate = true;
   }
-
-  getPassById(id){ // UTIL
-    for(let m in this.state.maps){
-      for(let p in this.state.maps[m].composer.passes){
-        let pass = this.state.maps[m].composer.passes[p];
-
-        if(pass.material.name == id){
-          return pass;
-        }
-      }
+  
+  setupShaderPasses(map, passes) {
+    for (let pass of passes) {
+      let p = new THREE.ShaderPass(pass.shaderMaterial);
+      map.composer.addPass(p);
     }
+
+    map.composer.swapBuffers();
+  }
+
+  setupStats() {
+    this.stats = new Stats();
+    this.stats.domElement.style.position = 'absolute';
+    this.stats.domElement.style.right = '0px';
+    this.stats.domElement.style.left = '';
+    this.stats.domElement.style.bottom = '0px';
+    this.stats.domElement.style.top = '';
+    this.stats.domElement.style.display = 'visible';
+    document.getElementById('APP').appendChild(this.stats.domElement);
   }
 
   componentDidUpdate(prevProps) {
-    if(this.props.passes != prevProps.passes){ 
-      for(let p in this.props.passes){ 
+    if (this.props.passes != prevProps.passes) {
+      for (let p in this.props.passes) {
         let prop_pass = this.props.passes[p];
         let prevPass = prevProps.passes[p];
 
-        if(prop_pass != prevPass && prevPass){
+        if (prop_pass != prevPass && prevPass) {
           let pass = this.getPassById(prop_pass.id);
 
-          let params_changed   = prop_pass.params   != prevPass.params;
-          let defines_changed  = prop_pass.defines  != prevPass.defines;
+          let params_changed = prop_pass.params != prevPass.params;
+          let defines_changed = prop_pass.defines != prevPass.defines;
           let uniforms_changed = prop_pass.uniforms != prevPass.uniforms;
 
           if (params_changed) {
@@ -72,9 +129,9 @@ export default class Sketch extends React.Component {
             pass.renderToScreen = prop_pass.params.renderToScreen;
           }
 
-          if (defines_changed){
+          if (defines_changed) {
             Object.assign(pass.material.defines, prop_pass.defines);
-            pass.material.needsUpdate = true;    
+            pass.material.needsUpdate = true;
           }
 
           if (uniforms_changed) {
@@ -82,16 +139,16 @@ export default class Sketch extends React.Component {
           }
         }
       }
-      
+
       this.state.maps.elevation.render(); //TODO: update only the map that changed.
       this.terrain.displace(); //TODO: displace only if necessary
     }
 
-    if(this.props.cameras != prevProps.cameras){ //TODO: insufficient
-      this.camera.setFocalLength(this.props.cameras["Primary Camera"].fov); 
-    }
+    // if (this.props.cameras != prevProps.cameras) { //TODO: insufficient
+    //   this.camera.setFocalLength(this.props.cameras["Primary Camera"].fov);
+    // }
 
-    if(this.props.terrain != prevProps.terrain){
+    if (this.props.terrain != prevProps.terrain) {
       // console.log('terrain changed!');
       //TODO: change terrain parameters and reset mesh
     }
@@ -101,7 +158,6 @@ export default class Sketch extends React.Component {
     this.width  = window.innerWidth;
     this.height = window.innerHeight
 
-    // TODO: deconstructing StandardManager
     this.entities = [];
 
     this.clock = new THREE.Clock();
@@ -114,20 +170,7 @@ export default class Sketch extends React.Component {
       background: 'green'
     });
 
-    this.camera = new THREE.PerspectiveCamera(
-      75,            // fov
-      this.width/this.height,   // aspect
-      0.01,          // near
-      2000           // far
-    );
-
-    this.camera.name = "Primary Camera";
-    this.camera.zoom = 2;
-    this.camera.position.z = 999;
-    this.camera.updateProjectionMatrix();
-
-    this.setupOrbit();
-    // END OF DECONSTRUCTION
+    this.setupCameras();
 
     let map = new ProceduralMap(this.renderer, {width: 512, height: 512});
 
@@ -161,27 +204,6 @@ export default class Sketch extends React.Component {
     // CALLING PROPS FOR REDUX
     this.props.mapAdded("Elevation", map); // TODO: rename these (addMap)
     this.props.terrainAdded(this.terrain); // TODO: rename these (addTerrain)
-    this.props.cameraAdded(this.camera); // TODO: rename these (addCamera)
-  }
-
-  setupShaderPasses(map, passes) {
-    for(let pass of passes) {
-      let p = new THREE.ShaderPass(pass.shaderMaterial);
-      map.composer.addPass(p);
-    }
-
-    map.composer.swapBuffers();
-  }
-
-  setupStats() {
-    this.stats = new Stats();
-    this.stats.domElement.style.position = 'absolute';
-    this.stats.domElement.style.right = '0px';
-    this.stats.domElement.style.left = '';
-    this.stats.domElement.style.bottom = '0px';
-    this.stats.domElement.style.top = '';
-    this.stats.domElement.style.display = 'visible';
-    document.getElementById('APP').appendChild(this.stats.domElement);
   }
 
   componentWillUnmount() {

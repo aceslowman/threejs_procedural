@@ -9,9 +9,9 @@ export default function cameras(state = initial, action){
             return ({
                 byId: {
                     ...state.byId,
-                    [action.camera.id]: action.camera
+                    [action.camera.object.name]: action.camera.object
                 },
-                allIds: [...state.allIds, action.camera.id]
+                allIds: [...state.allIds, action.camera.object.name]
             });
 
         case 'UPDATE_CAMERA':

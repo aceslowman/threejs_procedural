@@ -34,15 +34,10 @@ const terrainAdded = (terrain) => {
     });
 }
 
-const cameraAdded = (camera) => {
-    // TODO: strip out only the necessary params.
-
+const addCamera = (camera) => {
     return ({
         type: 'ADD_CAMERA',
-        camera: {
-            'id': camera.name,
-            'fov': camera.getFocalLength()
-        }
+        camera: camera.toJSON()
     });
 }
 
@@ -64,8 +59,8 @@ const mapDispatchToProps = dispatch => ({
     terrainAdded: (terrain) => {
         dispatch(terrainAdded(terrain))
     },
-    cameraAdded: (camera) => {
-        dispatch(cameraAdded(camera))
+    addCamera: (camera) => {
+        dispatch(addCamera(camera))
     }
 });
 

@@ -18,42 +18,71 @@ html, body, .container, #root {
   align-items: stretch;
 }
 
+
+/* MAPS */
 #ShaderGraph ol{
   padding:0px;
   padding-left:15px;
 }
 
+
+/* GUI */
 .dg.main .close-button.close-bottom {
   position:static !important;
 }
 
-#DATGUI {
+#subwrapper {
   transition: opacity 1s;
   position:inherit;
   display:flex;
 }
 
-#DATGUI div {
+#subwrapper div {
   max-width: 300px;
   position: relative !important; /* NOTE: important for dis-gui */
 }
 
-#NAV{
-  padding-bottom:15px;
+/* TITLE */
+#title {
+  font-size:  3em;
+  margin: 0px;
+  text-align: center;
+  justify-content: center;
+  background-color:red;
 }
 
-#NAV ul {
+/* NAVIGATION */
+
+#navigation{
+  padding-bottom:15px;
+  background-color: green; /*TEMP*/
+}
+
+#navigation ul, .subnavigation ul {
   padding:0px;
   list-style: none;
   text-align:center;
 }
 
-#NAV ul li {
+#navigation ul li, .subnavigation ul li{
   text-align:center;
   display:inline-block;
   font-size:2em;
   padding: 0px 5px;
 }
+
+.subnavigation ul li {
+  font-size: 1.5em;
+  background-color: yellow;
+}
+
+/* SUB CONTEXTUAL TOOLS */
+
+.subcontextual {
+  background-color:orange; /*TEMP*/
+}
+
+/* APP */
 
 #APP {
   flex-shrink: 10;
