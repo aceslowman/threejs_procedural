@@ -32,11 +32,22 @@ html, body, .container, #root {
 .tooldrawer_open {
   width: 360px;
   transition: width 900ms ease;
+  overflow-x:hidden;
 }
 
 .tooldrawer_closed {
   width: 60px;
   transition: width 900ms ease;
+  overflow-x:hidden;
+}
+
+/* SUBWRAPPER */
+#subwrapper {
+  padding:16px;
+}
+
+.gui_textinput {
+  margin:6px !important;
 }
 
 /* APP */

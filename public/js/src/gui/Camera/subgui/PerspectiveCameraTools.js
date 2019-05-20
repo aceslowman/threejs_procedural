@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
-
+import Slider from '@material-ui/lab/Slider';
 
 export default class PerspectiveCameraTools extends React.Component {
     constructor(props) {
@@ -14,9 +14,7 @@ export default class PerspectiveCameraTools extends React.Component {
     render() {
         return (
             <div>
-                <h3>Here lies the PerspectiveCameraTools</h3>
-                {/* <Button>Activate</Button> */}
-                <Grid container spacing={24} alignItems="center" justify="center">
+                <Grid container spacing={8} alignItems="left" justify="left">
                     <Grid item xs={12}>
                         <Button fullWidth={true}>Activate</Button>
                     </Grid>
@@ -25,8 +23,9 @@ export default class PerspectiveCameraTools extends React.Component {
                             label="fov" 
                             type="number" 
                             value="0" 
-                            variant="outlined" 
+                            // variant="filled" 
                             margin="dense"
+                            className="gui_textinput"
                         />
                     </Grid>
                     
@@ -35,8 +34,9 @@ export default class PerspectiveCameraTools extends React.Component {
                             label="zoom" 
                             type="number" 
                             value="0" 
-                            variant="outlined" 
+                            // variant="filled" 
                             margin="dense"
+                            className="gui_textinput"
                         />
                     </Grid>
                     
@@ -45,8 +45,9 @@ export default class PerspectiveCameraTools extends React.Component {
                             label="near" 
                             type="number" 
                             value="0" 
-                            variant="outlined" 
+                            // variant="filled" 
                             margin="dense"
+                            className="gui_textinput"
                         />
                     </Grid>
                     
@@ -55,8 +56,9 @@ export default class PerspectiveCameraTools extends React.Component {
                             label="far" 
                             type="number" 
                             value="0" 
-                            variant="outlined" 
+                            // variant="filled" 
                             margin="dense"
+                            className="gui_textinput"
                         />
                     </Grid>
                     
@@ -65,8 +67,9 @@ export default class PerspectiveCameraTools extends React.Component {
                             label="focus" 
                             type="number" 
                             value="0" 
-                            variant="outlined" 
+                            // variant="filled" 
                             margin="dense"
+                            className="gui_textinput"
                         />
                     </Grid>
                     
@@ -75,8 +78,9 @@ export default class PerspectiveCameraTools extends React.Component {
                             label="aspect" 
                             type="number" 
                             value="0" 
-                            variant="outlined" 
+                            // variant="filled" 
                             margin="dense"
+                            className="gui_textinput"
                         />
                     </Grid>
                     
@@ -85,8 +89,9 @@ export default class PerspectiveCameraTools extends React.Component {
                             label="filmGauge" 
                             type="number" 
                             value="0" 
-                            variant="outlined" 
+                            // variant="filled" 
                             margin="dense"
+                            className="gui_textinput"
                         />
                     </Grid>
                     
@@ -95,8 +100,9 @@ export default class PerspectiveCameraTools extends React.Component {
                             label="filmOffset" 
                             type="number" 
                             value="0" 
-                            variant="outlined" 
+                            // variant="filled" 
                             margin="dense"
+                            className="gui_textinput"
                         />
                     </Grid>
                     

@@ -2,6 +2,17 @@ import React from 'react';
 import * as dg from "dis-gui";
 import { Route, Link } from 'react-router-dom';
 
+import Grid from '@material-ui/core/Grid';
+import Divider from '@material-ui/core/Divider';
+import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
+import Paper from '@material-ui/core/Paper';
+
+import FirstPersonIcon from '@material-ui/icons/PermIdentity';
+import OrthoIcon from '@material-ui/icons/GridOn';
+import PerspIcon from '@material-ui/icons/Visibility';
+
+
 // import subgui
 import FirstPersonCameraTools from './subgui/FirstPersonCameraTools.js';
 import OrthographicCameraTools from './subgui/OrthographicCameraTools';
@@ -55,7 +66,7 @@ export default class Camera extends React.Component {
   render(){
     return (
       <div className="subnavigation">
-        <nav>
+        {/* <nav>
           <ul>
             <li>
               <Link to="/camera/firstperson/">👁</Link>
@@ -67,13 +78,29 @@ export default class Camera extends React.Component {
               <Link to="/camera/perspective/">⌆</Link>
             </li>
           </ul>
-        </nav>
-        <div className="subcontextual">
+        </nav> */}
+        <Grid className="subnav" container spacing={this.state.open ? 0 : 0} alignItems="center" justify="center">
+          <Grid item>
+            <Button component={Link} to="/camera/firstperson/" disableRipple={true} fullWidth={true} onClick={() => this.handleDrawerOpen()}><FirstPersonIcon style={{fontSize: 18}}/></Button>
+          </Grid>
+          <Grid item>
+            <Button component={Link} to="/camera/ortho/" fullWidth={true}><OrthoIcon style={{fontSize: 18}}/></Button>
+          </Grid>
+          <Grid item>
+            <Button component={Link} to="/camera/perspective/" fullWidth={true}><PerspIcon style={{fontSize: 18}}/></Button>
+          </Grid>
+        </Grid>
+        <Divider />
+        <Paper
+          style={{padding:'15px'}}
+          elevation={1}  
+          square={true}
+        >
           <Route path="/camera/" exact component={PerspectiveCameraTools} />
           <Route path="/camera/firstperson/" exact component={FirstPersonCameraTools} />
           <Route path="/camera/ortho/" exact component={OrthographicCameraTools} />
           <Route path="/camera/perspective/" exact component={PerspectiveCameraTools} />
-        </div>
+        </Paper>
       </div>
     );
   }

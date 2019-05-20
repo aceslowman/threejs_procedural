@@ -22,6 +22,7 @@
   "homepage": "https://github.com/aceslowman/threejs_node#readme",
   "dependencies": {
     "@material-ui/icons": "^3.0.2",
+    "@material-ui/lab": "^3.0.0-alpha.30",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
