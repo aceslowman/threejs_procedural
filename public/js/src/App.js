@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
+
 import Sketch from './sketch/SketchContainer';
 import GUI from './gui/GUI';
 import RootReducer from './state/RootReducer';
@@ -18,12 +20,35 @@ const store = createStore(RootReducer, composeEnhancers(
   applyMiddleware(...middlewares)
 ));
 
+const theme = createMuiTheme({
+  typography: {
+    fontSize: 12
+  },
+  spacing: {
+    unit: 4
+  },
+  shape: {
+    borderRadius: 2
+  },
+  palette: {
+    type: 'dark',
+    background: '#ccc'
+  },
+  overrides: {
+    MuiGrid: {
+      // margin: 30
+    }
+  }
+});
+
 ReactDOM.render(
-  <Provider store={store}>
-    <div className="container">
-      <GUI />
-      <Sketch />
-    </div>
-  </Provider>,
+  <MuiThemeProvider theme={theme}>
+    <Provider store={store}>
+      <div className="container">
+        <GUI />
+        <Sketch />
+      </div>
+    </Provider>
+  </MuiThemeProvider>,
   document.getElementById('root')
 );

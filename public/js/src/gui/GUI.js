@@ -1,24 +1,15 @@
 import React from 'react';
 import { HashRouter, Route, Link} from "react-router-dom";
-import { toolbar_style } from './style';
-
 
 // Material UI
-import Paper from '@material-ui/core/Paper';
+import { withStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Drawer from '@material-ui/core/Drawer';
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import AppBar from '@material-ui/core/AppBar';
-// import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
 
 import TerrainIcon from '@material-ui/icons/Terrain';
 import FloraIcon from '@material-ui/icons/LocalFlorist';
@@ -26,10 +17,9 @@ import FaunaIcon from '@material-ui/icons/Pets';
 import CityIcon from '@material-ui/icons/LocationCity';
 import CameraIcon from '@material-ui/icons/CameraEnhance';
 
-
+// CONTAINERS
 import CameraContainer from './Camera/CameraContainer';
 import TerrainContainer from './Terrain/TerrainContainer';
-// TODO: FILL IN THE REST WHEN THE DESIGN IS FINALIZED
 
 export default class Toolbar extends React.Component {
   constructor(props) {
@@ -67,7 +57,7 @@ export default class Toolbar extends React.Component {
             style={{ padding: this.state.open ? '0px 15px' : '15px 0px' }}
           >
             <Grid item>
-              <h1 style={{display: this.state.open ? 'block' : 'none'}}>Procedural Tools</h1>
+              <h1 style={{display: this.state.open ? 'block' : 'none', wordBreak: 'break-all'}}>Procedural Tools</h1>
             </Grid>
             <Grid item>
               <IconButton onClick={() => this.state.open ? this.handleDrawerClose() : this.handleDrawerOpen()}>
@@ -75,30 +65,69 @@ export default class Toolbar extends React.Component {
               </IconButton>
             </Grid>
           </Grid>
+
           <Divider />
+
           <Grid container spacing={this.state.open ? 0 : 0} alignItems="center" justify="center">
             <Grid item>
-              <Button component={Link} to="/terrain/" disableRipple={true} fullWidth={true} onClick={()=>this.handleDrawerOpen()}><TerrainIcon /></Button>
+              <Button 
+                component={Link} 
+                to="/terrain/" 
+                disableRipple={true} 
+                fullWidth={true} onClick={()=>this.handleDrawerOpen()}
+              >
+                <TerrainIcon />
+              </Button>
             </Grid>
             <Grid item>
-              <Button component={Link} to="/flora/" fullWidth={true} onClick={()=>this.handleDrawerOpen()}><FloraIcon /></Button>
+              <Button 
+                component={Link} 
+                to="/flora/" 
+                fullWidth={true} 
+                onClick={()=>this.handleDrawerOpen()}
+              >
+                <FloraIcon />
+              </Button>
             </Grid>
             <Grid item>
-              <Button component={Link} to="/fauna/" fullWidth={true} onClick={()=>this.handleDrawerOpen()}><FaunaIcon /></Button>
+              <Button 
+                component={Link} 
+                to="/fauna/" 
+                fullWidth={true} 
+                onClick={()=>this.handleDrawerOpen()}
+              >
+                <FaunaIcon />
+              </Button>
             </Grid>
             <Grid item>
-              <Button component={Link} to="/city/" fullWidth={true} onClick={()=>this.handleDrawerOpen()}><CityIcon /></Button>
+              <Button 
+                component={Link} 
+                to="/city/" 
+                fullWidth={true} 
+                onClick={()=>this.handleDrawerOpen()}
+              >
+                <CityIcon />
+              </Button>
             </Grid>
             <Grid item>
-              <Button component={Link} to="/camera/" fullWidth={true} onClick={()=>this.handleDrawerOpen()}><CameraIcon /></Button>
+              <Button 
+                component={Link} 
+                to="/camera/" 
+                fullWidth={true} 
+                onClick={()=>this.handleDrawerOpen()}>
+                <CameraIcon />
+              </Button>
             </Grid>
           </Grid>
+
           <Divider />
+
           <div id="subwrapper" style={ {display: this.state.open ? 'block' : 'none'} }>
             <Route path="/" exact component={CameraContainer} />
             <Route path="/camera/" component={CameraContainer} />
             <Route path="/terrain/" component={TerrainContainer} />
           </div>
+
         </Drawer>
       </HashRouter>
     );

@@ -6,6 +6,10 @@ body{
   font-family: Helvetica;
 }
 
+h1 {
+  color:white;
+}
+
 html, body, .container, #root {
   height:100%;
   width:100%;
@@ -44,10 +48,6 @@ html, body, .container, #root {
 /* SUBWRAPPER */
 #subwrapper {
   padding:16px;
-}
-
-.gui_textinput {
-  margin:6px !important;
 }
 
 /* APP */
