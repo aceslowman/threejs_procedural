@@ -13,6 +13,8 @@
 - Begin incorporating MaterialUI into the CameraTools
 - Add new material ui drawer.
 - 
+- Hook into Redux for the current PerspectiveCameraTools
+- 
 
 ## Done
 

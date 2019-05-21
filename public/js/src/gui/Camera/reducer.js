@@ -15,7 +15,13 @@ export default function cameras(state = initial, action){
             });
 
         case 'UPDATE_CAMERA':
+            console.group();
+            console.log('id', action.cameraId);
+            console.log('param', action.param);
+            console.log('val', action.value);
+            console.groupEnd();
             return ({
+                ...state,
                 byId: {
                     ...state.byId,
                     [action.cameraId]: {

@@ -22,63 +22,12 @@ export default class Camera extends React.Component {
   constructor(props){
     super(props);
 
-    this.controls = [];
-
-    this.style = {
-      nav: {
-        textDecoration: 'none'
-      }
-    }
-
-    this.state = {
-
-    }
-  }
-
-  assembleControls(){
-    this.controls = []; //clear
-
-    // console.log(this.props.cameras);
-    // if (this.props.cameras) {
-    //   this.controls.push(
-    //     <dg.Number 
-    //       key={0} 
-    //       label='FOV' 
-    //       value={this.props.cameras["Primary Camera"].fov} 
-    //       min={0} 
-    //       max={30} 
-    //       step={0.1} 
-    //       onChange={(v) => this.props.updateCamera("Primary Camera", 'fov', v)} 
-    //     />);
-    // }
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps != this.props) {
-      this.assembleControls();
-    }
-  }
-
-  componentDidMount(){
-    this.assembleControls();
+    this.state = {}
   }
 
   render(){
     return (
       <div className="subnavigation">
-        {/* <nav>
-          <ul>
-            <li>
-              <Link to="/camera/firstperson/">👁</Link>
-            </li>
-            <li>
-              <Link to="/camera/ortho/">▦</Link>
-            </li>
-            <li>
-              <Link to="/camera/perspective/">⌆</Link>
-            </li>
-          </ul>
-        </nav> */}
         <Grid className="subnav" container spacing={this.state.open ? 0 : 0} alignItems="center" justify="center">
           <Grid item>
             <Button component={Link} to="/camera/firstperson/" disableRipple={true} fullWidth={true} onClick={() => this.handleDrawerOpen()}><FirstPersonIcon style={{fontSize: 18}}/></Button>
@@ -96,10 +45,10 @@ export default class Camera extends React.Component {
           elevation={0}  
           square={true}
         >
-          <Route path="/camera/" exact component={PerspectiveCameraTools} />
-          <Route path="/camera/firstperson/" exact component={FirstPersonCameraTools} />
-          <Route path="/camera/ortho/" exact component={OrthographicCameraTools} />
-          <Route path="/camera/perspective/" exact component={PerspectiveCameraTools} />
+          <Route path="/camera/" exact render={(props)=><PerspectiveCameraTools {...props} camera={this.props.cameras["Perspective"]} updateCamera={(camId, param, val)=>this.props.updateCamera(camId, param, val)} />}/> 
+          <Route path="/camera/firstperson/" exact render={(props)=><FirstPersonCameraTools {...props} camera={this.props.cameras["First Person"]} updateCamera={(camId, param, val)=>this.props.updateCamera(camId, param, val)} />}/>
+          <Route path="/camera/ortho/" exact render={(props)=><OrthographicCameraTools {...props} camera={this.props.cameras["Orthographic"]} updateCamera={(camId, param, val)=>this.props.updateCamera(camId, param, val)} />}/>
+          <Route path="/camera/perspective/" exact render={(props)=><PerspectiveCameraTools {...props} camera={this.props.cameras["Perspective"]} updateCamera={(camId, param, val)=>this.props.updateCamera(camId, param, val)} />}/>
         </Paper>
       </div>
     );

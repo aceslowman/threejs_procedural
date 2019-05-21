@@ -41,40 +41,37 @@ export default class Sketch extends React.Component {
   }
 
   setupCameras(){
-    let first_person_cam = new THREE.PerspectiveCamera(
+    this.first_person_cam = new THREE.PerspectiveCamera(
       75,            // fov
       this.width / this.height,   // aspect
       0.01,          // near
       2000           // far
     );
-    first_person_cam.name = "First Person";
+    this.first_person_cam.name = "First Person";
 
-    this.props.addCamera(first_person_cam);
+    this.ortho_cam = new THREE.OrthographicCamera();
+    this.ortho_cam.name = "Orthographic";
 
-    let ortho_cam = new THREE.OrthographicCamera();
-    ortho_cam.name = "Orthographic";
-
-    this.props.addCamera(ortho_cam);
-
-    let perspective_cam = new THREE.PerspectiveCamera(
+    this.perspective_cam = new THREE.PerspectiveCamera(
       75,            // fov
       this.width / this.height,   // aspect
       0.01,          // near
       2000           // far
     );
-    perspective_cam.name = "Perspective";
-    perspective_cam.zoom = 2;
-    perspective_cam.position.z = 999;
-    perspective_cam.updateProjectionMatrix();
-
-    this.props.addCamera(perspective_cam);
+    this.perspective_cam.name = "Perspective";
+    this.perspective_cam.zoom = 2;
+    this.perspective_cam.position.z = 999;
+    this.perspective_cam.updateProjectionMatrix();
 
     // set default camera
-    this.camera = perspective_cam;
+    this.camera = this.perspective_cam;
 
     this.setupOrbit();
 
-    // this.props.cameraAdded(this.camera); // TODO: rename these (addCamera)
+    // send to store
+    this.props.addCamera(this.first_person_cam);
+    this.props.addCamera(this.ortho_cam);
+    this.props.addCamera(this.perspective_cam);
   }
 
   setupOrbit() {
@@ -144,13 +141,21 @@ export default class Sketch extends React.Component {
       this.terrain.displace(); //TODO: displace only if necessary
     }
 
-    // if (this.props.cameras != prevProps.cameras) { //TODO: insufficient
-    //   this.camera.setFocalLength(this.props.cameras["Primary Camera"].fov);
-    // }
+    /* TODO: this seems like it can be streamlined and simplified.
+             how do I map a serialized object to it's unserialized relative?
+    */
+    if (this.props.cameras != prevProps.cameras){
+      if (this.props.cameras["Perspective"] != prevProps.cameras["Perspective"] && prevProps.cameras["Perspective"]){
 
-    if (this.props.terrain != prevProps.terrain) {
-      // console.log('terrain changed!');
-      //TODO: change terrain parameters and reset mesh
+        for(let key in this.props.cameras["Perspective"]){
+          if (this.props.cameras["Perspective"][key] != prevProps.cameras["Perspective"][key]){
+            console.log(`${key} has changed to ${this.props.cameras["Perspective"][key]}`);
+            this.perspective_cam[key] = this.props.cameras["Perspective"][key];
+          }
+        }
+
+        this.perspective_cam.updateProjectionMatrix();
+      }
     }
   }
 

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
@@ -8,206 +9,139 @@ import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/lab/Slider';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
-// import Slider from 'material-ui-slider-label/Slider';
 
-const styles = {
-    gridBump: {
-        // position: 'relative !important',
-        // top: '10px !important'
-        marginTop: '15px'
-    },
-    gridOuter: {
-        margin: '15px'
-    },
-    gridInner: {
-        alignItems: 'center'
+const styles = theme => ({
+    textfield: {
+        color:'green',
+        margin:100
     }
-};
+});
 
-export default class PerspectiveCameraTools extends React.Component {
+class PerspectiveCameraTools extends React.Component {
     constructor(props) {
         super(props);
+    }
+
+    componentDidUpdate(prevProps){
+        if(this.props.camera != prevProps.camera){
+            this.controls = (<Grid container spacing={8} justify="center">
+                <Grid item xs={12}>
+                    <Button variant="outlined" fullWidth={true}>Activate</Button>
+                </Grid>
+
+                <Divider />
+
+                {/* NOTE: I am using CONTROLLED components */}
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        id="zoom-number"
+                        label="zoom"
+                        step="0.1"
+                        type="number"
+                        variant="filled"
+                        margin="dense"
+                        style={styles.textfield}
+                        value={this.props.camera.zoom}
+                        onChange={(e) => {
+                            console.log(e.target.value);
+                            this.props.updateCamera(this.props.camera.name, 'zoom', e.target.value);
+                        }}
+                    />
+                    <Slider
+                        id="zoom"
+                        min={0}
+                        max={10}
+                        value={this.props.camera.zoom}
+                        onChange={(e, v) => this.props.updateCamera(this.props.camera.name, 'zoom', v)}
+                    />
+                </Grid>
+
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        id="fov-number"
+                        label="fov"
+                        step="5"
+                        type="number"
+                        variant="filled"
+                        margin="dense"
+                        style={styles.textfield}
+                        value={this.props.camera ? this.props.camera.fov : 0}
+                        onChange={(e, v) => this.props.updateCamera(this.props.camera.name, 'fov', v)}
+                    />
+                    <Slider
+                        id="fov"
+                        min={0}
+                        max={75}
+                        value={this.props.camera ? this.props.camera.fov : 0}
+                        onChange={(e, v) => this.props.updateCamera(this.props.camera.name, 'fov', v)}
+                    />
+                </Grid>
+
+                <Grid item xs={4}>
+                    <TextField
+                        id="near"
+                        label="near"
+                        type="number"
+                        variant="filled"
+                        margin="dense"
+                        step="0.1"
+                        style={styles.textfield}
+                        value={this.props.camera ? this.props.camera.near : 0}
+                        onChange={(e, v) => this.props.updateCamera(this.props.camera.name, 'near', v)}
+                    />
+                </Grid>
+
+                <Grid item xs={4}>
+                    <TextField
+                        id="far"
+                        label="far"
+                        type="number"
+                        variant="filled"
+                        margin="dense"
+                        style={styles.textfield}
+                        value={this.props.camera ? this.props.camera.far : 0}
+                        onChange={(e, v) => this.props.updateCamera(this.props.camera.name, 'far', v)}
+                    />
+                </Grid>
+
+                <Grid item xs={4}>
+                    <TextField
+                        id="filmGauge"
+                        label="filmGauge"
+                        type="number"
+                        variant="filled"
+                        margin="dense"
+                        style={styles.textfield}
+                        value={this.props.camera ? this.props.camera.filmGauge : 0}
+                        onChange={(e, v) => this.props.updateCamera(this.props.camera.name, 'filmGauge', v)}
+                    />
+                </Grid>
+
+                <Grid item xs={4}>
+                    <TextField
+                        id="filmOffset"
+                        label="filmOffset"
+                        type="number"
+                        variant="filled"
+                        margin="dense"
+                        style={styles.textfield}
+                        value={this.props.camera ? this.props.camera.filmOffset : 0}
+                        onChange={(e, v) => this.props.updateCamera(this.props.camera.name, 'filmOffset', v)}
+                    />
+                </Grid>
+            </Grid>);
+        }
     }
 
     render() {
         return (
             <div>
-                <Grid container  style={styles.gridOuter}spacing={8} justify="center">
-                    <Grid item xs={12}>
-                        <Button variant="outlined" fullWidth={true}>Activate</Button>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Button variant="outlined" fullWidth={true}>Activate</Button>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Button variant="outlined" fullWidth={true}>Activate</Button>
-                    </Grid>
-
-                    <Divider />
-
-                    <Grid container alignItems="center">
-                        <Grid item xs={2}>
-                            <TextField
-                                id="zoom-number"
-                                label="zoom"
-                                value="0"
-                                step="5"
-                                onChange={(e) => { console.log('changed' + e) }}
-                                type="number"
-                                variant="filled"
-                                margin="dense"
-                                style={styles.textfield}
-                            />
-                        </Grid>
-                        <Grid item xs={10} style={styles.gridBump}>
-                            <Slider 
-                                min={-10} 
-                                max={10} 
-                                value={0} 
-                            />
-                        </Grid>
-                    </Grid>
-
-                    <Grid item xs={4}>
-                        <TextField 
-                            label="fov" 
-                            type="number" 
-                            value="0" 
-                            variant="filled" 
-                            margin="dense"
-                            style={styles.textfield}
-                        />
-                    </Grid>
-                
-                    <Grid item xs={4 }>
-                        <TextField 
-                            label="near" 
-                            type="number" 
-                            value="0" 
-                            variant="filled" 
-                            margin="dense"
-                            style={styles.textfield}
-                        />
-                    </Grid>
-                    
-                    <Grid item xs={4 }>
-                        <TextField 
-                            label="far" 
-                            type="number" 
-                            value="0" 
-                            variant="filled" 
-                            margin="dense"
-                            style={styles.textfield}
-                        />
-                    </Grid>
-                    
-                    <Grid item xs={4 }>
-                        <TextField 
-                            label="focus" 
-                            type="number" 
-                            value="0" 
-                            variant="filled" 
-                            margin="dense"
-                            style={styles.textfield}
-                        />
-                    </Grid>
-                    
-                    <Grid item xs={4 }>
-                        <TextField 
-                            label="aspect" 
-                            type="number" 
-                            value="0" 
-                            variant="filled" 
-                            margin="dense"
-                            style={styles.textfield}
-                        />
-                    </Grid>
-                    
-                    <Grid item xs={4 }>
-                        <TextField 
-                            label="filmGauge" 
-                            type="number" 
-                            value="0" 
-                            variant="filled" 
-                            margin="dense"
-                            style={styles.textfield}
-                        />
-                    </Grid>
-                    
-                    <Grid item xs={4 }>
-                        <TextField 
-                            label="filmOffset" 
-                            type="number" 
-                            value="0" 
-                            variant="filled" 
-                            margin="dense"
-                            style={styles.textfield}
-                        />
-                    </Grid>
-
-                    <Grid item xs={4}>
-                        <TextField
-                            label="filmOffset"
-                            type="number"
-                            value="0"
-                            variant="filled"
-                            margin="dense"
-                            style={styles.textfield}
-                        />
-                    </Grid>     
-                    
-                </Grid>
-
-                <Grid container style={styles.gridOuter}>
-                    <Grid item xs={12}>
-                        <Slider />
-                    </Grid>           
-                </Grid>
-
-                
-                {/* TRANSFORM */}
-                <Typography variant="h6">Transform</Typography>
-
-                <Divider />
-
-                <Grid container style={styles.gridOuter}>
-                    <Grid item xs={4}>
-                        <TextField
-                            label="x"
-                            InputLabelProps={{ shrink: true }} 
-                            type="number"
-                            value="0"
-                            variant="filled"
-                            margin="dense"
-                            style={styles.textfield}
-                        />
-                    </Grid>
-
-                    <Grid item xs={4}>
-                        <TextField
-                            label="y"
-                            InputLabelProps={{ shrink: true }} 
-                            type="number"
-                            value="0"
-                            variant="filled"
-                            margin="dense"
-                            style={styles.textfield}
-                        />
-                    </Grid>
-
-                    <Grid item xs={4}>
-                        <TextField
-                            label="z"
-                            InputLabelProps={{ shrink: true }} 
-                            type="number"
-                            value="0"
-                            variant="filled"
-                            margin="dense"
-                            style={styles.textfield}
-                        />
-                    </Grid> 
-                </Grid>
+                {this.controls}
             </div>
         );
     }
 };
+
+export default withStyles(styles)(PerspectiveCameraTools);

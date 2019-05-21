@@ -66,6 +66,27 @@ html, body, .container, #root {
   transition: all 500ms ease;
 }
 
+/* RANGESLIDER */
+
+/* .rangeslider-horizontal {
+  height: 5px !important;
+}
+
+.rangeslider__handle {
+  width:15px !important;
+  height:15px !important;
+}
+
+.rangeslider__handle:after {
+  /* width: 15px !important;
+  height: 15px !important; */
+  /*
+  width: 0px !important;
+  height: 0px !important;
+  top: 0px !important;
+  left: 0px !important;
+} */
+
 /* TODO: Go through and clean up below */
 
 .roadDebug{
