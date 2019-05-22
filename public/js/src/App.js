@@ -35,8 +35,8 @@ const theme = createMuiTheme({
     background: '#ccc'
   },
   overrides: {
-    MuiGrid: {
-      // margin: 30
+    MuiPaper: {
+      // border: '1px solid rgba(255, 255, 255, 0.12)'
     }
   }
 });

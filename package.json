@@ -28,6 +28,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "ccapture.js": "github:aceslowman/ccapture.js#npm-fix",
+    "classnames": "^2.2.6",
     "dis-gui": "github:aceslowman/dis-gui",
     "express": "^4.16.4",
     "npm": "^6.9.0",

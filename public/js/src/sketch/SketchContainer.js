@@ -37,9 +37,22 @@ const terrainAdded = (terrain) => {
 const addCamera = (camera) => {
     return ({
         type: 'ADD_CAMERA',
-        camera: camera.toJSON()
+        camera: {
+            ...camera.toJSON(),
+            focalLength: camera.type == 'PerspectiveCamera' ? camera.getFocalLength() : 0
+        }
     });
 }
+
+const setActiveCamera = (camera) => {
+    return ({
+        type: 'ACTIVATE_CAMERA',
+        cameraId: camera.name,
+        meta: {
+            throttle: 40
+        }
+    });
+};
 
 const mapStateToProps = state => {
     const { maps, passes, cameras, terrain } = state;
@@ -48,6 +61,7 @@ const mapStateToProps = state => {
         maps: maps.byId,
         passes: passes.byId,
         cameras: cameras.byId,
+        active_camera: cameras.active,
         terrain: terrain
     }
 };
@@ -61,6 +75,9 @@ const mapDispatchToProps = dispatch => ({
     },
     addCamera: (camera) => {
         dispatch(addCamera(camera))
+    },
+    setActiveCamera: (camera) => {
+        dispatch(setActiveCamera(camera))
     }
 });
 

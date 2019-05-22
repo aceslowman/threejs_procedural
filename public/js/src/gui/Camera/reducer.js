@@ -1,4 +1,5 @@
 const initial = {
+    active: '',
     byId: {},
     allIds: []
 }
@@ -9,17 +10,15 @@ export default function cameras(state = initial, action){
             return ({
                 byId: {
                     ...state.byId,
-                    [action.camera.object.name]: action.camera.object
+                    [action.camera.object.name]: {
+                        ...action.camera.object,
+                        focalLength: action.camera.focalLength
+                    }
                 },
                 allIds: [...state.allIds, action.camera.object.name]
             });
 
         case 'UPDATE_CAMERA':
-            console.group();
-            console.log('id', action.cameraId);
-            console.log('param', action.param);
-            console.log('val', action.value);
-            console.groupEnd();
             return ({
                 ...state,
                 byId: {
@@ -29,7 +28,13 @@ export default function cameras(state = initial, action){
                         [action.param]: action.value
                     }
                 }
-            });             
+            });   
+
+        case 'ACTIVATE_CAMERA':
+            return ({
+                ...state,
+                active: action.cameraId
+            });   
              
         default:
             return state

@@ -49,8 +49,18 @@ export default class Sketch extends React.Component {
     );
     this.first_person_cam.name = "First Person";
 
-    this.ortho_cam = new THREE.OrthographicCamera();
+    this.ortho_cam = new THREE.OrthographicCamera(
+      this.width / - 2, 
+      this.width / 2, 
+      this.height / 2, 
+      this.height / - 2, 
+      0, 
+      1000
+    );
     this.ortho_cam.name = "Orthographic";
+    this.ortho_cam.zoom = 2;
+    this.ortho_cam.position.z = 999;
+    this.ortho_cam.updateProjectionMatrix();
 
     this.perspective_cam = new THREE.PerspectiveCamera(
       75,            // fov
@@ -63,15 +73,16 @@ export default class Sketch extends React.Component {
     this.perspective_cam.position.z = 999;
     this.perspective_cam.updateProjectionMatrix();
 
-    // set default camera
-    this.camera = this.perspective_cam;
-
-    this.setupOrbit();
-
     // send to store
     this.props.addCamera(this.first_person_cam);
     this.props.addCamera(this.ortho_cam);
     this.props.addCamera(this.perspective_cam);
+
+    // set default camera
+    this.camera = this.perspective_cam;
+    this.props.setActiveCamera(this.perspective_cam);
+
+    this.setupOrbit();
   }
 
   setupOrbit() {
@@ -141,6 +152,31 @@ export default class Sketch extends React.Component {
       this.terrain.displace(); //TODO: displace only if necessary
     }
 
+    /* 
+      TODO: change active camera.
+      
+      I could probably store the cameras in an array similar to how it is stored in the redux store (in its
+      unserialized form.)
+    */
+    if (this.props.active_camera != prevProps.active_camera) {
+
+      switch (this.props.active_camera) {
+        case 'Perspective':
+          this.camera = this.perspective_cam;
+          break;
+        case 'Orthographic':
+          this.camera = this.ortho_cam;
+          break;
+        case 'First Person':
+          this.camera = this.first_person_cam;
+          break;
+        default:
+          console.log("??? active cam change failed");
+      }
+
+      console.log('active camera changed', this.props.active_camera);
+    }
+
     /* TODO: this seems like it can be streamlined and simplified.
              how do I map a serialized object to it's unserialized relative?
     */
@@ -148,8 +184,11 @@ export default class Sketch extends React.Component {
       if (this.props.cameras["Perspective"] != prevProps.cameras["Perspective"] && prevProps.cameras["Perspective"]){
 
         for(let key in this.props.cameras["Perspective"]){
+          if (key == 'focalLength'){
+            this.perspective_cam.setFocalLength(this.props.cameras["Perspective"].focalLength)
+          }
+
           if (this.props.cameras["Perspective"][key] != prevProps.cameras["Perspective"][key]){
-            console.log(`${key} has changed to ${this.props.cameras["Perspective"][key]}`);
             this.perspective_cam[key] = this.props.cameras["Perspective"][key];
           }
         }

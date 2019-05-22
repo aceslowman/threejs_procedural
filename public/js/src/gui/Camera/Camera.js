@@ -45,10 +45,10 @@ export default class Camera extends React.Component {
           elevation={0}  
           square={true}
         >
-          <Route path="/camera/" exact render={(props)=><PerspectiveCameraTools {...props} camera={this.props.cameras["Perspective"]} updateCamera={(camId, param, val)=>this.props.updateCamera(camId, param, val)} />}/> 
-          <Route path="/camera/firstperson/" exact render={(props)=><FirstPersonCameraTools {...props} camera={this.props.cameras["First Person"]} updateCamera={(camId, param, val)=>this.props.updateCamera(camId, param, val)} />}/>
-          <Route path="/camera/ortho/" exact render={(props)=><OrthographicCameraTools {...props} camera={this.props.cameras["Orthographic"]} updateCamera={(camId, param, val)=>this.props.updateCamera(camId, param, val)} />}/>
-          <Route path="/camera/perspective/" exact render={(props)=><PerspectiveCameraTools {...props} camera={this.props.cameras["Perspective"]} updateCamera={(camId, param, val)=>this.props.updateCamera(camId, param, val)} />}/>
+          <Route path="/camera/" exact render={(props)=><PerspectiveCameraTools {...props} camera={this.props.cameras["Perspective"]} activateCamera={(cam)=>this.props.activateCamera(cam)} updateCamera={(camId, param, val)=>this.props.updateCamera(camId, param, val)} />}/> 
+          <Route path="/camera/firstperson/" exact render={(props)=><FirstPersonCameraTools {...props} camera={this.props.cameras["First Person"]} activateCamera={(cam)=>this.props.activateCamera(cam)} updateCamera={(camId, param, val)=>this.props.updateCamera(camId, param, val)} />}/>
+          <Route path="/camera/ortho/" exact render={(props)=><OrthographicCameraTools {...props} camera={this.props.cameras["Orthographic"]} activateCamera={(cam)=>this.props.activateCamera(cam)} updateCamera={(camId, param, val)=>this.props.updateCamera(camId, param, val)} />}/>
+          <Route path="/camera/perspective/" exact render={(props)=><PerspectiveCameraTools {...props} camera={this.props.cameras["Perspective"]} activateCamera={(cam)=>this.props.activateCamera(cam)} updateCamera={(camId, param, val)=>this.props.updateCamera(camId, param, val)} />}/>
         </Paper>
       </div>
     );

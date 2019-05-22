@@ -15,6 +15,16 @@ const updateCamera = (camId, param, val) => {
   });
 };
 
+const activateCamera = (camId) => {
+  return ({
+    type: 'ACTIVATE_CAMERA',
+    cameraId: camId,
+    meta: {
+      throttle: 40
+    }
+  });
+};
+
 const mapStateToProps = state => {
   const { cameras } = state;
 
@@ -26,6 +36,9 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => ({
   updateCamera: (camId, param, val) => {
     dispatch(updateCamera(camId, param, val));
+  },
+  activateCamera: (camId) => {
+    dispatch(activateCamera(camId));
   }
 });
 
