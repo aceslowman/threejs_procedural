@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { createStore, applyMiddleware } from 'redux'
+import { HashRouter } from 'react-router-dom';
 import { Provider } from 'react-redux'
 
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
@@ -56,14 +57,16 @@ class App extends React.Component {
 
   render() {
     return (
-      <MuiThemeProvider theme={theme}>
-        <Provider store={store}>
-          <div className="container">
-            { this.state.sketchReady && <GUI />}
-            <Sketch onReady={()=>this.handleSketchReady()}/>
-          </div>
-        </Provider>
-      </MuiThemeProvider>)
+      <HashRouter>
+        <MuiThemeProvider theme={theme}>
+          <Provider store={store}>
+            <div className="container">
+              {this.state.sketchReady && <GUI />}
+              <Sketch onReady={() => this.handleSketchReady()} />
+            </div>
+          </Provider>
+        </MuiThemeProvider>
+      </HashRouter>)
     }
 }
 

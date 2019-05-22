@@ -1,6 +1,6 @@
 import React from 'react';
 import * as dg from "dis-gui";
-import { Route, Link } from 'react-router-dom';
+import { withRouter, Route, Link } from 'react-router-dom';
 
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
@@ -18,7 +18,7 @@ import FirstPersonCameraTools from './subgui/FirstPersonCameraTools.js';
 import OrthographicCameraTools from './subgui/OrthographicCameraTools';
 import PerspectiveCameraTools from './subgui/PerspectiveCameraTools';
 
-export default class Camera extends React.Component {
+class Camera extends React.Component {
   constructor(props){
     super(props);
 
@@ -26,17 +26,19 @@ export default class Camera extends React.Component {
   }
 
   render(){
+    let location = this.props.location.pathname;
+
     return (
       <div className="subnavigation">
         <Grid className="subnav" container spacing={this.state.open ? 0 : 0} alignItems="center" justify="center">
           <Grid item>
-            <Button component={Link} to="/camera/firstperson/" disableRipple={true} fullWidth={true} onClick={() => this.handleDrawerOpen()}><FirstPersonIcon style={{fontSize: 18}}/></Button>
+            <Button color={location == '/camera/firstperson/' ? 'primary' : ''} component={Link} to="/camera/firstperson/" disableRipple={true} fullWidth={true} onClick={() => this.handleDrawerOpen()}>First Person</Button>
           </Grid>
           <Grid item>
-            <Button component={Link} to="/camera/ortho/" fullWidth={true}><OrthoIcon style={{fontSize: 18}}/></Button>
+            <Button color={location == '/camera/ortho/' ? 'primary' : ''} component={Link} to="/camera/ortho/" fullWidth={true}>Orthographic</Button>
           </Grid>
           <Grid item>
-            <Button component={Link} to="/camera/perspective/" fullWidth={true}><PerspIcon style={{fontSize: 18}}/></Button>
+            <Button color={location == '/camera/perspective/' ? 'primary' : ''} component={Link} to="/camera/perspective/" fullWidth={true}>Perspective</Button>
           </Grid>
         </Grid>
         <Divider />
@@ -54,3 +56,5 @@ export default class Camera extends React.Component {
     );
   }
 }
+
+export default withRouter(Camera);

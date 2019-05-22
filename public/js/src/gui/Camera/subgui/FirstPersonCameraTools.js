@@ -27,8 +27,6 @@ class FirstPersonCameraTools extends React.Component {
 
         return (
             <div>
-                <Typography variant="h5" align="center" gutterBottom>First Person Camera</Typography>
-                <Divider />
                 <Paper className={classes.root}>
                     <CameraCommons camera={this.props.camera} activateCamera={this.props.activateCamera} updateCamera={this.props.updateCamera} />
                 </Paper>

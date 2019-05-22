@@ -27,10 +27,29 @@ class PerspectiveCameraTools extends React.Component {
 
         return (
             <div>
-                <Typography variant="h5" align="center" gutterBottom>Perspective Camera</Typography>
-                <Divider />                    
                 <Paper className={classes.root}>
                     <CameraCommons camera={this.props.camera} activateCamera={this.props.activateCamera} updateCamera={this.props.updateCamera}/>
+                    <Grid item xs={12}>
+                        <TextField
+                            fullWidth
+                            id="focal_length-number"
+                            label="Focal Length"
+                            step="5"
+                            type="number"
+                            variant="filled"
+                            margin="dense"
+                            style={styles.textfield}
+                            value={this.props.camera.focalLength}
+                            onChange={(e) => this.props.updateCamera(this.props.camera.name, 'focalLength', e.target.value)}
+                        />
+                        <Slider
+                            id="focal_length"
+                            min={0}
+                            max={75}
+                            value={Number(this.props.camera.focalLength)}
+                            onChange={(e, v) => this.props.updateCamera(this.props.camera.name, 'focalLength', v)}
+                        />
+                    </Grid>
                 </Paper>
             </div>
         );

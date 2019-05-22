@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter, Route, Link} from "react-router-dom";
+import {withRouter, HashRouter, Route, Link} from "react-router-dom";
 
 // Material UI
 import { withStyles } from '@material-ui/core/styles';
@@ -10,6 +10,7 @@ import Drawer from '@material-ui/core/Drawer';
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import Divider from '@material-ui/core/Divider';
+import Tooltip from '@material-ui/core/Tooltip';
 
 import TerrainIcon from '@material-ui/icons/Terrain';
 import FloraIcon from '@material-ui/icons/LocalFlorist';
@@ -21,7 +22,7 @@ import CameraIcon from '@material-ui/icons/CameraEnhance';
 import CameraContainer from './Camera/CameraContainer';
 import TerrainContainer from './Terrain/TerrainContainer';
 
-export default class Toolbar extends React.Component {
+class GUI extends React.Component {
   constructor(props) {
     super(props);
 
@@ -39,8 +40,11 @@ export default class Toolbar extends React.Component {
   };
 
   render() {
+    console.log("HERE", this.props.location.pathname);
+    let location = this.props.location.pathname;
+
     return (
-      <HashRouter>
+
         <Drawer 
           variant="permanent"
           classes={{
@@ -68,55 +72,75 @@ export default class Toolbar extends React.Component {
 
           <Divider />
 
-          <Grid container spacing={this.state.open ? 0 : 0} alignItems="center" justify="center">
+          <Grid container spacing={this.state.open ? 0 : 0} alignItems="center" justify="space-evenly">
+            
             <Grid item>
-              <Button 
-                component={Link} 
-                to="/terrain/" 
-                disableRipple={true} 
-                fullWidth={true} onClick={()=>this.handleDrawerOpen()}
-              >
-                <TerrainIcon />
-              </Button>
+              <Tooltip disableFocusListener title="Terrain">
+                <IconButton 
+                  color={location.includes('terrain') ? 'primary' : ''}
+                  component={Link} 
+                  to="/terrain/" 
+                  disableRipple={true} 
+                  fullWidth={true} onClick={()=>this.handleDrawerOpen()}
+                >
+                  <TerrainIcon />
+                </IconButton>
+              </Tooltip>
             </Grid>
+            
             <Grid item>
-              <Button 
-                component={Link} 
-                to="/flora/" 
-                fullWidth={true} 
-                onClick={()=>this.handleDrawerOpen()}
-              >
-                <FloraIcon />
-              </Button>
+              <Tooltip disableFocusListener title="Flora">
+                <IconButton 
+                  color={location.includes('flora') ? 'primary' : ''}
+                  component={Link} 
+                  to="/flora/" 
+                  fullWidth={true} 
+                  onClick={()=>this.handleDrawerOpen()}
+                >
+                  <FloraIcon />
+                </IconButton>
+              </Tooltip>
             </Grid>
+            
             <Grid item>
-              <Button 
-                component={Link} 
-                to="/fauna/" 
-                fullWidth={true} 
-                onClick={()=>this.handleDrawerOpen()}
-              >
-                <FaunaIcon />
-              </Button>
+              <Tooltip disableFocusListener title="Fauna">
+                <IconButton 
+                  color={location.includes('fauna') ? 'primary' : ''}
+                  component={Link} 
+                  to="/fauna/" 
+                  fullWidth={true} 
+                  onClick={()=>this.handleDrawerOpen()}
+                >
+                  <FaunaIcon />
+                </IconButton>
+              </Tooltip>
             </Grid>
+            
             <Grid item>
-              <Button 
-                component={Link} 
-                to="/city/" 
-                fullWidth={true} 
-                onClick={()=>this.handleDrawerOpen()}
-              >
-                <CityIcon />
-              </Button>
+              <Tooltip disableFocusListener title="City">
+                <IconButton 
+                  color={location.includes('city') ? 'primary' : ''}
+                  component={Link} 
+                  to="/city/" 
+                  fullWidth={true} 
+                  onClick={()=>this.handleDrawerOpen()}
+                >
+                  <CityIcon />
+                </IconButton>
+              </Tooltip>
             </Grid>
+            
             <Grid item>
-              <Button 
-                component={Link} 
-                to="/camera/" 
-                fullWidth={true} 
-                onClick={()=>this.handleDrawerOpen()}>
-                <CameraIcon />
-              </Button>
+                <Tooltip disableFocusListener title="Camera">
+                <IconButton 
+                  color={location.includes('camera') ? 'primary' : ''}
+                  component={Link} 
+                  to="/camera/" 
+                  fullWidth={true} 
+                  onClick={()=>this.handleDrawerOpen()}>
+                  <CameraIcon />
+                </IconButton>
+              </Tooltip>
             </Grid>
           </Grid>
 
@@ -129,7 +153,9 @@ export default class Toolbar extends React.Component {
           </div>
 
         </Drawer>
-      </HashRouter>
+
     );
   }
 }
+
+export default withRouter(GUI);
