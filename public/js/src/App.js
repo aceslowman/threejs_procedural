@@ -41,14 +41,33 @@ const theme = createMuiTheme({
   }
 });
 
+class App extends React.Component {
+  constructor(props){
+    super(props);
+
+    this.state = {
+      sketchReady: false
+    }
+  }
+
+  handleSketchReady(){
+    this.setState({sketchReady: true});
+  }
+
+  render() {
+    return (
+      <MuiThemeProvider theme={theme}>
+        <Provider store={store}>
+          <div className="container">
+            { this.state.sketchReady && <GUI />}
+            <Sketch onReady={()=>this.handleSketchReady()}/>
+          </div>
+        </Provider>
+      </MuiThemeProvider>)
+    }
+}
+
 ReactDOM.render(
-  <MuiThemeProvider theme={theme}>
-    <Provider store={store}>
-      <div className="container">
-        <GUI />
-        <Sketch />
-      </div>
-    </Provider>
-  </MuiThemeProvider>,
+  <App />,
   document.getElementById('root')
 );

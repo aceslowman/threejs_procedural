@@ -209,6 +209,9 @@ export default class Sketch extends React.Component {
     // CALLING PROPS FOR REDUX
     this.props.mapAdded("Elevation", map); // TODO: rename these (addMap)
     this.props.terrainAdded(this.terrain); // TODO: rename these (addTerrain)
+  
+    // MARK SKETCH AS READY!
+    this.props.onReady();
   }
 
   componentWillUnmount() {
