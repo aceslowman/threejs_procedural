@@ -70,7 +70,7 @@ class GUI extends React.Component {
                   // wordBreak: 'break-all',
                   paddingTop:15
                 }}
-                gutterBottom="true"
+                gutterBottom={true}
                 >
                   Procedural Tools
                 </Typography>
@@ -89,11 +89,11 @@ class GUI extends React.Component {
             <Grid item>
               <Tooltip disableFocusListener title="Terrain">
                 <IconButton 
-                  color={location.includes('terrain') ? 'primary' : ''}
+                  color={location.includes('terrain') ? 'primary' : 'default'}
                   component={Link} 
                   to="/terrain/" 
                   disableRipple={true} 
-                  fullWidth={true} onClick={()=>this.handleDrawerOpen()}
+                  onClick={()=>this.handleDrawerOpen()}
                 >
                   <TerrainIcon />
                 </IconButton>
@@ -103,10 +103,9 @@ class GUI extends React.Component {
             <Grid item>
               <Tooltip disableFocusListener title="Flora">
                 <IconButton 
-                  color={location.includes('flora') ? 'primary' : ''}
+                  color={location.includes('flora') ? 'primary' : 'default'}
                   component={Link} 
                   to="/flora/" 
-                  fullWidth={true} 
                   onClick={()=>this.handleDrawerOpen()}
                 >
                   <FloraIcon />
@@ -117,10 +116,9 @@ class GUI extends React.Component {
             <Grid item>
               <Tooltip disableFocusListener title="Fauna">
                 <IconButton 
-                  color={location.includes('fauna') ? 'primary' : ''}
+                  color={location.includes('fauna') ? 'primary' : 'default'}
                   component={Link} 
                   to="/fauna/" 
-                  fullWidth={true} 
                   onClick={()=>this.handleDrawerOpen()}
                 >
                   <FaunaIcon />
@@ -131,10 +129,9 @@ class GUI extends React.Component {
             <Grid item>
               <Tooltip disableFocusListener title="City">
                 <IconButton 
-                  color={location.includes('city') ? 'primary' : ''}
+                  color={location.includes('city') ? 'primary' : 'default'}
                   component={Link} 
                   to="/city/" 
-                  fullWidth={true} 
                   onClick={()=>this.handleDrawerOpen()}
                 >
                   <CityIcon />
@@ -145,10 +142,9 @@ class GUI extends React.Component {
             <Grid item>
                 <Tooltip disableFocusListener title="Camera">
                 <IconButton 
-                  color={location.includes('camera') ? 'primary' : ''}
+                  color={location.includes('camera') ? 'primary' : 'default'}
                   component={Link} 
                   to="/camera/" 
-                  fullWidth={true} 
                   onClick={()=>this.handleDrawerOpen()}>
                   <CameraIcon />
                 </IconButton>

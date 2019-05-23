@@ -14,6 +14,11 @@ import Slider from '@material-ui/lab/Slider';
 import InputLabel from '@material-ui/core/InputLabel';
 import { Typography } from '@material-ui/core';
 
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 const styles = theme => ({
   root: {
     padding: 8,
@@ -121,19 +126,19 @@ class Terrain extends React.Component {
         }
 
         passes.push(
-          <Paper gutterTop className={classes.root}>
-            <Grid container>
-              <Grid item xs={12}>
-                <Typography variant="h5" gutterBottom={true} gutterTop={true}>{map.passes[p]}</Typography>
-                <Divider />
+          <ExpansionPanel>
+            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h5" className={classes.heading}>{map.passes[p]}</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <Grid container>
+                {enabled}
+                {rendertoscreen}
+                {defines}
+                {uniforms}
               </Grid>
-              
-              {enabled}
-              {rendertoscreen}
-              {defines}
-              {uniforms}
-            </Grid>
-          </Paper>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
         );
       }
       this.elev_controls.push(passes);

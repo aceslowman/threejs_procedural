@@ -49,11 +49,7 @@ const updateTerrain = (param, val) => {
 }
 
 const mapStateToProps = state => {
-  const { terrain } = state;
-
-  const { maps } = state;
-  const { passes } = state;
-
+  const { terrain, maps, passes } = state;
   return ({
     terrain: terrain,
     maps: maps.byId,

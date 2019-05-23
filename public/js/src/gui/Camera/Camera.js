@@ -32,13 +32,13 @@ class Camera extends React.Component {
       <div className="subnavigation">
         <Grid className="subnav" container spacing={this.state.open ? 0 : 0} alignItems="center" justify="center">
           <Grid item>
-            <Button color={location == '/camera/firstperson/' ? 'primary' : ''} component={Link} to="/camera/firstperson/" disableRipple={true} fullWidth={true} onClick={() => this.handleDrawerOpen()}>First Person</Button>
+            <Button color={location == '/camera/firstperson/' ? 'primary' : 'default'} component={Link} to="/camera/firstperson/" disableRipple={true} fullWidth={true} onClick={() => this.handleDrawerOpen()}>First Person</Button>
           </Grid>
           <Grid item>
-            <Button color={location == '/camera/ortho/' ? 'primary' : ''} component={Link} to="/camera/ortho/" fullWidth={true}>Orthographic</Button>
+            <Button color={location == '/camera/ortho/' ? 'primary' : 'default'} component={Link} to="/camera/ortho/" fullWidth={true}>Orthographic</Button>
           </Grid>
           <Grid item>
-            <Button color={location == '/camera/perspective/' ? 'primary' : ''} component={Link} to="/camera/perspective/" fullWidth={true}>Perspective</Button>
+            <Button color={location == '/camera/perspective/' ? 'primary' : 'default'} component={Link} to="/camera/perspective/" fullWidth={true}>Perspective</Button>
           </Grid>
         </Grid>
         <Divider />

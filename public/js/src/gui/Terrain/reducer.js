@@ -16,6 +16,7 @@ const terrain = (state = initial, action) => {
                 detail: action.terrain.detail,
                 amplitude: action.terrain.amplitude,
                 elevation: action.terrain.elevation,
+                open: true
             });     
 
         case 'UPDATE_TERRAIN':
