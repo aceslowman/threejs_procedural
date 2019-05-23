@@ -9,7 +9,7 @@ const guiStyle = {
 };
 
 export default class Terrain extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.elements = [];
 
@@ -19,7 +19,7 @@ export default class Terrain extends React.Component {
     }
   }
 
-  assembleMeshControls(){
+  assembleMeshControls() {
     this.mesh_controls = [];
     let p_k = 0;
 
@@ -50,7 +50,7 @@ export default class Terrain extends React.Component {
     }
   }
 
-  assembleElevationControls(){
+  assembleElevationControls() {
     this.elev_controls = [];
     let m_k = 0;
 
@@ -131,18 +131,18 @@ export default class Terrain extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if(prevProps != this.props){
+    if (prevProps != this.props) {
       this.assembleMeshControls();
       this.assembleElevationControls();
     }
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.assembleMeshControls();
     this.assembleElevationControls();
   }
 
-  render(){
+  render() {
     return (
       <div>
         <div>
@@ -152,7 +152,7 @@ export default class Terrain extends React.Component {
             <option>FractalWarp</option>
           </select>
         </div>
-        
+
         <dg.GUI style={guiStyle}>
           {this.mesh_controls}
         </dg.GUI>
