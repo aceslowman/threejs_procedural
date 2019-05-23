@@ -12,12 +12,16 @@ import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
 import Slider from '@material-ui/lab/Slider';
 import InputLabel from '@material-ui/core/InputLabel';
-import { Typography } from '@material-ui/core';
+import { Typography, ExpansionPanelActions } from '@material-ui/core';
 
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
+import UpIcon from '@material-ui/icons/KeyboardArrowUp';
+import DownIcon from '@material-ui/icons/KeyboardArrowDown';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const styles = theme => ({
   root: {
@@ -84,7 +88,7 @@ class Terrain extends React.Component {
                 type="number"
                 variant="filled"
                 margin="dense"
-                onChange={(val) => this.props.updatePassDefine(map.passes[p], d, val)}
+                onChange={(e) => this.props.updatePassDefine(map.passes[p], d, e.target.value)}
               />
             </Grid>
           );
@@ -105,7 +109,7 @@ class Terrain extends React.Component {
                   type="number"
                   variant="filled"
                   margin="dense"
-                  onChange={(val) => this.props.updatePassUniform(map.passes[p], u, val)}
+                  onChange={(e) => this.props.updatePassUniform(map.passes[p], u, e.target.value)}
                 />
               </Grid>
             );
@@ -138,6 +142,11 @@ class Terrain extends React.Component {
                 {uniforms}
               </Grid>
             </ExpansionPanelDetails>
+            <ExpansionPanelActions>
+              <IconButton disabled size="small"><DeleteIcon /></IconButton>
+              <IconButton disabled size="small"><UpIcon /></IconButton>
+              <IconButton disabled size="small"><DownIcon /></IconButton>
+            </ExpansionPanelActions>
           </ExpansionPanel>
         );
       }
@@ -154,17 +163,45 @@ class Terrain extends React.Component {
 
     return (
       <div className="subnavigation">
-        <Paper
-          elevation={0}
-          square={true}
-        >
-          <Grid container xs={12} spacing={8}>
-            {this.elev_controls}
-          </Grid>
-        </Paper>
+        <Grid container xs={12} spacing={8}>
+          {this.elev_controls}
+        </Grid>
       </div>
     );
   }
 }
 
 export default withStyles(styles)(withRouter(Terrain));
+
+/*
+  assembleMeshControls() {
+    this.mesh_controls = [];
+    let p_k = 0;
+
+    for (let p in this.props.terrain) {
+      let param = this.props.terrain[p];
+
+      if (typeof param === 'number') {
+        this.mesh_controls.push(
+          <dg.Number
+            key={p_k++}
+            label={p}
+            value={param}
+            step={0.01}
+            onChange={(val) => this.props.updateTerrain(p, val)}
+          />
+        );
+      } else if (typeof param === 'string') {
+        this.mesh_controls.push(
+          <dg.Text
+            key={p_k++}
+            label={p}
+            value={param}
+          />
+        );
+      } else {
+        console.warn('terrain parameter not mapped to GUI');
+      }
+    }
+  }
+*/

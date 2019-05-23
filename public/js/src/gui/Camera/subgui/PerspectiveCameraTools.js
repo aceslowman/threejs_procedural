@@ -1,5 +1,6 @@
 import React from 'react';
-import CameraCommons from '../common/CameraCommons'
+import CameraCommons from '../common/CameraCommons';
+import CameraViews from '../common/CameraViews';
 
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
@@ -13,7 +14,7 @@ import { Typography, Paper } from '@material-ui/core';
 const styles = theme => ({
     root: {
         padding: 8,
-        margin: '0 4px'
+        margin: '4px 4px 16px 4px'
     }
 });
 
@@ -50,6 +51,9 @@ class PerspectiveCameraTools extends React.Component {
                             onChange={(e, v) => this.props.updateCamera(this.props.camera.name, 'focalLength', v)}
                         />
                     </Grid>
+                </Paper>
+                <Paper className={classes.root}>
+                    <CameraViews props={{ ...this.props }} />
                 </Paper>
             </div>
         );

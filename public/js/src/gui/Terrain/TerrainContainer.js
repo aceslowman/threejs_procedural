@@ -26,6 +26,7 @@ const updatePassDefine = (pId, dId, val) => {
 };
 
 const updatePassUniform = (pId, uId, val) => {
+  console.log([pId, uId, val]);
   return ({
     type: 'UPDATE_PASS_UNIFORM',
     passId: pId,

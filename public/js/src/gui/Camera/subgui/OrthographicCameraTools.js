@@ -1,5 +1,6 @@
 import React from 'react';
 import CameraCommons from '../common/CameraCommons'
+import CameraViews from '../common/CameraViews';
 
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
@@ -13,7 +14,7 @@ import { Typography, Paper } from '@material-ui/core';
 const styles = theme => ({
     root: {
         padding: 8,
-        margin: '0 4px'
+        margin: '4px 4px 16px 4px'
     }
 });
 
@@ -29,6 +30,9 @@ class OrthoGraphicCameraTools extends React.Component {
             <div>
                 <Paper className={classes.root}>
                     <CameraCommons camera={this.props.camera} activateCamera={this.props.activateCamera} updateCamera={this.props.updateCamera} />
+                </Paper>
+                <Paper className={classes.root}>
+                    <CameraViews props={{ ...this.props }} />
                 </Paper>
             </div>
         );
