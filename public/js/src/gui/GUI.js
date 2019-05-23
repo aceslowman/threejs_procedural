@@ -11,6 +11,7 @@ import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import Divider from '@material-ui/core/Divider';
 import Tooltip from '@material-ui/core/Tooltip';
+import Typography from '@material-ui/core/Typography';
 
 import TerrainIcon from '@material-ui/icons/Terrain';
 import FloraIcon from '@material-ui/icons/LocalFlorist';
@@ -61,7 +62,18 @@ class GUI extends React.Component {
             style={{ padding: this.state.open ? '0px 15px' : '15px 0px' }}
           >
             <Grid item>
-              <h1 style={{display: this.state.open ? 'block' : 'none', wordBreak: 'break-all'}}>Procedural Tools</h1>
+              <Typography 
+                variant="h1" 
+                style={{ 
+                  fontSize: '2.3em', 
+                  display: this.state.open ? 'block' : 'none', 
+                  // wordBreak: 'break-all',
+                  paddingTop:15
+                }}
+                gutterBottom="true"
+                >
+                  Procedural Tools
+                </Typography>
             </Grid>
             <Grid item>
               <IconButton onClick={() => this.state.open ? this.handleDrawerClose() : this.handleDrawerOpen()}>

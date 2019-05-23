@@ -11,10 +11,16 @@ import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
 import Slider from '@material-ui/lab/Slider';
+import InputLabel from '@material-ui/core/InputLabel';
+import { Typography } from '@material-ui/core';
 
-import FirstPersonIcon from '@material-ui/icons/PermIdentity';
-import OrthoIcon from '@material-ui/icons/GridOn';
-import PerspIcon from '@material-ui/icons/Visibility';
+const styles = theme => ({
+  root: {
+    padding: 8,
+    margin: '4px 4px 16px 4px'
+  }
+});
+
 
 class Terrain extends React.Component {
   constructor(props) {
@@ -24,21 +30,23 @@ class Terrain extends React.Component {
   }
 
   assembleElevationControls(){
+    const {classes} = this.props;
+
     this.elev_controls = [];
     let m_k = 0;
 
     for (let m in this.props.maps) {
       let map = this.props.maps[m];
 
+      let passes = [];
       for (let p in map.passes) {
         let pass = this.props.passes[map.passes[p]];
-
-        let pass_controls = [];
         let p_k = 0;
 
         // enabled
-        pass_controls.push(
-          <Grid item xs={6}>
+        let enabled = (
+          <Grid item xs={5}>
+            <InputLabel margin="dense">Enabled</InputLabel>
             <Checkbox
               key={p_k++}
               checked={pass.params.enabled}
@@ -48,8 +56,9 @@ class Terrain extends React.Component {
         );
 
         // render to screen
-        pass_controls.push(
-          <Grid item xs={6}>
+        let rendertoscreen = (
+          <Grid item xs={7}>
+            <InputLabel margin="dense">Render To Screen</InputLabel>
             <Checkbox
               key={p_k++}
               checked={pass.params.renderToScreen}
@@ -58,9 +67,11 @@ class Terrain extends React.Component {
           </Grid>
         );
 
+        // defines
+        let defines = [];
         for (let d in pass.defines) {
           let define = pass.defines[d];
-          pass_controls.push(
+          defines.push(
             <Grid item xs={6}>
               <TextField
                 label={d}
@@ -74,11 +85,13 @@ class Terrain extends React.Component {
           );
         }
 
+        // uniforms
+        let uniforms = [];
         for (let u in pass.uniforms) {
           let uniform = pass.uniforms[u];
 
           if (typeof uniform.value === 'number') {
-            pass_controls.push(
+            uniforms.push(
               <Grid item xs={6}>
                 <TextField
                   key={p_k++}
@@ -92,20 +105,40 @@ class Terrain extends React.Component {
               </Grid>
             );
           } else if (typeof uniform.value === 'object') {
-            // pass_controls.push(
-            //   <dg.Text
-            //     key={p_k++}
-            //     label={u}
-            //     value={uniform.value.name}
-            //   />
-            // );
+            uniforms.push(
+              <Grid item xs={6}>
+                <TextField
+                  key={p_k++}
+                  label={u}
+                  value={uniform.value.name}
+                  type="text"
+                  variant="filled"
+                  margin="dense"
+                />
+              </Grid>
+            );
           }
         }
 
-        this.elev_controls.push(pass_controls);
-
-        m_k++;
+        passes.push(
+          <Paper gutterTop className={classes.root}>
+            <Grid container>
+              <Grid item xs={12}>
+                <Typography variant="h5" gutterBottom={true} gutterTop={true}>{map.passes[p]}</Typography>
+                <Divider />
+              </Grid>
+              
+              {enabled}
+              {rendertoscreen}
+              {defines}
+              {uniforms}
+            </Grid>
+          </Paper>
+        );
       }
+      this.elev_controls.push(passes);
+
+      m_k++;
     }
   }
 
@@ -117,7 +150,6 @@ class Terrain extends React.Component {
     return (
       <div className="subnavigation">
         <Paper
-          style={{ padding: 16 }}
           elevation={0}
           square={true}
         >
@@ -130,4 +162,4 @@ class Terrain extends React.Component {
   }
 }
 
-export default withRouter(Terrain);
+export default withStyles(styles)(withRouter(Terrain));

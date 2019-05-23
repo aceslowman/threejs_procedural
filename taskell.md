@@ -10,11 +10,6 @@
 - Clean up and reformat the Terrain GUI component.
     > The terrain GUI has been isolated, but certain react+redux specific issues persist.
     * [ ] Fix issue where component doesn't receive updated store in time for initial render.
-- Begin incorporating MaterialUI into the CameraTools
-- Add new material ui drawer.
-- 
-- Hook into Redux for the current PerspectiveCameraTools
-- 
 
 ## Done
 
@@ -44,3 +39,8 @@
 - Create TerrainGUI, TerrainGUIContainer, and TerrainReducer, and populate with basic parameters.
 - Add several new camera elements and figure out how to best handle them in state.
     > So far I can see the use of a First Person, Ortho, and Perspective camera. Currently they seem to be well organized in state, but I currently don't have a plan for the GUI.
+- Begin incorporating MaterialUI into the CameraTools
+- Hook into Redux for the current PerspectiveCameraTools
+- 
+- 
+- Add new material ui drawer.

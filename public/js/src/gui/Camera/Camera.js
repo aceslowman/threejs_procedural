@@ -43,7 +43,6 @@ class Camera extends React.Component {
         </Grid>
         <Divider />
         <Paper
-          style={{padding:16}}
           elevation={0}  
           square={true}
         >

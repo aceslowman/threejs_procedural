@@ -32,8 +32,8 @@ const theme = createMuiTheme({
     borderRadius: 2
   },
   palette: {
-    type: 'dark',
-    background: '#ccc'
+    // type: 'dark',
+    // background: '#ccc'
   },
   overrides: {
     MuiPaper: {
