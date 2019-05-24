@@ -25,11 +25,12 @@ const activateCamera = (camId) => {
   });
 };
 
-const changeView = (type) => {
-  console.log(type);
+const changeView = (view) => {
+  console.log(view);
 
   return ({
-    type: type,
+    type: 'CHANGE_VIEW',
+    view: view
   });
 };
 

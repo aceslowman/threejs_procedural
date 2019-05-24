@@ -1,6 +1,4 @@
 import React from 'react';
-import * as dg from "dis-gui";
-import { withRouter, Route, Link } from 'react-router-dom';
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -11,12 +9,8 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import { Typography } from '@material-ui/core';
 
-
-import FirstPersonIcon from '@material-ui/icons/PermIdentity';
-import OrthoIcon from '@material-ui/icons/GridOn';
-import PerspIcon from '@material-ui/icons/Visibility';
-
 import CameraViews from './common/CameraViews';
+import CameraCommons from './common/CameraCommons';
 
 // import subgui
 import OrthographicCameraTools from './subgui/OrthographicCameraTools';
@@ -46,32 +40,21 @@ class Camera extends React.Component {
         <CameraViews {...this.props} />
 
         <Paper className={classes.root}>
-      
-          <Grid
-            container
-            justify={'space-around'}
-            alignItems={'center'}
-            spacing={16}
-          >
+          <Grid container justify={'space-around'} alignItems={'center'} spacing={16}>
             <Grid item xs={12}>
               <Typography variant="h6" align="center">Camera Type</Typography>
             </Grid>
-            {/* <Grid item xs={4}>
-              <Button onClick={() => this.props.activateCamera("First Person")} fullWidth>First</Button>
-            </Grid> */}
-            <Grid item xs={4}>
-              <Button color={this.props.active == "Orthographic" ? 'primary' : 'default'} onClick={() => this.props.activateCamera("Orthographic")} fullWidth>Orthographic</Button>
+            <Grid item xs={6}>
+              <Button color={this.props.active == "Orthographic" ? 'primary' : 'default'} onClick={()=>this.props.activateCamera("Orthographic")} fullWidth variant="outlined">Orthographic</Button>
             </Grid>
-            <Grid item xs={4}>
-              <Button color={this.props.active == "Perspective" ? 'primary' : 'default'} onClick={() => this.props.activateCamera("Perspective")} fullWidth>Perspective</Button>
+            <Grid item xs={6}>
+              <Button color={this.props.active == "Perspective" ? 'primary' : 'default'} onClick={()=>this.props.activateCamera("Perspective")} fullWidth variant="outlined">Perspective</Button>
             </Grid>
           </Grid>
         </Paper>
 
-        <Paper
-          elevation={0}  
-          square={true}
-        >
+        <Paper className={classes.root}>
+          <CameraCommons camera={this.props.cameras[this.props.active]} activateCamera={this.props.activateCamera} updateCamera={this.props.updateCamera} />
           {this.props.active == "Perspective" && <PerspectiveCameraTools {...this.props} camera={this.props.cameras["Perspective"]} />}
           {this.props.active == "Orthographic" && <OrthographicCameraTools {...this.props} camera={this.props.cameras["Orthographic"]} />}
         </Paper>
@@ -80,4 +63,4 @@ class Camera extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(Camera));
+export default withStyles(styles)(Camera);

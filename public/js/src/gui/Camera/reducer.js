@@ -34,8 +34,19 @@ export default function cameras(state = initial, action){
             return ({
                 ...state,
                 active: action.cameraId
-            });   
-             
+            });
+            
+        case 'CHANGE_VIEW':
+            return ({
+                ...state,
+                byId: {
+                    ...state.byId,
+                    [state.active]: {
+                        ...state.byId[state.active],
+                    }
+                }
+            });  
+
         default:
             return state
     }

@@ -44,9 +44,7 @@ class Terrain extends React.Component {
 
     return (
       <div className="subnavigation">
-        {/* <Grid container spacing={8}> */}
-            <MapTools map={this.props.maps["Elevation"]} {...this.props} />
-        {/* </Grid> */}
+        <MapTools map={this.props.maps["Elevation"]} {...this.props} />
       </div>
     );
   }

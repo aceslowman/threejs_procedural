@@ -28,9 +28,6 @@ class OrthoGraphicCameraTools extends React.Component {
 
         return (
             <div>
-                <Paper className={classes.root}>
-                    <CameraCommons camera={this.props.camera} activateCamera={this.props.activateCamera} updateCamera={this.props.updateCamera} />
-                </Paper>
             </div>
         );
     }

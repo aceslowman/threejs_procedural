@@ -20,12 +20,6 @@ class CameraCommons extends React.Component {
         return(
             <div>
                 <Grid item xs={12}>
-                    <Button variant="outlined" fullWidth={true} onClick={() => this.props.activateCamera(this.props.camera.name)}>Activate</Button>
-                </Grid>
-
-                <Divider />
-
-                <Grid item xs={12}>
                     <TextField
                         fullWidth
                         id="zoom-number"

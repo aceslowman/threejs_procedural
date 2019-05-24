@@ -1,15 +1,12 @@
 ## To Do
 
-- Start planning the 'first-person' mode.
 - Research RayTracing Renderer
 
 ## Doing
 
 - Correct FBM artifact issue.
     > Currently small artifacts exist after a FractalWarp pass.
-- Clean up and reformat the Terrain GUI component.
-    > The terrain GUI has been isolated, but certain react+redux specific issues persist.
-    * [ ] Fix issue where component doesn't receive updated store in time for initial render.
+- Begin implementing react hooks
 
 ## Done
 
@@ -44,3 +41,6 @@
 - 
 - 
 - Add new material ui drawer.
+- Clean up and reformat the Terrain GUI component.
+    > The terrain GUI has been isolated, but certain react+redux specific issues persist.
+    * [ ] Fix issue where component doesn't receive updated store in time for initial render.
