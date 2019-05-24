@@ -25,7 +25,11 @@ import DeleteIcon from '@material-ui/icons/Delete';
 
 const styles = theme => ({
     root: {
-
+        padding: '16px !important',
+        margin: '4px 4px 16px 4px'
+    },
+    type: {
+        padding: '8px 0px'
     }
 });
 
@@ -47,8 +51,6 @@ class MapTools extends React.Component {
         let passes = [];
         for (let p in map.passes) {
             let pass = this.props.passes[map.passes[p]];
-
-            console.log('ENABLED?', pass.params.enabled);
 
             // enabled
             let enabled = (
@@ -155,12 +157,18 @@ class MapTools extends React.Component {
     }
 
     render() {
+        const {classes} = this.props;
         let passes = this.assembleControls();
 
         return (
-            <Grid container spacing={8}>
-                {passes}
-            </Grid>
+            <Paper className={classes.root}>
+                <Grid container spacing={8}>
+                    <Grid item xs={12}>
+                        <Typography className={classes.type} variant="h5">{this.props.map.id}</Typography>
+                    </Grid>
+                    {passes}
+                </Grid>
+            </Paper>
         );
     }
 }

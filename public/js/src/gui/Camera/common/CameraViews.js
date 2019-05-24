@@ -25,24 +25,28 @@ class CameraViews extends React.Component {
         const {classes} = this.props;
 
         return (
-            <Grid
-                container
-                justify={'space-between'}
-                alignItems={'center'}
-            >
-                <Grid item xs={12}>
-                    <Typography variant="h5" gutterBottom>Camera Views</Typography>
-                </Grid>
-                <Grid item xs={4}>
-                    <Button disabled fullWidth variant="outlined">Side</Button>
-                </Grid>
-                <Grid item xs={4}>
-                    <Button disabled fullWidth variant="outlined">Top</Button>
-                </Grid>
-                <Grid item xs={4}>
-                    <Button disabled fullWidth variant="outlined">Angle</Button>
-                </Grid>
-            </Grid>
+            <Paper className={classes.root}>
+                <Grid
+                    container
+                    justify={'space-around'}
+                    alignItems={'center'}
+                    spacing={16}
+                >
+                    <Grid item xs={12}>
+                        <Typography variant="h6" align="center">Camera Views</Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Button onClick={()=>this.props.changeView("VIEW_SIDE")} fullWidth variant="outlined">Side</Button>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Button onClick={()=>this.props.changeView("VIEW_TOP")} fullWidth variant="outlined">Top</Button>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Button onClick={()=>this.props.changeView("VIEW_ANGLE")} fullWidth variant="outlined">Angle</Button>
+                    </Grid>
+                </Grid>  
+            </Paper>
+
         );
     }
 }

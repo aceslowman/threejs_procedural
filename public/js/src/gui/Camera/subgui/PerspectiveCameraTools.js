@@ -11,6 +11,11 @@ import Slider from '@material-ui/lab/Slider';
 import Divider from '@material-ui/core/Divider';
 import { Typography, Paper } from '@material-ui/core';
 
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 const styles = theme => ({
     root: {
         padding: 8,
@@ -52,10 +57,21 @@ class PerspectiveCameraTools extends React.Component {
                         />
                     </Grid>
                 </Paper>
-                <Paper className={classes.root}>
-                    <CameraViews props={{ ...this.props }} />
-                </Paper>
-            </div>
+
+            {/* <ExpansionPanel>
+                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography variant="h5" className={classes.heading}>Perspective</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                    <Grid container>
+
+                    </Grid>
+                </ExpansionPanelDetails>
+                <ExpansionPanelActions>
+
+                </ExpansionPanelActions>
+            </ExpansionPanel>        */}
+            </div>     
         );
     }
 };

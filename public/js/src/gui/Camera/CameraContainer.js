@@ -25,11 +25,22 @@ const activateCamera = (camId) => {
   });
 };
 
+const changeView = (type) => {
+  console.log(type);
+
+  return ({
+    type: type,
+  });
+};
+
+//-----------------------------------------------------------------------
+
 const mapStateToProps = state => {
   const { cameras } = state;
 
   return ({
-    cameras: cameras.byId
+    cameras: cameras.byId,
+    active: cameras.active
   })
 };
 
@@ -39,6 +50,9 @@ const mapDispatchToProps = dispatch => ({
   },
   activateCamera: (camId) => {
     dispatch(activateCamera(camId));
+  },
+  changeView: (type) => {
+    dispatch(changeView(type));
   }
 });
 
