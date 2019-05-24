@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import Terrain from './Terrain';
 
 const updatePassParam = (pId, param, val) => {
+  console.log([pId, param, val]);
   return ({
     type: 'UPDATE_PASS_PARAM',
     passId: pId,
@@ -26,7 +27,6 @@ const updatePassDefine = (pId, dId, val) => {
 };
 
 const updatePassUniform = (pId, uId, val) => {
-  console.log([pId, uId, val]);
   return ({
     type: 'UPDATE_PASS_UNIFORM',
     passId: pId,

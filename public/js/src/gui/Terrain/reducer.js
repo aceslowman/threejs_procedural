@@ -15,8 +15,7 @@ const terrain = (state = initial, action) => {
                 height: action.terrain.height,
                 detail: action.terrain.detail,
                 amplitude: action.terrain.amplitude,
-                elevation: action.terrain.elevation,
-                open: true
+                elevation: action.terrain.elevation
             });     
 
         case 'UPDATE_TERRAIN':
@@ -83,6 +82,7 @@ const passes = (state = { byId: {}, allIds: [] }, action) => {
 
         case 'UPDATE_PASS_UNIFORM':
             // TODO: I will need to generate some sort of UNIQUE id for each pass, appending to the end of the sanitized name.
+            console.log('ACTION!!', action);
             return ({
                 ...state,
                 byId: {
