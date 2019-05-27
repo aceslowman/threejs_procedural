@@ -27,7 +27,10 @@ export default function cameras(state = initial, action){
                     ...state.byId,
                     [action.cameraId]: {
                         ...state.byId[action.cameraId],
-                        [action.param]: action.value
+                        object: {
+                            ...state.byId[action.cameraId].object,
+                            [action.param]: action.value
+                        }
                     }
                 }
             });   
@@ -44,15 +47,15 @@ export default function cameras(state = initial, action){
             
             switch (action.view){
                 case 'SIDE':
-                    obj.position.set(1,0,0);
+                    obj.position.set(1000,0,0);
                     obj.lookAt(0,0,0);
                     break;
                 case 'TOP':
-                    obj.position.set(0,0,-1);
+                    obj.position.set(0,0,1000);
                     obj.lookAt(0,0,0);
                     break;
                 case 'ANGLE':
-                    obj.position.set(-1,1,1);
+                    obj.position.set(1000,1000,1000);
                     obj.lookAt(0,0,0);
                     break;
             }

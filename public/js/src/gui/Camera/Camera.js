@@ -3,8 +3,6 @@ import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 
 import Grid from '@material-ui/core/Grid';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import { Typography } from '@material-ui/core';
@@ -46,18 +44,18 @@ class Camera extends React.Component {
               <Typography variant="h6" align="center">Camera Type</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Button color={this.props.active == "Orthographic" ? 'primary' : 'default'} onClick={()=>this.props.activateCamera("Orthographic")} fullWidth variant="outlined">Orthographic</Button>
+              <Button color={this.props.active.object.type == "OrthographicCamera" ? 'primary' : 'default'} onClick={()=>this.props.activateCamera("Orthographic")} fullWidth variant="outlined">Orthographic</Button>
             </Grid>
             <Grid item xs={6}>
-              <Button color={this.props.active == "Perspective" ? 'primary' : 'default'} onClick={()=>this.props.activateCamera("Perspective")} fullWidth variant="outlined">Perspective</Button>
+              <Button color={this.props.active.object.type == "PerspectiveCamera" ? 'primary' : 'default'} onClick={()=>this.props.activateCamera("Perspective")} fullWidth variant="outlined">Perspective</Button>
             </Grid>
           </Grid>
         </Paper>
 
         <Paper className={classes.root}>
-          <CameraCommons camera={this.props.cameras[this.props.active]} activateCamera={this.props.activateCamera} updateCamera={this.props.updateCamera} />
-          {this.props.active == "Perspective" && <PerspectiveCameraTools {...this.props} camera={this.props.cameras["Perspective"]} />}
-          {this.props.active == "Orthographic" && <OrthographicCameraTools {...this.props} camera={this.props.cameras["Orthographic"]} />}
+          <CameraCommons {...this.props} camera={this.props.active} />
+          {this.props.active.object.type == "OrthographicCamera" && <PerspectiveCameraTools {...this.props} camera={this.props.active} />}
+          {this.props.active.object.type == "PerspectiveCamera" && <OrthographicCameraTools {...this.props} camera={this.props.active} />}
         </Paper>
       </div>
     );

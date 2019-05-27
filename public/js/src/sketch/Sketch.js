@@ -41,16 +41,14 @@ export default class Sketch extends React.Component {
   }
 
   updateActiveCamera(uuid){
-    console.group('updateActiveCamera()');
-    let new_cam = this.props.cameras.byId[uuid];
+    /* There could be a performance boost here by only copying over the parameters that have changed. Not sure how that works
+    but maybe it's a matter of doing some kind of diff. I am imagining that loader.parse() could be a bottleneck. */
 
-    // deserialize and reassign to camera
     const loader = new THREE.ObjectLoader();
-    const obj = loader.parse(new_cam);
+    const obj = loader.parse(this.props.cameras.byId[uuid]);
 
     this.camera = obj;
-
-    console.groupEnd();
+    this.camera.updateProjectionMatrix();
   }
 
   setupCameras(){
@@ -71,6 +69,7 @@ export default class Sketch extends React.Component {
     ortho.zoom = 2;
     ortho.position.z = 999;
     ortho.updateProjectionMatrix();
+    ortho.updateMatrixWorld();
 
     let perspective = new THREE.PerspectiveCamera(
       75,            // fov
@@ -82,6 +81,7 @@ export default class Sketch extends React.Component {
     perspective.zoom = 2;
     perspective.position.z = 999;
     perspective.updateProjectionMatrix();
+    perspective.updateMatrixWorld();
 
     // send to store
     this.props.addCamera(ortho);
@@ -167,51 +167,6 @@ export default class Sketch extends React.Component {
     if(this.props.cameras.byId[active_cam_uuid] != prevProps.cameras.byId[active_cam_uuid]){
       this.updateActiveCamera(active_cam_uuid);
     }
-
-    /* 
-      TODO: change active camera.
-      
-    //   I could probably store the cameras in an array similar to how it is stored in the redux store (in its
-    //   unserialized form.)
-    // */
-    // if (this.props.active_camera != prevProps.active_camera) {
-
-    //   switch (this.props.active_camera) {
-    //     case 'Perspective':
-    //       this.camera = this.perspective;
-    //       break;
-    //     case 'Orthographic':
-    //       this.camera = this.ortho;
-    //       break;
-    //     case 'First Person':
-    //       this.camera = this.first_person_cam;
-    //       break;
-    //     default:
-    //       console.log("??? active cam change failed");
-    //   }
-
-    //   console.log('active camera changed', this.props.active_camera);
-    // }
-
-    /* TODO: this seems like it can be streamlined and simplified.
-             how do I map a serialized object to it's unserialized relative?
-    */
-    // if (this.props.cameras != prevProps.cameras){
-    //   if (this.props.cameras["Perspective"] != prevProps.cameras["Perspective"] && prevProps.cameras["Perspective"]){
-
-    //     for(let key in this.props.cameras["Perspective"]){
-    //       if (key == 'focalLength'){
-    //         this.perspective.setFocalLength(this.props.cameras["Perspective"].focalLength)
-    //       }
-
-    //       if (this.props.cameras["Perspective"][key] != prevProps.cameras["Perspective"][key]){
-    //         this.perspective[key] = this.props.cameras["Perspective"][key];
-    //       }
-    //     }
-
-    //     this.perspective.updateProjectionMatrix();
-    //   }
-    // }
   }
 
   componentDidMount() {

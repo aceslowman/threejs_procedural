@@ -1,5 +1,4 @@
 import { connect } from 'react-redux';
-//import actions
 import Camera from './Camera';
 
 // send some sort of message along to the store, to be utilized by the reducer.
@@ -39,7 +38,7 @@ const mapStateToProps = state => {
 
   return ({
     cameras: cameras.byId,
-    active: cameras.active
+    active: cameras.byId[cameras.active]
   })
 };
 

@@ -29,15 +29,15 @@ class CameraCommons extends React.Component {
                         variant="filled"
                         margin="dense"
                         style={styles.textfield}
-                        // value={this.props.camera.zoom}
-                        onChange={(e) => this.props.updateCamera(this.props.camera.name, 'zoom', e.target.value)}
+                        value={this.props.camera.object.zoom}
+                        onChange={(e) => this.props.updateCamera(this.props.camera.object.uuid, 'zoom', e.target.value)}
                     />
                     <Slider
                         id="zoom"
                         min={0}
                         max={10}
-                        // value={Number(this.props.camera.zoom)}
-                        onChange={(e, v) => this.props.updateCamera(this.props.camera.name, 'zoom', v)}
+                        value={Number(this.props.camera.object.zoom)}
+                        onChange={(e, v) => this.props.updateCamera(this.props.camera.object.uuid, 'zoom', v)}
                     />
                 </Grid>
             </div>

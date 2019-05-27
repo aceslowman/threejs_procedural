@@ -6,8 +6,6 @@
 
 - Correct FBM artifact issue.
     > Currently small artifacts exist after a FractalWarp pass.
-- Begin implementing react hooks
-- Correct issue with 'active' id for camera.
 
 ## Done
 
@@ -45,3 +43,5 @@
 - Clean up and reformat the Terrain GUI component.
     > The terrain GUI has been isolated, but certain react+redux specific issues persist.
     * [ ] Fix issue where component doesn't receive updated store in time for initial render.
+- Begin implementing react hooks
+- Correct issue with 'active' id for camera.
