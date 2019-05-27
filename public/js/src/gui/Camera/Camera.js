@@ -56,8 +56,8 @@ class Camera extends React.Component {
 
         <Paper className={classes.root}>
           <CameraCommons {...this.props} camera={this.props.active} />
-          {this.props.active.object.type == "OrthographicCamera" && <PerspectiveCameraTools {...this.props} camera={this.props.active} />}
-          {this.props.active.object.type == "PerspectiveCamera" && <OrthographicCameraTools {...this.props} camera={this.props.active} />}
+          {this.props.active.object.type == "PerspectiveCamera" && <PerspectiveCameraTools {...this.props} camera={this.props.active} />}
+          {this.props.active.object.type == "OrthographicCamera" && <OrthographicCameraTools {...this.props} camera={this.props.active} />}
         </Paper>
       </div>
     );
