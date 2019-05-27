@@ -68,7 +68,7 @@ export default class Sketch extends React.Component {
       this.height / 2, 
       this.height / - 2, 
       0, 
-      1000
+      2000
     );
     ortho.name = "Default Orthographic";
     ortho.zoom = 2;
@@ -99,7 +99,7 @@ export default class Sketch extends React.Component {
 
     // set default camera
     this.camera = perspective;
-    this.props.setActiveCamera(perspective);
+    this.props.setActiveCamera(perspective.uuid);
 
     this.setupOrbit();
   }
@@ -183,7 +183,8 @@ export default class Sketch extends React.Component {
     let active_cam_uuid = this.props.cameras.active;
 
     // if the active camera has changed...
-    if(this.props.cameras.byId[active_cam_uuid] != prevProps.cameras.byId[active_cam_uuid]){
+    if(this.props.cameras.active != prevProps.cameras.active || 
+        this.props.cameras.byId[active_cam_uuid] != prevProps.cameras.byId[active_cam_uuid]){
       this.updateActiveCamera(active_cam_uuid);
     }
   }

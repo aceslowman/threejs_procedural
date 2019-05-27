@@ -34,6 +34,8 @@ class Camera extends React.Component {
 
     let location = this.props.location.pathname;
 
+    // console.log(this.props.active.object.type);
+
     return (
       <div className="subnavigation">
         <CameraViews {...this.props} />
@@ -44,10 +46,10 @@ class Camera extends React.Component {
               <Typography variant="h6" align="center">Camera Type</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Button color={this.props.active.object.type == "OrthographicCamera" ? 'primary' : 'default'} onClick={()=>this.props.activateCamera("Orthographic")} fullWidth variant="outlined">Orthographic</Button>
+              <Button color={this.props.active.object.type == "OrthographicCamera" ? 'primary' : 'default'} onClick={() => this.props.activateCamera("OrthographicCamera")} fullWidth variant="outlined">Orthographic</Button>
             </Grid>
             <Grid item xs={6}>
-              <Button color={this.props.active.object.type == "PerspectiveCamera" ? 'primary' : 'default'} onClick={()=>this.props.activateCamera("Perspective")} fullWidth variant="outlined">Perspective</Button>
+              <Button color={this.props.active.object.type == "PerspectiveCamera" ? 'primary' : 'default'} onClick={() => this.props.activateCamera("PerspectiveCamera")} fullWidth variant="outlined">Perspective</Button>
             </Grid>
           </Grid>
         </Paper>

@@ -46,10 +46,10 @@ const addCamera = (camera) => {
     });
 }
 
-const setActiveCamera = (camera) => {
+const setActiveCamera = (uuid) => {
     return ({
         type: 'ACTIVATE_CAMERA',
-        cameraId: camera.uuid,
+        uuid: uuid,
         meta: {
             throttle: 40
         }

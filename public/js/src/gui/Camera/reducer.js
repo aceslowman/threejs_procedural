@@ -4,6 +4,7 @@ const initial = {
     active: '',
     orbitControls: '',
     byId: {},
+    byType: {},
     allIds: []
 }
 
@@ -17,6 +18,10 @@ export default function cameras(state = initial, action){
                     [action.camera.object.uuid]: {
                         ...action.camera,
                     }
+                },
+                byType: {
+                    ...state.byType,
+                    [action.camera.object.type]: action.camera.object.uuid
                 },
                 allIds: [...state.allIds, action.camera.object.uuid]
             });
@@ -37,9 +42,11 @@ export default function cameras(state = initial, action){
             });   
 
         case 'ACTIVATE_CAMERA':
+            let uuid = action.uuid ? action.uuid : state.byType[action.cameraType];
+
             return ({
                 ...state,
-                active: action.cameraId
+                active: uuid
             });
             
         case 'CHANGE_VIEW':

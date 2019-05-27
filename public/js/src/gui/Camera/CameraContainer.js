@@ -14,10 +14,10 @@ const updateCamera = (camId, param, val) => {
   });
 };
 
-const activateCamera = (camId) => {
+const activateCamera = (type) => {
   return ({
     type: 'ACTIVATE_CAMERA',
-    cameraId: camId,
+    cameraType: type,
     meta: {
       throttle: 40
     }
@@ -46,8 +46,8 @@ const mapDispatchToProps = dispatch => ({
   updateCamera: (camId, param, val) => {
     dispatch(updateCamera(camId, param, val));
   },
-  activateCamera: (camId) => {
-    dispatch(activateCamera(camId));
+  activateCamera: (camType) => {
+    dispatch(activateCamera(camType));
   },
   changeView: (type) => {
     dispatch(changeView(type));

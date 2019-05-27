@@ -2,7 +2,6 @@
 
 - Research RayTracing Renderer
 - Camera aspect ratio is not being correctly updated onWindowResize.
-- Enable Orthographic Camera
 - Change maps and passes to be stored in Object Scene format.
 
 ## Doing
@@ -49,3 +48,4 @@
 - Begin implementing react hooks
 - Correct issue with 'active' id for camera.
 - Enable OrbitControls
+- Enable Orthographic Camera
