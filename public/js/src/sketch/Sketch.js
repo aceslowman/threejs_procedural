@@ -40,16 +40,26 @@ export default class Sketch extends React.Component {
     }
   }
 
-  setupCameras(){
-    this.first_person_cam = new THREE.PerspectiveCamera(
-      75,            // fov
-      this.width / this.height,   // aspect
-      0.01,          // near
-      2000           // far
-    );
-    this.first_person_cam.name = "First Person";
+  updateActiveCamera(uuid){
+    console.group('updateActiveCamera()');
+    let new_cam = this.props.cameras.byId[uuid];
 
-    this.ortho_cam = new THREE.OrthographicCamera(
+    // deserialize and reassign to camera
+    const loader = new THREE.ObjectLoader();
+    const obj = loader.parse(new_cam);
+
+    this.camera = obj;
+
+    console.groupEnd();
+  }
+
+  setupCameras(){
+    /*
+      here, I can create several cameras and immediately send them to state as
+      serialized objects. then, I could just worry about maintaining an 'active'
+      camera at any given time.
+    */
+    let ortho = new THREE.OrthographicCamera(
       this.width / - 2, 
       this.width / 2, 
       this.height / 2, 
@@ -57,32 +67,31 @@ export default class Sketch extends React.Component {
       0, 
       1000
     );
-    this.ortho_cam.name = "Orthographic";
-    this.ortho_cam.zoom = 2;
-    this.ortho_cam.position.z = 999;
-    this.ortho_cam.updateProjectionMatrix();
+    ortho.name = "Default Orthographic";
+    ortho.zoom = 2;
+    ortho.position.z = 999;
+    ortho.updateProjectionMatrix();
 
-    this.perspective_cam = new THREE.PerspectiveCamera(
+    let perspective = new THREE.PerspectiveCamera(
       75,            // fov
       this.width / this.height,   // aspect
       0.01,          // near
       2000           // far
     );
-    this.perspective_cam.name = "Perspective";
-    this.perspective_cam.zoom = 2;
-    this.perspective_cam.position.z = 999;
-    this.perspective_cam.updateProjectionMatrix();
+    perspective.name = "Default Perspective";
+    perspective.zoom = 2;
+    perspective.position.z = 999;
+    perspective.updateProjectionMatrix();
 
     // send to store
-    this.props.addCamera(this.first_person_cam);
-    this.props.addCamera(this.ortho_cam);
-    this.props.addCamera(this.perspective_cam);
+    this.props.addCamera(ortho);
+    this.props.addCamera(perspective);
 
     // set default camera
-    this.camera = this.perspective_cam;
-    this.props.setActiveCamera(this.perspective_cam);
+    this.camera = perspective;
+    this.props.setActiveCamera(perspective);
 
-    this.setupOrbit();
+    // this.setupOrbit();
   }
 
   setupOrbit() {
@@ -152,50 +161,57 @@ export default class Sketch extends React.Component {
       this.terrain.displace(); //TODO: displace only if necessary
     }
 
+    let active_cam_uuid = this.props.cameras.active;
+
+    // if the active camera has changed...
+    if(this.props.cameras.byId[active_cam_uuid] != prevProps.cameras.byId[active_cam_uuid]){
+      this.updateActiveCamera(active_cam_uuid);
+    }
+
     /* 
       TODO: change active camera.
       
-      I could probably store the cameras in an array similar to how it is stored in the redux store (in its
-      unserialized form.)
-    */
-    if (this.props.active_camera != prevProps.active_camera) {
+    //   I could probably store the cameras in an array similar to how it is stored in the redux store (in its
+    //   unserialized form.)
+    // */
+    // if (this.props.active_camera != prevProps.active_camera) {
 
-      switch (this.props.active_camera) {
-        case 'Perspective':
-          this.camera = this.perspective_cam;
-          break;
-        case 'Orthographic':
-          this.camera = this.ortho_cam;
-          break;
-        case 'First Person':
-          this.camera = this.first_person_cam;
-          break;
-        default:
-          console.log("??? active cam change failed");
-      }
+    //   switch (this.props.active_camera) {
+    //     case 'Perspective':
+    //       this.camera = this.perspective;
+    //       break;
+    //     case 'Orthographic':
+    //       this.camera = this.ortho;
+    //       break;
+    //     case 'First Person':
+    //       this.camera = this.first_person_cam;
+    //       break;
+    //     default:
+    //       console.log("??? active cam change failed");
+    //   }
 
-      console.log('active camera changed', this.props.active_camera);
-    }
+    //   console.log('active camera changed', this.props.active_camera);
+    // }
 
     /* TODO: this seems like it can be streamlined and simplified.
              how do I map a serialized object to it's unserialized relative?
     */
-    if (this.props.cameras != prevProps.cameras){
-      if (this.props.cameras["Perspective"] != prevProps.cameras["Perspective"] && prevProps.cameras["Perspective"]){
+    // if (this.props.cameras != prevProps.cameras){
+    //   if (this.props.cameras["Perspective"] != prevProps.cameras["Perspective"] && prevProps.cameras["Perspective"]){
 
-        for(let key in this.props.cameras["Perspective"]){
-          if (key == 'focalLength'){
-            this.perspective_cam.setFocalLength(this.props.cameras["Perspective"].focalLength)
-          }
+    //     for(let key in this.props.cameras["Perspective"]){
+    //       if (key == 'focalLength'){
+    //         this.perspective.setFocalLength(this.props.cameras["Perspective"].focalLength)
+    //       }
 
-          if (this.props.cameras["Perspective"][key] != prevProps.cameras["Perspective"][key]){
-            this.perspective_cam[key] = this.props.cameras["Perspective"][key];
-          }
-        }
+    //       if (this.props.cameras["Perspective"][key] != prevProps.cameras["Perspective"][key]){
+    //         this.perspective[key] = this.props.cameras["Perspective"][key];
+    //       }
+    //     }
 
-        this.perspective_cam.updateProjectionMatrix();
-      }
-    }
+    //     this.perspective.updateProjectionMatrix();
+    //   }
+    // }
   }
 
   componentDidMount() {

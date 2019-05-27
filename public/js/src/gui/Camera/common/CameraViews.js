@@ -36,13 +36,13 @@ class CameraViews extends React.Component {
                         <Typography variant="h6" align="center">Camera Views</Typography>
                     </Grid>
                     <Grid item xs={4}>
-                        <Button onClick={()=>this.props.changeView("VIEW_SIDE")} fullWidth variant="outlined">Side</Button>
+                        <Button onClick={()=>this.props.changeView("SIDE")} fullWidth variant="outlined">Side</Button>
                     </Grid>
                     <Grid item xs={4}>
-                        <Button onClick={()=>this.props.changeView("VIEW_TOP")} fullWidth variant="outlined">Top</Button>
+                        <Button onClick={()=>this.props.changeView("TOP")} fullWidth variant="outlined">Top</Button>
                     </Grid>
                     <Grid item xs={4}>
-                        <Button onClick={()=>this.props.changeView("VIEW_ANGLE")} fullWidth variant="outlined">Angle</Button>
+                        <Button onClick={()=>this.props.changeView("ANGLE")} fullWidth variant="outlined">Angle</Button>
                     </Grid>
                 </Grid>  
             </Paper>

@@ -42,14 +42,14 @@ class PerspectiveCameraTools extends React.Component {
                         variant="filled"
                         margin="dense"
                         style={styles.textfield}
-                        value={this.props.camera.focalLength}
+                        // value={this.props.camera.focalLength}
                         onChange={(e) => this.props.updateCamera(this.props.camera.name, 'focalLength', e.target.value)}
                     />
                     <Slider
                         id="focal_length"
                         min={0}
                         max={75}
-                        value={Number(this.props.camera.focalLength)}
+                        // value={Number(this.props.camera.focalLength)}
                         onChange={(e, v) => this.props.updateCamera(this.props.camera.name, 'focalLength', v)}
                     />
                 </Grid>

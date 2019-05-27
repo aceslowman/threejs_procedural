@@ -1,3 +1,6 @@
+// TEMP
+import * as THREE from 'three';
+
 const initial = {
     active: '',
     byId: {},
@@ -10,12 +13,11 @@ export default function cameras(state = initial, action){
             return ({
                 byId: {
                     ...state.byId,
-                    [action.camera.object.name]: {
-                        ...action.camera.object,
-                        focalLength: action.camera.focalLength
+                    [action.camera.object.uuid]: {
+                        ...action.camera,
                     }
                 },
-                allIds: [...state.allIds, action.camera.object.name]
+                allIds: [...state.allIds, action.camera.object.uuid]
             });
 
         case 'UPDATE_CAMERA':
@@ -37,13 +39,33 @@ export default function cameras(state = initial, action){
             });
             
         case 'CHANGE_VIEW':
+            const loader = new THREE.ObjectLoader();
+            const obj = loader.parse(state.byId[state.active]);
+            
+            switch (action.view){
+                case 'SIDE':
+                    obj.position.set(1,0,0);
+                    obj.lookAt(0,0,0);
+                    break;
+                case 'TOP':
+                    obj.position.set(0,0,-1);
+                    obj.lookAt(0,0,0);
+                    break;
+                case 'ANGLE':
+                    obj.position.set(-1,1,1);
+                    obj.lookAt(0,0,0);
+                    break;
+            }
+
+            obj.updateMatrixWorld();
+
+            const serialized = obj.toJSON();
+
             return ({
                 ...state,
                 byId: {
                     ...state.byId,
-                    [state.active]: {
-                        ...state.byId[state.active],
-                    }
+                    [serialized.object.uuid]: serialized,
                 }
             });  
 

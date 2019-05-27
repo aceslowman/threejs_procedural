@@ -26,8 +26,6 @@ const activateCamera = (camId) => {
 };
 
 const changeView = (view) => {
-  console.log(view);
-
   return ({
     type: 'CHANGE_VIEW',
     view: view

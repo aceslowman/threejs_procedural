@@ -7,6 +7,7 @@
 - Correct FBM artifact issue.
     > Currently small artifacts exist after a FractalWarp pass.
 - Begin implementing react hooks
+- Correct issue with 'active' id for camera.
 
 ## Done
 

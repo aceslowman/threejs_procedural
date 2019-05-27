@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import Sketch from './Sketch';
 
+// TERRAIN ---------------------------------
 const mapAdded = (id, map) => {
     let d_map = {
         id: id,
@@ -34,6 +35,7 @@ const terrainAdded = (terrain) => {
     });
 }
 
+//CAMERAS------------------------------------
 const addCamera = (camera) => {
     return ({
         type: 'ADD_CAMERA',
@@ -47,21 +49,21 @@ const addCamera = (camera) => {
 const setActiveCamera = (camera) => {
     return ({
         type: 'ACTIVATE_CAMERA',
-        cameraId: camera.name,
+        cameraId: camera.uuid,
         meta: {
             throttle: 40
         }
     });
 };
 
+//REACTREDUXCONFIG---------------------------------
 const mapStateToProps = state => {
     const { maps, passes, cameras, terrain } = state;
 
     return {
-        maps: maps.byId,
-        passes: passes.byId,
-        cameras: cameras.byId,
-        active_camera: cameras.active,
+        maps:    maps.byId,     //TODO: remove byId
+        passes:  passes.byId,   //TODO: remove byId
+        cameras: cameras,
         terrain: terrain
     }
 };
