@@ -2,12 +2,15 @@
 
 - Research RayTracing Renderer
 - Camera aspect ratio is not being correctly updated onWindowResize.
-- Change maps and passes to be stored in Object Scene format.
 
 ## Doing
 
 - Correct FBM artifact issue.
     > Currently small artifacts exist after a FractalWarp pass.
+- Define initial state in reducer, instead of mixing it into the 'sketch' logic.
+    > This sounds preferable, and allows the Sketch component to be pretty slim. Sketch should 'run' the app, and all custom configurables (serializables?) would be initialized in their respective reducer. 
+    * [ ] Read up on how to best organize reducers.
+    * [ ] Implement Normalizr?
 
 ## Done
 
@@ -49,3 +52,15 @@
 - Correct issue with 'active' id for camera.
 - Enable OrbitControls
 - Enable Orthographic Camera
+
+## Backburner
+
+- Use Normalizr to format store data.
+    > Normalizr can be used in the container components (or is it the reducers?) to define schema, and then insert data into the store that confines to that schema.
+    * [ ] 
+- Change maps and passes to be stored in Object Scene format.
+    > and if they can't be directly serialized in that way, I can manually serialize them
+    * [ ] Store correct representation in store.
+    * [ ] Update reducer to match
+    * [ ] Update containers to match
+    * [ ] Update presentation components where relevant.
