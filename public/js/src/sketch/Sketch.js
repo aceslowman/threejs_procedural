@@ -51,6 +51,11 @@ export default class Sketch extends React.Component {
 
     this.camera = obj;
     this.camera.updateProjectionMatrix();
+
+    this.camera.up.set(0,0,1);
+
+    this.orbitControls.object = this.camera;
+    this.orbitControls.update(); 
   }
 
   setupCameras(){
@@ -68,6 +73,7 @@ export default class Sketch extends React.Component {
     ortho.name = "Default Orthographic";
     ortho.zoom = 2;
     ortho.position.z = 999;
+    ortho.up.set(0,0,1);
     ortho.updateProjectionMatrix();
     ortho.updateMatrixWorld();
 
@@ -80,8 +86,12 @@ export default class Sketch extends React.Component {
     perspective.name = "Default Perspective";
     perspective.zoom = 2;
     perspective.position.z = 999;
+    perspective.up.set(0,0,1);
     perspective.updateProjectionMatrix();
     perspective.updateMatrixWorld();
+
+    // TODO: currently trying to figure out whether or not to
+    // initialize in the reducer
 
     // send to store
     this.props.addCamera(ortho);
@@ -94,22 +104,28 @@ export default class Sketch extends React.Component {
     this.setupOrbit();
   }
 
+  //ORBIT CONTROLS------------------------------------------------------
   setupOrbit() {
     this.orbitControls = new OrbitControls(
       this.camera,
       this.renderer.domElement
     );
-    this.orbitControls.enableDamping = true;
+    // this.orbitControls.enableDamping = true;
     this.orbitControls.dampingFactor = 0.8;
     // this.orbitControls.panningMode = THREE.HorizontalPanning; // default is THREE.ScreenSpacePanning
     this.orbitControls.minDistance = 0.1;
     this.orbitControls.maxDistance = 1000;
-    // this.orbitControls.maxPolarAngle = Math.PI / 2;
+    this.orbitControls.maxPolarAngle = Math.PI / 2;
     // this.orbitControls.autoRotate = true;
 
-    console.log(this.orbitControls)
+    this.props.addOrbit(this.orbitControls);
+  }
+
+  updateOrbit() {
+    // this.orbitControls.enableDamping = this.orbitControls.
   }
   
+  //TERRAIN------------------------------------------------------
   setupShaderPasses(map, passes) {
     for (let pass of passes) {
       let p = new THREE.ShaderPass(pass.shaderMaterial);

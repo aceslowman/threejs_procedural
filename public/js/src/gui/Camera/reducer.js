@@ -1,8 +1,8 @@
-// TEMP
 import * as THREE from 'three';
 
 const initial = {
     active: '',
+    orbitControls: '',
     byId: {},
     allIds: []
 }
@@ -11,6 +11,7 @@ export default function cameras(state = initial, action){
     switch (action.type) {
         case 'ADD_CAMERA':
             return ({
+                ...state,
                 byId: {
                     ...state.byId,
                     [action.camera.object.uuid]: {
@@ -73,6 +74,12 @@ export default function cameras(state = initial, action){
                     [serialized.object.uuid]: serialized,
                 }
             });  
+
+        case 'ADD_ORBITCONTROLS':
+            return ({
+                ...state,
+                orbitControls: action.serialized
+            });
 
         default:
             return state

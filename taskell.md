@@ -9,7 +9,6 @@
 
 - Correct FBM artifact issue.
     > Currently small artifacts exist after a FractalWarp pass.
-- Enable OrbitControls
 
 ## Done
 
@@ -49,3 +48,4 @@
     * [ ] Fix issue where component doesn't receive updated store in time for initial render.
 - Begin implementing react hooks
 - Correct issue with 'active' id for camera.
+- Enable OrbitControls

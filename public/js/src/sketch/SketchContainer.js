@@ -56,6 +56,25 @@ const setActiveCamera = (camera) => {
     });
 };
 
+// TODO: create action for adding orbitcontrols
+const addOrbit = (orbit) => {
+    const serialized = {
+        autoRotate: orbit.autoRotate,
+        enableDamping: orbit.enableDamping,
+        dampingFactor: orbit.dampingFactor,
+        minDistance: orbit.minDistance,
+        maxDistance: orbit.maxDistance,
+        panningMode: orbit.panningMode, 
+        maxPolarAngle: orbit.maxPolarAngle, 
+        autoRotate: orbit.autoRotate
+    };
+
+    return ({
+        type: 'ADD_ORBITCONTROLS',
+        serialized: serialized
+    });
+}
+
 //REACTREDUXCONFIG---------------------------------
 const mapStateToProps = state => {
     const { maps, passes, cameras, terrain } = state;
@@ -80,6 +99,9 @@ const mapDispatchToProps = dispatch => ({
     },
     setActiveCamera: (camera) => {
         dispatch(setActiveCamera(camera))
+    },
+    addOrbit: (orbit) => {
+        dispatch(addOrbit(orbit))
     }
 });
 
