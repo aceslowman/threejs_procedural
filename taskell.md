@@ -1,11 +1,15 @@
 ## To Do
 
 - Research RayTracing Renderer
+- Camera aspect ratio is not being correctly updated onWindowResize.
+- Enable Orthographic Camera
+- Change maps and passes to be stored in Object Scene format.
 
 ## Doing
 
 - Correct FBM artifact issue.
     > Currently small artifacts exist after a FractalWarp pass.
+- Enable OrbitControls
 
 ## Done
 

@@ -44,10 +44,12 @@ export default function cameras(state = initial, action){
         case 'CHANGE_VIEW':
             const loader = new THREE.ObjectLoader();
             const obj = loader.parse(state.byId[state.active]);
+
+            obj.up.set(0,0,1);
             
             switch (action.view){
                 case 'SIDE':
-                    obj.position.set(1000,0,0);
+                    obj.position.set(1100,0,0);
                     obj.lookAt(0,0,0);
                     break;
                 case 'TOP':
@@ -55,7 +57,7 @@ export default function cameras(state = initial, action){
                     obj.lookAt(0,0,0);
                     break;
                 case 'ANGLE':
-                    obj.position.set(1000,1000,1000);
+                    obj.position.set(600,600,600);
                     obj.lookAt(0,0,0);
                     break;
             }

@@ -41,8 +41,10 @@ export default class Sketch extends React.Component {
   }
 
   updateActiveCamera(uuid){
-    /* There could be a performance boost here by only copying over the parameters that have changed. Not sure how that works
-    but maybe it's a matter of doing some kind of diff. I am imagining that loader.parse() could be a bottleneck. */
+    /* There could be a performance boost here by only copying over the 
+    parameters that have changed. Not sure how that works but maybe it's 
+    a matter of doing some kind of diff. I am imagining that 
+    loader.parse() could be a bottleneck. */
 
     const loader = new THREE.ObjectLoader();
     const obj = loader.parse(this.props.cameras.byId[uuid]);
@@ -52,11 +54,9 @@ export default class Sketch extends React.Component {
   }
 
   setupCameras(){
-    /*
-      here, I can create several cameras and immediately send them to state as
-      serialized objects. then, I could just worry about maintaining an 'active'
-      camera at any given time.
-    */
+    /* here, I can create several cameras and immediately send them to 
+      state as serialized objects. then, I could just worry about 
+      maintaining an 'active' camera at any given time. */
     let ortho = new THREE.OrthographicCamera(
       this.width / - 2, 
       this.width / 2, 
@@ -91,7 +91,7 @@ export default class Sketch extends React.Component {
     this.camera = perspective;
     this.props.setActiveCamera(perspective);
 
-    // this.setupOrbit();
+    this.setupOrbit();
   }
 
   setupOrbit() {
@@ -106,6 +106,8 @@ export default class Sketch extends React.Component {
     this.orbitControls.maxDistance = 1000;
     // this.orbitControls.maxPolarAngle = Math.PI / 2;
     // this.orbitControls.autoRotate = true;
+
+    console.log(this.orbitControls)
   }
   
   setupShaderPasses(map, passes) {
@@ -128,6 +130,7 @@ export default class Sketch extends React.Component {
     document.getElementById('APP').appendChild(this.stats.domElement);
   }
 
+  //LIFECYCLE------------------------------------------------------
   componentDidUpdate(prevProps) {
     if (this.props.passes != prevProps.passes) {
       for (let p in this.props.passes) {
@@ -230,6 +233,7 @@ export default class Sketch extends React.Component {
     this.mount.removeChild(this.renderer.domElement);
   }
 
+  //LISTENERS-----------------------------------------------------
   handleResize = () => {
     this.width  = this.mount.clientWidth;
     this.height = this.mount.clientHeight;
@@ -240,6 +244,7 @@ export default class Sketch extends React.Component {
     this.renderer.setSize(this.width, this.height);
   }
 
+  //--------------------------------------------------------------
   start = () => {
     if (!this.frameId) {
       this.frameId = requestAnimationFrame(this.animate);
