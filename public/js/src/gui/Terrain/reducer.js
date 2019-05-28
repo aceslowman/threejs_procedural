@@ -1,12 +1,12 @@
-const initial = {
-    width: '',
-    height: '',
-    detail: '',
-    amplitude: '',
-    elevation: ''
-}
+const initial_terrain = {
+    width: 256,
+    height: 256,
+    detail: 256,
+    amplitude: 100,
+    random_seed: Math.random() * 10000
+};
 
-const terrain = (state = initial, action) => {
+const terrain = (state = initial_terrain, action) => {
     switch (action.type) {
         case 'ADD_TERRAIN':
             return ({

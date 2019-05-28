@@ -11,6 +11,7 @@
     > This sounds preferable, and allows the Sketch component to be pretty slim. Sketch should 'run' the app, and all custom configurables (serializables?) would be initialized in their respective reducer. 
     * [ ] Read up on how to best organize reducers.
     * [ ] Implement Normalizr?
+    * [ ] If I'm serializing objects before inserting them into the store, should I use the reducer to store the initial state?
 
 ## Done
 

@@ -2,7 +2,6 @@ import * as THREE from 'three';
 
 const initial = {
     active: '',
-    orbitControls: '',
     byId: {},
     byType: {},
     allIds: []

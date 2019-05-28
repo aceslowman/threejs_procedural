@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import React from 'react';
-import Toolbar from '../gui/GUI'
 import Stats from "stats-js";
 
 import OrbitControls from "./utilities/OrbitControls.js";
@@ -21,7 +20,6 @@ export default class Sketch extends React.Component {
     window.addEventListener('resize', this.handleResize);
 
     this.state = {
-      random_seed: Math.random() * 10000,
       maps: {
         elevation: ''
       }
@@ -124,16 +122,6 @@ export default class Sketch extends React.Component {
   updateOrbit() {
     // this.orbitControls.enableDamping = this.orbitControls.
   }
-  
-  //TERRAIN------------------------------------------------------
-  setupShaderPasses(map, passes) {
-    for (let pass of passes) {
-      let p = new THREE.ShaderPass(pass.shaderMaterial);
-      map.composer.addPass(p);
-    }
-
-    map.composer.swapBuffers();
-  }
 
   setupStats() {
     this.stats = new Stats();
@@ -144,6 +132,51 @@ export default class Sketch extends React.Component {
     this.stats.domElement.style.top = '';
     this.stats.domElement.style.display = 'visible';
     document.getElementById('APP').appendChild(this.stats.domElement);
+  }
+
+  //TERRAIN------------------------------------------------------
+  setupTerrain() {
+    let map = new ProceduralMap(this.renderer, { width: this.props.terrain.width, height: this.props.terrain.height });
+
+    this.setupShaderPasses(map, [
+      new FractalNoise(8, this.props.terrain.random_seed),
+      new FractalWarp(4, this.props.terrain.random_seed)
+    ]);
+
+    map.render();
+
+    // SETUP TERRAIN
+    this.terrain = new ProceduralTerrain(this.renderer, this.scene, {
+      width: this.props.terrain.width,
+      height: this.props.terrain.height,
+      detail: this.props.terrain.detail,
+      amplitude: this.props.terrain.amplitude,
+      elevation: map
+    });
+
+    this.terrain.setup();
+    this.terrain.setupDebug();
+
+    this.setupStats();
+
+    this.setState({
+      maps: {
+        elevation: map
+      }
+    });
+
+    // CALLING PROPS FOR REDUX
+    this.props.addMap("Elevation", map); // TODO: rename these (addMap)
+    this.props.addTerrain(this.terrain); // TODO: rename these (addTerrain)
+  }
+
+  setupShaderPasses(map, passes) {
+    for (let pass of passes) {
+      let p = new THREE.ShaderPass(pass.shaderMaterial);
+      map.composer.addPass(p);
+    }
+
+    map.composer.swapBuffers();
   }
 
   //LIFECYCLE------------------------------------------------------
@@ -183,8 +216,8 @@ export default class Sketch extends React.Component {
     let active_cam_uuid = this.props.cameras.active;
 
     // if the active camera has changed...
-    if(this.props.cameras.active != prevProps.cameras.active || 
-        this.props.cameras.byId[active_cam_uuid] != prevProps.cameras.byId[active_cam_uuid]){
+    if (this.props.cameras.active != prevProps.cameras.active ||
+      this.props.cameras.byId[active_cam_uuid] != prevProps.cameras.byId[active_cam_uuid]) {
       this.updateActiveCamera(active_cam_uuid);
     }
   }
@@ -206,40 +239,8 @@ export default class Sketch extends React.Component {
     });
 
     this.setupCameras();
+    this.setupTerrain();
 
-    let map = new ProceduralMap(this.renderer, {width: 512, height: 512});
-
-    this.setupShaderPasses(map, [
-      new FractalNoise(8, this.state.random_seed),
-      new FractalWarp(4, this.state.random_seed)
-    ]);
-
-    map.render();
-
-    // SETUP TERRAIN
-    this.terrain = new ProceduralTerrain(this.renderer, this.scene, {
-      width: 512,
-      height: 512,
-      detail: 512.0,
-      amplitude: 300,
-      elevation: map
-    });
-
-    this.terrain.setup();
-    this.terrain.setupDebug();
-
-    this.setupStats();
-
-    this.setState({
-      maps: {
-        elevation: map
-      }
-    });
-
-    // CALLING PROPS FOR REDUX
-    this.props.mapAdded("Elevation", map); // TODO: rename these (addMap)
-    this.props.terrainAdded(this.terrain); // TODO: rename these (addTerrain)
-  
     // MARK SKETCH AS READY!
     this.props.onReady();
   }

@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import Sketch from './Sketch';
 
 // TERRAIN ---------------------------------
-const mapAdded = (id, map) => {
+const addMap = (id, map) => {
     let d_map = {
         id: id,
         passes: map.composer.passes.map(a=>a.material.name)
@@ -25,7 +25,7 @@ const mapAdded = (id, map) => {
     });
 };
 
-const terrainAdded = (terrain) => {
+const addTerrain = (terrain) => {
     return ({
         type: 'ADD_TERRAIN',
         terrain: {
@@ -80,19 +80,19 @@ const mapStateToProps = state => {
     const { maps, passes, cameras, terrain } = state;
 
     return {
-        maps:    maps.byId,     //TODO: remove byId
-        passes:  passes.byId,   //TODO: remove byId
+        maps:    maps,     //TODO: remove byId
+        passes:  passes,   //TODO: remove byId
         cameras: cameras,
         terrain: terrain
     }
 };
 
 const mapDispatchToProps = dispatch => ({
-    mapAdded: (id, map) => {
-        dispatch(mapAdded(id, map)) // send action containing the key and value
+    addMap: (id, map) => {
+        dispatch(addMap(id, map)) // send action containing the key and value
     },
-    terrainAdded: (terrain) => {
-        dispatch(terrainAdded(terrain))
+    addTerrain: (terrain) => {
+        dispatch(addTerrain(terrain))
     },
     addCamera: (camera) => {
         dispatch(addCamera(camera))
