@@ -1,7 +1,4 @@
 import * as THREE from 'three';
-import * as elevation from '../shaders/elevation';
-
-import Map from '../ProceduralMap';
 
 export default class ProceduralTerrain {
   constructor(renderer, scene, options){
@@ -12,6 +9,7 @@ export default class ProceduralTerrain {
     this.detail    = options.detail;
     this.elevation = options.elevation;
     this.amplitude = options.amplitude;
+    this.color     = options.color;
 
     this.verbose = false;
   }
@@ -81,24 +79,11 @@ export default class ProceduralTerrain {
       geometry, or just utilize the MeshStandardMaterial to do so
 
     */
-    // this.elev_uniforms = {
-    //   range: { value: this.geometry.boundingBox.max.z },
-    //   draw_elev: {value: true},
-    //   draw_topo: {value: false}
-    // };
+    this.material = new THREE.MeshBasicMaterial({
+      map: this.color.target,
+    });
 
-    // this.material = new THREE.ShaderMaterial({
-    //   vertexShader: elevation.vert,
-    //   fragmentShader: elevation.frag,
-    //   uniforms: this.elev_uniforms,
-    //   wireframe: false,
-    //   side: THREE.DoubleSide
-    // });
-    // this.material = new THREE.MeshStandardMaterial({
-    //   map: this.elevation.target
-    // });
-
-    this.material = new THREE.MeshNormalMaterial();
+    // this.material = new THREE.MeshNormalMaterial();
 
     this.mesh = new THREE.Mesh( this.geometry, this.material );
 

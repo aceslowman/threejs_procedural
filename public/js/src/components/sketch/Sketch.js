@@ -2,15 +2,15 @@ import * as THREE from 'three';
 import React from 'react';
 import Stats from "stats-js";
 
-import OrbitControls from "./utilities/OrbitControls.js";
+import OrbitControls from "../../utilities/OrbitControls.js";
 
 // PROCEDURAL TOOLS IMPORTS
-import ProceduralMap from './procedural/ProceduralMap';
-import ProceduralTerrain from './procedural/terrain/ProceduralTerrain';
+import ProceduralMap from '../../procedural/ProceduralMap';
+import ProceduralTerrain from '../../procedural/terrain/ProceduralTerrain';
 
 // SHADER IMPORTS
-import FractalNoise from "./shaders/fractalnoise.js";
-import FractalWarp from "./shaders/fractalwarp.js";
+import FractalNoise from "../../shaders/fractalnoise.js";
+import FractalWarp from "../../shaders/fractalwarp.js";
 
 export default class Sketch extends React.Component {
   constructor(props) {
@@ -22,18 +22,6 @@ export default class Sketch extends React.Component {
     this.state = {
       maps: {
         elevation: ''
-      }
-    }
-  }
-
-  getPassById(id){ // UTIL
-    for(let m in this.state.maps){
-      for(let p in this.state.maps[m].composer.passes){
-        let pass = this.state.maps[m].composer.passes[p];
-
-        if(pass.material.name == id){
-          return pass;
-        }
       }
     }
   }
@@ -56,7 +44,7 @@ export default class Sketch extends React.Component {
     this.orbitControls.update(); 
   }
 
-  setupCameras(){
+  initializeCameras(){
     /* here, I can create several cameras and immediately send them to 
       state as serialized objects. then, I could just worry about 
       maintaining an 'active' camera at any given time. */
@@ -119,10 +107,6 @@ export default class Sketch extends React.Component {
     this.props.addOrbit(this.orbitControls);
   }
 
-  updateOrbit() {
-    // this.orbitControls.enableDamping = this.orbitControls.
-  }
-
   setupStats() {
     this.stats = new Stats();
     this.stats.domElement.style.position = 'absolute';
@@ -135,29 +119,60 @@ export default class Sketch extends React.Component {
   }
 
   //TERRAIN------------------------------------------------------
-  setupTerrain() {
-    let map = new ProceduralMap(this.renderer, { width: this.props.terrain.width, height: this.props.terrain.height });
+  initializeTerrain() {
 
-    this.setupShaderPasses(map, [
+    // FIRST MAP
+    // generate initial elevation map
+    let map = new ProceduralMap(this.renderer, {
+      width: this.props.terrain.width,
+      height: this.props.terrain.height
+    });
+
+    let passes = [
       new FractalNoise(8, this.props.terrain.random_seed),
       new FractalWarp(4, this.props.terrain.random_seed)
-    ]);
+    ];
 
+    for (let pass of passes) {
+      let p = new THREE.ShaderPass(pass.shaderMaterial);
+      map.composer.addPass(p);
+    }
+
+    map.composer.swapBuffers();
     map.render();
 
-    // SETUP TERRAIN
+    // SECOND MAP
+    // WIP: generate initial color map
+    let color = new ProceduralMap(this.renderer, {
+      width:  this.props.terrain.width,
+      height: this.props.terrain.height
+    });
+
+    passes = [
+      new FractalNoise(8, this.props.terrain.random_seed),
+      new FractalWarp(4, this.props.terrain.random_seed)
+    ];
+
+    for (let pass of passes) {
+      let p = new THREE.ShaderPass(pass.shaderMaterial);
+      color.composer.addPass(p);
+    }
+
+    color.composer.swapBuffers();
+    color.render();
+
+    // generate terrain
     this.terrain = new ProceduralTerrain(this.renderer, this.scene, {
-      width: this.props.terrain.width,
-      height: this.props.terrain.height,
-      detail: this.props.terrain.detail,
+      width:     this.props.terrain.width,
+      height:    this.props.terrain.height,
+      detail:    this.props.terrain.detail,
       amplitude: this.props.terrain.amplitude,
-      elevation: map
+      elevation: map,
+      color:     color
     });
 
     this.terrain.setup();
     this.terrain.setupDebug();
-
-    this.setupStats();
 
     this.setState({
       maps: {
@@ -170,13 +185,16 @@ export default class Sketch extends React.Component {
     this.props.addTerrain(this.terrain); // TODO: rename these (addTerrain)
   }
 
-  setupShaderPasses(map, passes) {
-    for (let pass of passes) {
-      let p = new THREE.ShaderPass(pass.shaderMaterial);
-      map.composer.addPass(p);
-    }
+  getPassById(id) { // UTIL
+    for (let m in this.state.maps) {
+      for (let p in this.state.maps[m].composer.passes) {
+        let pass = this.state.maps[m].composer.passes[p];
 
-    map.composer.swapBuffers();
+        if (pass.material.name == id) {
+          return pass;
+        }
+      }
+    }
   }
 
   //LIFECYCLE------------------------------------------------------
@@ -238,8 +256,11 @@ export default class Sketch extends React.Component {
       background: 'green'
     });
 
-    this.setupCameras();
-    this.setupTerrain();
+    this.initializeCameras();
+    this.initializeTerrain();
+
+
+    this.setupStats();
 
     // MARK SKETCH AS READY!
     this.props.onReady();

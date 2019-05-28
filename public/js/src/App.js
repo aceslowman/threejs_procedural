@@ -6,9 +6,9 @@ import { Provider } from 'react-redux'
 
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 
-import Sketch from './sketch/SketchContainer';
-import GUI from './gui/GUI';
-import RootReducer from './state/RootReducer';
+import Sketch from './components/sketch/SketchContainer';
+import GUI from './components/gui/GUI';
+import RootReducer from './redux/reducers/RootReducer';
 
 // middleware
 import throttledMiddleware from './state/middleware/throttled';

@@ -39,6 +39,7 @@
     "react-redux": "^7.0.3",
     "react-router-dom": "^5.0.0",
     "redux": "^4.0.1",
+    "redux-thunk": "^2.3.0",
     "stats-js": "^1.0.0-alpha1",
     "three": "^0.90.0",
     "webpack-dev-server": "^3.1.14"

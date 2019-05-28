@@ -1,7 +1,7 @@
 const initial_terrain = {
-    width: 256,
-    height: 256,
-    detail: 256,
+    width: 512,
+    height: 512,
+    detail: 512,
     amplitude: 100,
     random_seed: Math.random() * 10000
 };
@@ -66,6 +66,7 @@ const passes = (state = { byId: {}, allIds: [] }, action) => {
             })
         case 'UPDATE_PASS_DEFINE':
             // TODO: I will need to generate some sort of UNIQUE id for each pass, appending to the end of the sanitized name.
+            console.log(state.byId[action.passId]);
             return ({
                 ...state,
                 byId: {
