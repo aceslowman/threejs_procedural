@@ -1,17 +1,22 @@
 ## To Do
 
 - Research RayTracing Renderer
+    > Raytracing Renderer (kept within renderers/RaytracingRenderer.js) would be a great option here, allowing me to do some high quality non-realtime renders. Perfect!
 - Camera aspect ratio is not being correctly updated onWindowResize.
 
 ## Doing
 
-- Correct FBM artifact issue.
-    > Currently small artifacts exist after a FractalWarp pass.
 - Define initial state in reducer, instead of mixing it into the 'sketch' logic.
     > This sounds preferable, and allows the Sketch component to be pretty slim. Sketch should 'run' the app, and all custom configurables (serializables?) would be initialized in their respective reducer. 
     * [ ] Read up on how to best organize reducers.
     * [ ] Implement Normalizr?
     * [ ] If I'm serializing objects before inserting them into the store, should I use the reducer to store the initial state?
+- Correct FBM artifact issue.
+    > Currently small artifacts exist after a FractalWarp pass.
+    * [ ] Check sampling functions
+    * [ ] Check negative dot product
+    * [ ] Check for divide by zero
+    * [ ] Clamp values?
 
 ## Done
 

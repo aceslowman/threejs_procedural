@@ -2,15 +2,9 @@ import * as THREE from 'three';
 import React from 'react';
 import Stats from "stats-js";
 
-import OrbitControls from "../../utilities/OrbitControls.js";
-
-// PROCEDURAL TOOLS IMPORTS
-import ProceduralMap from '../../procedural/ProceduralMap';
-import ProceduralTerrain from '../../procedural/terrain/ProceduralTerrain';
-
-// SHADER IMPORTS
-import FractalNoise from "../../shaders/fractalnoise.js";
-import FractalWarp from "../../shaders/fractalwarp.js";
+// IN PROGRESS
+import Camera from '../camera/Camera';
+import Terrain from '../terrain/Terrain';
 
 export default class Sketch extends React.Component {
   constructor(props) {
@@ -18,93 +12,6 @@ export default class Sketch extends React.Component {
 
     // SETUP LISTENERS
     window.addEventListener('resize', this.handleResize);
-
-    this.state = {
-      maps: {
-        elevation: ''
-      }
-    }
-  }
-
-  updateActiveCamera(uuid){
-    /* There could be a performance boost here by only copying over the 
-    parameters that have changed. Not sure how that works but maybe it's 
-    a matter of doing some kind of diff. I am imagining that 
-    loader.parse() could be a bottleneck. */
-
-    const loader = new THREE.ObjectLoader();
-    const obj = loader.parse(this.props.cameras.byId[uuid]);
-
-    this.camera = obj;
-    this.camera.updateProjectionMatrix();
-
-    this.camera.up.set(0,0,1);
-
-    this.orbitControls.object = this.camera;
-    this.orbitControls.update(); 
-  }
-
-  initializeCameras(){
-    /* here, I can create several cameras and immediately send them to 
-      state as serialized objects. then, I could just worry about 
-      maintaining an 'active' camera at any given time. */
-    let ortho = new THREE.OrthographicCamera(
-      this.width / - 2, 
-      this.width / 2, 
-      this.height / 2, 
-      this.height / - 2, 
-      0, 
-      2000
-    );
-    ortho.name = "Default Orthographic";
-    ortho.zoom = 2;
-    ortho.position.z = 999;
-    ortho.up.set(0,0,1);
-    ortho.updateProjectionMatrix();
-    ortho.updateMatrixWorld();
-
-    let perspective = new THREE.PerspectiveCamera(
-      75,            // fov
-      this.width / this.height,   // aspect
-      0.01,          // near
-      2000           // far
-    );
-    perspective.name = "Default Perspective";
-    perspective.zoom = 2;
-    perspective.position.z = 999;
-    perspective.up.set(0,0,1);
-    perspective.updateProjectionMatrix();
-    perspective.updateMatrixWorld();
-
-    // TODO: currently trying to figure out whether or not to
-    // initialize in the reducer
-
-    // send to store
-    this.props.addCamera(ortho);
-    this.props.addCamera(perspective);
-
-    // set default camera
-    this.camera = perspective;
-    this.props.setActiveCamera(perspective.uuid);
-
-    this.setupOrbit();
-  }
-
-  //ORBIT CONTROLS------------------------------------------------------
-  setupOrbit() {
-    this.orbitControls = new OrbitControls(
-      this.camera,
-      this.renderer.domElement
-    );
-    // this.orbitControls.enableDamping = true;
-    this.orbitControls.dampingFactor = 0.8;
-    // this.orbitControls.panningMode = THREE.HorizontalPanning; // default is THREE.ScreenSpacePanning
-    this.orbitControls.minDistance = 0.1;
-    this.orbitControls.maxDistance = 1000;
-    this.orbitControls.maxPolarAngle = Math.PI / 2;
-    // this.orbitControls.autoRotate = true;
-
-    this.props.addOrbit(this.orbitControls);
   }
 
   setupStats() {
@@ -119,117 +26,52 @@ export default class Sketch extends React.Component {
   }
 
   //TERRAIN------------------------------------------------------
-  initializeTerrain() {
 
-    // FIRST MAP
-    // generate initial elevation map
-    let map = new ProceduralMap(this.renderer, {
-      width: this.props.terrain.width,
-      height: this.props.terrain.height
-    });
+  // getPassById(id) { // UTIL
+  //   for (let m in this.state.maps) {
+  //     for (let p in this.state.maps[m].composer.passes) {
+  //       let pass = this.state.maps[m].composer.passes[p];
 
-    let passes = [
-      new FractalNoise(8, this.props.terrain.random_seed),
-      new FractalWarp(4, this.props.terrain.random_seed)
-    ];
-
-    for (let pass of passes) {
-      let p = new THREE.ShaderPass(pass.shaderMaterial);
-      map.composer.addPass(p);
-    }
-
-    map.composer.swapBuffers();
-    map.render();
-
-    // SECOND MAP
-    // WIP: generate initial color map
-    let color = new ProceduralMap(this.renderer, {
-      width:  this.props.terrain.width,
-      height: this.props.terrain.height
-    });
-
-    passes = [
-      new FractalNoise(8, this.props.terrain.random_seed),
-      new FractalWarp(4, this.props.terrain.random_seed)
-    ];
-
-    for (let pass of passes) {
-      let p = new THREE.ShaderPass(pass.shaderMaterial);
-      color.composer.addPass(p);
-    }
-
-    color.composer.swapBuffers();
-    color.render();
-
-    // generate terrain
-    this.terrain = new ProceduralTerrain(this.renderer, this.scene, {
-      width:     this.props.terrain.width,
-      height:    this.props.terrain.height,
-      detail:    this.props.terrain.detail,
-      amplitude: this.props.terrain.amplitude,
-      elevation: map,
-      color:     color
-    });
-
-    this.terrain.setup();
-    this.terrain.setupDebug();
-
-    this.setState({
-      maps: {
-        elevation: map
-      }
-    });
-
-    // CALLING PROPS FOR REDUX
-    this.props.addMap("Elevation", map); // TODO: rename these (addMap)
-    this.props.addTerrain(this.terrain); // TODO: rename these (addTerrain)
-  }
-
-  getPassById(id) { // UTIL
-    for (let m in this.state.maps) {
-      for (let p in this.state.maps[m].composer.passes) {
-        let pass = this.state.maps[m].composer.passes[p];
-
-        if (pass.material.name == id) {
-          return pass;
-        }
-      }
-    }
-  }
+  //       if (pass.material.name == id) {
+  //         return pass;
+  //       }
+  //     }
+  //   }
+  // }
 
   //LIFECYCLE------------------------------------------------------
   componentDidUpdate(prevProps) {
-    if (this.props.passes != prevProps.passes) {
-      for (let p in this.props.passes) {
-        let prop_pass = this.props.passes[p];
-        let prevPass = prevProps.passes[p];
+    // if (this.props.passes != prevProps.passes) {
+    //   for (let p in this.props.passes) {
+    //     let prop_pass = this.props.passes[p];
+    //     let prevPass = prevProps.passes[p];
 
-        if (prop_pass != prevPass && prevPass) {
-          let pass = this.getPassById(prop_pass.id);
+    //     if (prop_pass != prevPass && prevPass) {
+    //       let pass = this.getPassById(prop_pass.id);
 
-          let params_changed = prop_pass.params != prevPass.params;
-          let defines_changed = prop_pass.defines != prevPass.defines;
-          let uniforms_changed = prop_pass.uniforms != prevPass.uniforms;
+    //       let params_changed = prop_pass.params != prevPass.params;
+    //       let defines_changed = prop_pass.defines != prevPass.defines;
+    //       let uniforms_changed = prop_pass.uniforms != prevPass.uniforms;
 
-          if (params_changed) {
-            pass.enabled = prop_pass.params.enabled;
-            pass.renderToScreen = prop_pass.params.renderToScreen;
-          }
+    //       if (params_changed) {
+    //         pass.enabled = prop_pass.params.enabled;
+    //         pass.renderToScreen = prop_pass.params.renderToScreen;
+    //       }
 
-          if (defines_changed) {
-            Object.assign(pass.material.defines, prop_pass.defines);
-            pass.material.needsUpdate = true;
-          }
+    //       if (defines_changed) {
+    //         Object.assign(pass.material.defines, prop_pass.defines);
+    //         pass.material.needsUpdate = true;
+    //       }
 
-          if (uniforms_changed) {
-            Object.assign(pass.material.uniforms, prop_pass.uniforms);
-          }
-        }
-      }
+    //       if (uniforms_changed) {
+    //         Object.assign(pass.material.uniforms, prop_pass.uniforms);
+    //       }
+    //     }
+    //   }
 
-      this.state.maps.elevation.render(); //TODO: update only the map that changed.
-      this.terrain.displace(); //TODO: displace only if necessary
-    }
+    //   this.state.maps.elevation.render(); //TODO: update only the map that changed.
+    //   this.terrain.displace(); //TODO: displace only if necessary
+    // }
 
     let active_cam_uuid = this.props.cameras.active;
 
@@ -256,13 +98,18 @@ export default class Sketch extends React.Component {
       background: 'green'
     });
 
-    this.initializeCameras();
-    this.initializeTerrain();
-
-
+    // IN PROGRESS
+    this.camera  = new Camera(this.renderer, this.width, this.height);
+    this.terrain = new Terrain(this.renderer, this.scene, {
+      width: 512,
+      height: 512,
+      detail: 512,
+      amplitude: 150
+    });
+    
     this.setupStats();
 
-    // MARK SKETCH AS READY!
+    // sketch marked 'ready' for GUI to render.
     this.props.onReady();
   }
 
@@ -277,8 +124,8 @@ export default class Sketch extends React.Component {
     this.width  = this.mount.clientWidth;
     this.height = this.mount.clientHeight;
 
-    this.camera.aspect = this.width / this.height;
-    this.camera.updateProjectionMatrix();
+    this.camera.getCamera().aspect = this.width / this.height;
+    this.camera.getCamera().updateProjectionMatrix();
 
     this.renderer.setSize(this.width, this.height);
   }
@@ -306,9 +153,9 @@ export default class Sketch extends React.Component {
         this.entities[i].update();
       }
 
-      this.renderer.render(this.scene, this.camera);
+      this.renderer.render(this.scene, this.camera.getCamera());
 
-      this.state.maps.elevation.render();
+      this.terrain.update();
     this.stats.end();
   }
 

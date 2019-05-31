@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore, applyMiddleware } from 'redux'
 import { HashRouter } from 'react-router-dom';
 import { Provider } from 'react-redux'
 
@@ -8,18 +7,8 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 
 import Sketch from './components/sketch/SketchContainer';
 import GUI from './components/gui/GUI';
-import RootReducer from './redux/reducers/RootReducer';
 
-// middleware
-import throttledMiddleware from './state/middleware/throttled';
-
-const middlewares = [throttledMiddleware];
-
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-
-const store = createStore(RootReducer, composeEnhancers(
-  applyMiddleware(...middlewares)
-));
+import store from './redux/store';
 
 const theme = createMuiTheme({
   typography: {

@@ -1,5 +1,9 @@
 import * as THREE from 'three';
 
+/*
+  TODO: create a react component here.
+*/
+
 export default class FractalWarp {
   constructor(octaves, seed){
     this.shaderMaterial = new THREE.ShaderMaterial({
@@ -149,9 +153,21 @@ export default class FractalWarp {
         float n = fbm(src.rgb * scalar);
 
         float c = map(n, -1.0, 1.0, map_min, map_max);
+
         gl_FragColor = vec4(c, c, c, 1.0);
+        // gl_FragColor = src;
       }
     `;
+
+    /*
+      ARTIFACT ISSUE:
+
+      map is not the problem
+      scalar is unconfirmed but not likely
+      src is fine
+      
+
+    */
 
     this.shaderMaterial.vertexShader   = this.vert;
     this.shaderMaterial.fragmentShader = this.frag;
