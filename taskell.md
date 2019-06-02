@@ -3,20 +3,27 @@
 - Research RayTracing Renderer
     > Raytracing Renderer (kept within renderers/RaytracingRenderer.js) would be a great option here, allowing me to do some high quality non-realtime renders. Perfect!
 - Camera aspect ratio is not being correctly updated onWindowResize.
-
-## Doing
-
 - Define initial state in reducer, instead of mixing it into the 'sketch' logic.
     > This sounds preferable, and allows the Sketch component to be pretty slim. Sketch should 'run' the app, and all custom configurables (serializables?) would be initialized in their respective reducer. 
     * [ ] Read up on how to best organize reducers.
     * [ ] Implement Normalizr?
     * [ ] If I'm serializing objects before inserting them into the store, should I use the reducer to store the initial state?
+- Begin implementing simple tree map.
 - Correct FBM artifact issue.
     > Currently small artifacts exist after a FractalWarp pass.
     * [ ] Check sampling functions
     * [ ] Check negative dot product
     * [ ] Check for divide by zero
     * [ ] Clamp values?
+- Begin implementing RayTracing Renderer mode.
+- Begin implementing Storm React Diagrams
+
+## Doing
+
+- Connect the Terrain to redux store.
+    > The only thing holding me back on this is properly filtering out passes that haven't changed.
+- Research Storm React Diagrams
+    > This seems incredibly useful for displaying a material graph, post processing graph, etc etc. I think it would work well as a drawer, pulled up from the bottom of the window. I should put a hold on any more 'maps and  passes' ui until I get started implementing this.
 
 ## Done
 
@@ -58,6 +65,8 @@
 - Correct issue with 'active' id for camera.
 - Enable OrbitControls
 - Enable Orthographic Camera
+- Add gui folder to Terrain and Camera
+- Re-enable the Camera GUI
 
 ## Backburner
 

@@ -73,13 +73,13 @@ export default class Sketch extends React.Component {
     //   this.terrain.displace(); //TODO: displace only if necessary
     // }
 
-    let active_cam_uuid = this.props.cameras.active;
+    // let active_cam_uuid = this.props.cameras.active;
 
     // if the active camera has changed...
-    if (this.props.cameras.active != prevProps.cameras.active ||
-      this.props.cameras.byId[active_cam_uuid] != prevProps.cameras.byId[active_cam_uuid]) {
-      this.updateActiveCamera(active_cam_uuid);
-    }
+    // if (this.props.cameras.active != prevProps.cameras.active ||
+      // this.props.cameras.byId[active_cam_uuid] != prevProps.cameras.byId[active_cam_uuid]) {
+      // this.updateActiveCamera(active_cam_uuid);
+    // }
   }
 
   componentDidMount() {

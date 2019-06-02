@@ -15,8 +15,8 @@ import Typography from '@material-ui/core/Typography';
 import Navigation from './Navigation';
 
 // CONTAINERS
-import CameraContainer from './Camera/CameraContainer';
-import TerrainContainer from './Terrain/TerrainContainer';
+import CameraContainer from '../camera/gui/CameraContainer';
+import TerrainContainer from '../terrain/gui/TerrainContainer';
 
 class GUI extends React.Component {
   constructor(props) {

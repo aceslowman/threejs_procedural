@@ -7,50 +7,10 @@ import FractalNoise from "../../shaders/fractalnoise.js";
 import FractalWarp from "../../shaders/fractalwarp.js";
 
 // TODO: implement store 
-import store from '../../redux/store';
-
-const uuidv4 = require('uuid/v4');
-
-const addMap = (map, name) => {
-    console.log('MAP', map);
-
-    let d_passes = map.composer.passes.map(a => ({
-        id: uuidv4(),
-        name: a.material.name,
-        params: {
-            'enabled': a.enabled,
-            'renderToScreen': a.renderToScreen
-        },
-        defines: a.material.defines,
-        uniforms: a.material.uniforms
-    }));
-
-    let d_map = {
-        id: uuidv4(),
-        name: name,
-        passes: d_passes.map(a => a.id)
-    };
-
-    return ({
-        type: 'ADD_MAP',
-        map: d_map,
-        passes: d_passes
-    });
-};
-
-const addPass = () => {
-
-}
-
-const addTerrain = (terrain) => {
-    return ({
-        type: 'ADD_TERRAIN',
-        terrain: {
-            ...terrain,
-            elevation: terrain.elevation.target.texture.uuid
-        }
-    });
-}
+import store, {observeStore} from '../../redux/store';
+import {getTerrain, getPasses} from '../../redux/selectors'; 
+import {addMap} from '../../redux/actions/maps';
+import {addTerrain} from '../../redux/actions/terrain';
 
 export default class Terrain {
     constructor(renderer, scene, options){
@@ -69,11 +29,20 @@ export default class Terrain {
 
         store.dispatch(addTerrain(this));
 
-        let subscription = store.subscribe(() => {
-            // next(() => console.log(val));
-            const state = store.getState();
-            console.log("STATE FROM TERRAIN", state);
-        });
+        //TEMP:
+        // connecting to store.
+        observeStore(store, getTerrain, (v)=> this.updateTerrain(v));
+        observeStore(store, getPasses, (v)=> this.updatePasses(v));
+    }
+
+    updateTerrain(value){
+        console.log('terrain changed', value);
+    }
+
+    // TODO: in the process of filtering 'all' records out for the one
+    // that changed
+    updatePasses(passes) {
+        console.log('passes changed', passes);
     }
 
     initializeElevation(){
@@ -123,6 +92,27 @@ export default class Terrain {
         store.dispatch(addMap(map, 'Colors'));
     }
 
+    initializeMesh() {
+        this.geometry = new THREE.PlaneBufferGeometry(
+            this.width,
+            this.height,
+            this.detail,
+            this.detail
+        );
+
+        this.displaceGeometry();
+
+        // this.material = new THREE.MeshBasicMaterial({
+        //     map: this.colors.target,
+        // });
+
+        this.material = new THREE.MeshNormalMaterial();
+
+        this.mesh = new THREE.Mesh(this.geometry, this.material);
+
+        this.scene.add(this.mesh);
+    }
+
     initialize(){
         this.initializeElevation();
         this.initializeColors();
@@ -133,27 +123,6 @@ export default class Terrain {
 
     update(){
         this.elevation.render();
-    }
-
-    initializeMesh() {
-        this.geometry = new THREE.PlaneBufferGeometry(
-            this.width,
-            this.height,
-            this.detail,
-            this.detail
-        );
-
-        this.displaceGeometry();
-        
-        // this.material = new THREE.MeshBasicMaterial({
-        //     map: this.colors.target,
-        // });
-
-        this.material = new THREE.MeshNormalMaterial();
-
-        this.mesh = new THREE.Mesh(this.geometry, this.material);
-
-        this.scene.add(this.mesh);
     }
 
     setupDebug() {

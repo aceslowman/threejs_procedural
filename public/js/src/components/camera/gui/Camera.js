@@ -31,14 +31,10 @@ class Camera extends React.Component {
 
   render(){
     const { classes } = this.props;
-
-    let location = this.props.location.pathname;
-
-    // console.log(this.props.active.object.type);
-
+    
     return (
       <div className="subnavigation">
-        {/* <CameraViews {...this.props} />
+        <CameraViews {...this.props} />
 
         <Paper className={classes.root}>
           <Grid container justify={'space-around'} alignItems={'center'} spacing={16}>
@@ -58,7 +54,7 @@ class Camera extends React.Component {
           <CameraCommons {...this.props} camera={this.props.active} />
           {this.props.active.object.type == "PerspectiveCamera" && <PerspectiveCameraTools {...this.props} camera={this.props.active} />}
           {this.props.active.object.type == "OrthographicCamera" && <OrthographicCameraTools {...this.props} camera={this.props.active} />}
-        </Paper> */}
+        </Paper>
       </div>
     );
   }

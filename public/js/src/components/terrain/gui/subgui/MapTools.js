@@ -1,18 +1,15 @@
 import React from 'react';
-import * as dg from "dis-gui";
-import { withRouter, Route, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 
 import Grid from '@material-ui/core/Grid';
-import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
-import Slider from '@material-ui/lab/Slider';
 import InputLabel from '@material-ui/core/InputLabel';
-import { Typography, ExpansionPanelActions } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography';
+import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions';
 
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -49,6 +46,7 @@ class MapTools extends React.Component {
 
         // setup pass props
         let passes = [];
+
         for (let p in map.passes) {
             let pass = this.props.passes[map.passes[p]];
 
@@ -134,7 +132,7 @@ class MapTools extends React.Component {
             passes.push(
                 <ExpansionPanel key={p}>
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant="h5" className={classes.heading}>{map.passes[p]}</Typography>
+                        <Typography variant="h5" className={classes.heading}>{pass.name}</Typography>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
                         <Grid container>
@@ -164,7 +162,7 @@ class MapTools extends React.Component {
             <Paper className={classes.root}>
                 <Grid container spacing={8}>
                     <Grid item xs={12}>
-                        <Typography className={classes.type} variant="h5">{this.props.map.id}</Typography>
+                        <Typography className={classes.type} variant="h5">{this.props.map.name}</Typography>
                     </Grid>
                     {passes}
                 </Grid>

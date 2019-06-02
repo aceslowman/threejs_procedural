@@ -1,99 +1,19 @@
 import { connect } from 'react-redux';
 import Sketch from './Sketch';
 
-// TERRAIN ---------------------------------
-const addMap = (id, map) => {
-    let d_map = {
-        id: id,
-        passes: map.composer.passes.map(a=>a.material.name)
-    };
-
-    let d_passes = map.composer.passes.map(a=>({
-        id: a.material.name,
-        params: {
-            'enabled': a.enabled,
-            'renderToScreen': a.renderToScreen
-        },
-        defines: a.material.defines,
-        uniforms: a.material.uniforms
-    }));
-
-    return ({
-        type: 'ADD_MAP',
-        map: d_map,
-        passes: d_passes
-    });
-};
-
-const addTerrain = (terrain) => {
-    return ({
-        type: 'ADD_TERRAIN',
-        terrain: {
-            ...terrain,
-            elevation: terrain.elevation.target.texture.uuid
-        }
-    });
-}
-
-//CAMERAS------------------------------------
-const addCamera = (camera) => {
-    return ({
-        type: 'ADD_CAMERA',
-        camera: {
-            ...camera.toJSON(),
-            focalLength: camera.type == 'PerspectiveCamera' ? camera.getFocalLength() : 0
-        }
-    });
-}
-
-const setActiveCamera = (uuid) => {
-    return ({
-        type: 'ACTIVATE_CAMERA',
-        uuid: uuid,
-        meta: {
-            throttle: 40
-        }
-    });
-};
-
-// TODO: create action for adding orbitcontrols
-const addOrbit = (orbit) => {
-    const serialized = {
-        autoRotate: orbit.autoRotate,
-        enableDamping: orbit.enableDamping,
-        dampingFactor: orbit.dampingFactor,
-        minDistance: orbit.minDistance,
-        maxDistance: orbit.maxDistance,
-        panningMode: orbit.panningMode, 
-        maxPolarAngle: orbit.maxPolarAngle, 
-        autoRotate: orbit.autoRotate
-    };
-
-    return ({
-        type: 'ADD_ORBITCONTROLS',
-        serialized: serialized
-    });
-}
-
 //REACTREDUXCONFIG---------------------------------
 const mapStateToProps = state => {
     const { maps, passes, cameras, terrain } = state;
 
     return {
-        maps:    maps,     //TODO: remove byId
-        passes:  passes,   //TODO: remove byId
+        maps:    maps,   
+        passes:  passes, 
         cameras: cameras,
         terrain: terrain
     }
 };
 
 const mapDispatchToProps = dispatch => ({
-    addMap: (id, map) => {
-        dispatch(addMap(id, map)) // send action containing the key and value
-    },
-    addTerrain: (terrain) => {
-        dispatch(addTerrain(terrain))
-    },
     addCamera: (camera) => {
         dispatch(addCamera(camera))
     },
