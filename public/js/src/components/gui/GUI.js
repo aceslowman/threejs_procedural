@@ -39,6 +39,7 @@ class GUI extends React.Component {
     return (
 
         <Drawer 
+          id="GUI"
           variant="permanent"
           classes={{
             root: this.state.open ? 'tooldrawer_open' : 'tooldrawer_closed',

@@ -7,6 +7,7 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 
 import Sketch from './components/sketch/SketchContainer';
 import GUI from './components/gui/GUI';
+import Diagram from './components/gui/Diagram';
 
 import store from './redux/store';
 
@@ -50,8 +51,11 @@ class App extends React.Component {
         <MuiThemeProvider theme={theme}>
           <Provider store={store}>
             <div className="container">
-              {this.state.sketchReady && <GUI />}
-              <Sketch onReady={() => this.handleSketchReady()} />
+              {this.state.sketchReady && <GUI /> }
+              <div id="SKETCHCONTAINER">
+                <Sketch onReady={() => this.handleSketchReady()} />
+                {this.state.sketchReady && <Diagram />}
+              </div>
             </div>
           </Provider>
         </MuiThemeProvider>

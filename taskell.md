@@ -22,8 +22,12 @@
 
 - Connect the Terrain to redux store.
     > The only thing holding me back on this is properly filtering out passes that haven't changed.
+    * [ ] update the correct pass with the updated value
+    * [ ] generate uuid in Terrain.initializeElevation() so that I can keep track of passes while deserializing.
 - Research Storm React Diagrams
     > This seems incredibly useful for displaying a material graph, post processing graph, etc etc. I think it would work well as a drawer, pulled up from the bottom of the window. I should put a hold on any more 'maps and  passes' ui until I get started implementing this.
+- Implement Storm React Diagrams
+    * [ ] Create a new Diagram panel, an expandable drawer along the bottom of the Sketch panel
 
 ## Done
 

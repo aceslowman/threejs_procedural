@@ -2,15 +2,16 @@ import * as THREE from 'three';
 
 import ProceduralMap from '../../procedural/ProceduralMap';
 
-// SHADER IMPORTS
 import FractalNoise from "../../shaders/fractalnoise.js";
 import FractalWarp from "../../shaders/fractalwarp.js";
 
-// TODO: implement store 
 import store, {observeStore} from '../../redux/store';
 import {getTerrain, getPasses} from '../../redux/selectors'; 
 import {addMap} from '../../redux/actions/maps';
 import {addTerrain} from '../../redux/actions/terrain';
+import watch from 'redux-watch';
+
+import { diff } from 'deep-object-diff';
 
 export default class Terrain {
     constructor(renderer, scene, options){
@@ -31,18 +32,26 @@ export default class Terrain {
 
         //TEMP:
         // connecting to store.
-        observeStore(store, getTerrain, (v)=> this.updateTerrain(v));
-        observeStore(store, getPasses, (v)=> this.updatePasses(v));
+        // observeStore(store, getTerrain, (v)=> this.updateTerrain(v));
+        // observeStore(store, getPasses, (v)=> this.updatePasses(v));
+
+        //TEMP:
+        // also trying redux-watch
+        let watchPasses = watch(() => getPasses(store.getState()));
+        store.subscribe(watchPasses(this.updatePasses));
     }
 
     updateTerrain(value){
         console.log('terrain changed', value);
     }
 
-    // TODO: in the process of filtering 'all' records out for the one
-    // that changed
-    updatePasses(passes) {
-        console.log('passes changed', passes);
+    updatePasses(newPasses, oldPasses) {
+        console.log('newVal', newPasses);
+        console.log('oldVal', oldPasses);
+
+        let d = diff(oldPasses, newPasses);
+
+        console.log('DIFF',d);
     }
 
     initializeElevation(){
