@@ -36,6 +36,7 @@ class GUI extends React.Component {
   };
 
   render() {
+    console.log(this.props)
     return (
 
         <Drawer 
@@ -78,11 +79,14 @@ class GUI extends React.Component {
           <Navigation handleDrawerClose={() => this.handleDrawerClose()} handleDrawerOpen={() => this.handleDrawerOpen()} />
           <Divider />
 
-          <div id="subwrapper" style={ {display: this.state.open ? 'block' : 'none'} }>
-            <Route path="/" exact component={CameraContainer} />
-            <Route path="/camera/" component={CameraContainer} />
-            <Route path="/terrain/" component={TerrainContainer} />
-          </div>
+          {this.props.ready && (
+            <div id="subwrapper" style={{ display: this.state.open ? 'block' : 'none' }}>
+              <Route path="/" exact component={CameraContainer} />
+              <Route path="/camera/" component={CameraContainer} />
+              <Route path="/terrain/" component={TerrainContainer} />
+            </div>
+          )}
+          
 
         </Drawer>
 

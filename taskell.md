@@ -26,8 +26,12 @@
     * [ ] generate uuid in Terrain.initializeElevation() so that I can keep track of passes while deserializing.
 - Research Storm React Diagrams
     > This seems incredibly useful for displaying a material graph, post processing graph, etc etc. I think it would work well as a drawer, pulled up from the bottom of the window. I should put a hold on any more 'maps and  passes' ui until I get started implementing this.
+    * [ ] Can I create adjustable parameters IN the widget?
 - Implement Storm React Diagrams
-    * [ ] Create a new Diagram panel, an expandable drawer along the bottom of the Sketch panel
+    > Storm React Diagrams should work well as a backbone of a shader graph display, but I am yet to figure out a simple configuration that works for me. It looks extensible enough tho... 
+    * [x] Create a new Diagram panel, an expandable drawer along the bottom of the Sketch panel
+    * [x] Get a number of adjustable parameters to display on the Widget. (I actually should be able to do this using a custom widget)
+    * [ ] I have an idea for the input. On the far left, I will keep my map input as is, but I will use the onSelect handler for the diagram to change which pass is being shown.
 
 ## Done
 

@@ -9,9 +9,6 @@ import Terrain from '../terrain/Terrain';
 export default class Sketch extends React.Component {
   constructor(props) {
     super(props);
-
-    // SETUP LISTENERS
-    window.addEventListener('resize', this.handleResize);
   }
 
   setupStats() {
@@ -83,8 +80,10 @@ export default class Sketch extends React.Component {
   }
 
   componentDidMount() {
-    this.width  = window.innerWidth;
-    this.height = window.innerHeight
+    this.width = this.mount.clientWidth;
+    this.height = this.mount.clientHeight;
+
+    console.log([this.width, this.height]);
 
     this.entities = [];
 
@@ -111,10 +110,13 @@ export default class Sketch extends React.Component {
 
     // sketch marked 'ready' for GUI to render.
     this.props.onReady();
+
+    // SETUP LISTENERS
+    window.addEventListener('resize', this.handleResize);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.handleResize);
+    this.mount.removeEventListener('resize', this.handleResize);
     this.stop();
     this.mount.removeChild(this.renderer.domElement);
   }

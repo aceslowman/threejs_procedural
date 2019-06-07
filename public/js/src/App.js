@@ -7,7 +7,7 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 
 import Sketch from './components/sketch/SketchContainer';
 import GUI from './components/gui/GUI';
-import Diagram from './components/gui/Diagram';
+import Diagram from './components/diagram/DiagramContainer';
 
 import store from './redux/store';
 
@@ -22,8 +22,8 @@ const theme = createMuiTheme({
     borderRadius: 2
   },
   palette: {
-    // type: 'dark',
-    // background: '#ccc'
+    type: 'dark',
+    background: '#ccc'
   },
   overrides: {
     MuiPaper: {
@@ -51,7 +51,8 @@ class App extends React.Component {
         <MuiThemeProvider theme={theme}>
           <Provider store={store}>
             <div className="container">
-              {this.state.sketchReady && <GUI /> }
+              {/* {this.state.sketchReady && <GUI /> } */}
+              <GUI ready={this.state.sketchReady}/>
               <div id="SKETCHCONTAINER">
                 <Sketch onReady={() => this.handleSketchReady()} />
                 {this.state.sketchReady && <Diagram />}
