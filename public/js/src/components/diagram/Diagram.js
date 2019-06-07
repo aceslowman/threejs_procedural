@@ -14,13 +14,13 @@ class Diagram extends React.Component {
 
     this.state = {
       open: true,
-      currentMap: ''
+      currentMap: this.props.maps.byId[this.props.maps.allIds[0]]
     };
   }
   
   componentDidMount(){
-    let map = this.props.maps.byId[0];
-    console.log(map)
+    // get random map for now
+    let map = this.props.maps.byId[this.props.maps.allIds[0]];
 
     this.setState({currentMap: map})
   }
@@ -36,7 +36,29 @@ class Diagram extends React.Component {
 
   assembleDiagram(){
     // use the current map in state
-    console.log(this.state.currentMap)
+    this.nodes = [];
+    this.links = [];
+
+    if(this.state.currentMap){
+      let i = 0; 
+      let prevOutPort; //hold on to previous out port to link passes
+
+      for (let p in this.state.currentMap.passes) {
+        let pass_id = this.state.currentMap.passes[p];
+        let pass = this.props.passes.byId[pass_id];
+
+        let node = new DefaultNodeModel(pass.name, `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255})`);
+        let inPort = node.addInPort("In");
+        let outPort = node.addOutPort("Out");
+        node.setPosition(100 + (i*100),50);
+
+        this.nodes.push(node);
+        if (prevOutPort) this.links.push(inPort.link(prevOutPort));
+
+        prevOutPort = outPort;
+        i++;
+      }
+    }
   }
 
   render() {
@@ -47,23 +69,26 @@ class Diagram extends React.Component {
 
     let model = new DiagramModel();
 
-    var node1 = new DefaultNodeModel("Fractal Warp", "rgb(0,192,255)");
-    var port1 = node1.addOutPort("Out");
-    // can I add custom port models here?
-    // node1.addInPort("Something");
-    // node1.addInPort("SomethingELSE");
-    node1.setPosition(100, 100);
+    // var node1 = new DefaultNodeModel("Fractal Warp", "rgb(0,192,255)");
+    // var port1 = node1.addOutPort("Out");
+    // // can I add custom port models here?
+    // // node1.addInPort("Something");
+    // // node1.addInPort("SomethingELSE");
+    // node1.setPosition(100, 100);
     
-    //3-B) create another default node
-    var node2 = new DefaultNodeModel("Fractal Noise", "rgb(192,255,0)");
-    var port2 = node2.addInPort("In");
-    node2.setPosition(400, 100);
+    // //3-B) create another default node
+    // var node2 = new DefaultNodeModel("Fractal Noise", "rgb(192,255,0)");
+    // var port2 = node2.addInPort("In");
+    // node2.setPosition(400, 100);
 
-    //3-C) link the 2 nodes together
-    var link1 = port1.link(port2);
+    // //3-C) link the 2 nodes together
+    // var link1 = port1.link(port2);
 
-    //4) add the models to the root graph
-    let models = model.addAll(node1, node2, link1);
+    // //4) add the models to the root graph
+
+    // let models = model.addAll(node1, node2, link1);
+
+    let models = model.addAll(...this.nodes, ...this.links);
 
     models.forEach(item => {
       item.addListener({

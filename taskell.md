@@ -32,6 +32,7 @@
     * [x] Create a new Diagram panel, an expandable drawer along the bottom of the Sketch panel
     * [x] Get a number of adjustable parameters to display on the Widget. (I actually should be able to do this using a custom widget)
     * [ ] I have an idea for the input. On the far left, I will keep my map input as is, but I will use the onSelect handler for the diagram to change which pass is being shown.
+    * [ ] Disable panning, so that orbitControls still function.
 
 ## Done
 
