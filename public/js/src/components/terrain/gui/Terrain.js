@@ -18,13 +18,20 @@ class Terrain extends React.Component {
     this.state = {}
   }
 
+  handleMapSelect(map){ 
+    console.log('selecting map...');
+    this.props.updateDiagramActiveMap(map)
+  }
+
   assembleMaps(){
     let maps = [];
 
     for(let m in this.props.maps){
       let map = this.props.maps[m];
+      let selected;
+      this.props.diagrams && this.props.diagrams.activeMap == m ? selected = true : selected = false; 
 
-      maps.push(<MapTools key={m} map={map} {...this.props} />);
+      maps.push(<MapTools key={m} map={map} {...this.props} selected={selected} selectMap={(e)=>this.handleMapSelect(e)}/>);
     }
 
     return maps;

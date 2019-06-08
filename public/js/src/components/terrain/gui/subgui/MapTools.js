@@ -23,7 +23,11 @@ import DeleteIcon from '@material-ui/icons/Delete';
 const styles = theme => ({
     root: {
         padding: '16px !important',
-        margin: '4px 4px 16px 4px'
+        margin: '4px 4px 16px 4px',
+        border: '1px solid white'
+    },
+    highlighted: {
+        border: '3px solid blue'
     },
     type: {
         padding: '8px 0px'
@@ -34,7 +38,23 @@ class MapTools extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {}
+        this.state = {
+            selected: false
+        }
+    }
+
+    handleClick(){
+        // console.log('hellllllo');
+        // this.setState({ selected: !this.state.selected});
+        this.props.selectMap(this.props.map);
+        // change border width
+
+        // console.log(styles)
+    }
+
+    componentDidMount() {
+        // console.log(this.mount);
+        // this.mount.addEventListener('mousedown', () => this.handleClick());
     }
 
     assembleControls() {
@@ -159,7 +179,7 @@ class MapTools extends React.Component {
         let passes = this.assembleControls();
 
         return (
-            <Paper className={classes.root}>
+            <Paper className={`${classes.root} ${this.props.selected ? classes.highlighted : ''}`} ref={mount => { this.mount = mount }} onClick={() => this.handleClick()}>
                 <Grid container spacing={8}>
                     <Grid item xs={12}>
                         <Typography className={classes.type} variant="h5">{this.props.map.name}</Typography>

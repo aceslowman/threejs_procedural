@@ -49,12 +49,27 @@ const updateTerrain = (param, val) => {
   });
 }
 
+const updateDiagramActiveMap = (map) => {
+  return ({
+    type: 'SET_ACTIVE_MAP',
+    map: map
+  });
+}
+
+const updateDiagramActivePass = (pass) => {
+  return ({
+    type: 'SET_ACTIVE_PASS',
+    pass: pass
+  });
+}
+
 const mapStateToProps = state => {
-  const { terrain, maps, passes } = state;
+  const { terrain, maps, passes, diagrams } = state;
   return ({
     terrain: terrain,
     maps: maps.byId,
-    passes: passes.byId
+    passes: passes.byId,
+    diagrams: diagrams
   })
 };
 
@@ -70,6 +85,12 @@ const mapDispatchToProps = dispatch => ({
   },
   updatePassParam: (pId, param, val) => {
     dispatch(updatePassParam(pId, param, val));
+  },
+  updateDiagramActiveMap: (map) => {
+    dispatch(updateDiagramActiveMap(map));
+  },
+  updateDiagramActivePass: (pass) => {
+    dispatch(updateDiagramActivePass(pass));
   }
 });
 

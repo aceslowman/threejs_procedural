@@ -1,3 +1,10 @@
+export function changeView(view){
+    return ({
+        type: 'CHANGE_VIEW',
+        view: view
+    });
+};
+
 export function addCamera(camera){
     return ({
         type: 'ADD_CAMERA',

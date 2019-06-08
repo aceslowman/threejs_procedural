@@ -17,6 +17,7 @@
     * [ ] Clamp values?
 - Begin implementing RayTracing Renderer mode.
 - Begin implementing Storm React Diagrams
+- Move all actions (like in TerrainContainer.js) into the respective actions folder
 
 ## Doing
 
@@ -28,11 +29,12 @@
     > This seems incredibly useful for displaying a material graph, post processing graph, etc etc. I think it would work well as a drawer, pulled up from the bottom of the window. I should put a hold on any more 'maps and  passes' ui until I get started implementing this.
     * [ ] Can I create adjustable parameters IN the widget?
 - Implement Storm React Diagrams
-    > Storm React Diagrams should work well as a backbone of a shader graph display, but I am yet to figure out a simple configuration that works for me. It looks extensible enough tho... 
+    > Storm React Diagrams should work well as a backbone of a shader graph display, but I am yet to figure out a simple configuration that works for me. It looks extensible enough tho... j
     * [x] Create a new Diagram panel, an expandable drawer along the bottom of the Sketch panel
     * [x] Get a number of adjustable parameters to display on the Widget. (I actually should be able to do this using a custom widget)
-    * [ ] I have an idea for the input. On the far left, I will keep my map input as is, but I will use the onSelect handler for the diagram to change which pass is being shown.
-    * [ ] Disable panning, so that orbitControls still function.
+    * [ ] Change currently displayed diagram based on selected map. This might require a closer pairing of the Diagram and the GUI.
+    * [x] Disable panning, so that orbitControls still function.
+    * [x] Diagram assembly is being triggered twice as much as it should
 
 ## Done
 

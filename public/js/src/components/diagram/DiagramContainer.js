@@ -3,11 +3,13 @@ import Diagram from './Diagram';
 
 //REACTREDUXCONFIG---------------------------------
 const mapStateToProps = state => {
-    const { maps, passes } = state;
+    const { maps, passes, diagrams } = state;
 
     return {
         maps:    maps,   
-        passes:  passes
+        passes:  passes,
+        diagrams: diagrams,
+        activeMap: maps.byId[diagrams.activeMap],
     }
 };
 

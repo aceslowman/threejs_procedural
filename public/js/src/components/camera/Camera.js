@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 import OrbitControls from "../../utilities/OrbitControls.js";
 
-import { addCamera, setActiveCamera, addOrbit } from '../../redux/actions/cameras';
+import { addCamera, setActiveCamera, addOrbit, changeView } from '../../redux/actions/cameras';
 import store, { observeStore } from '../../redux/store';
 import { getCameras, getActiveCamera } from '../../redux/selectors'; 
 
@@ -61,6 +61,7 @@ export default class Camera {
         store.dispatch(addCamera(ortho));
         store.dispatch(addCamera(perspective));
         store.dispatch(setActiveCamera(perspective.uuid));
+        store.dispatch(changeView('ANGLE')); // set default view!
     }
 
     updateActiveCamera(cam){

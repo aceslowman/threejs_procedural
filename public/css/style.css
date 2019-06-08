@@ -73,10 +73,34 @@ html, body, .container, #root {
 }
 
 .srd-diagram {
-  height:100%;
-  width:100%;
+  height:90px;
+  width:100%; /* TODO: stop hardcoding */
+  top: 0px;
+  margin:15px 0px;
   left: 360px; /*not ideal to hardcode the gui width*/
   position: fixed !important;
+}
+
+.diagramContainer {
+  display:flex;
+  align-items: center;
+  justify-content: center;
+  height:90px;
+  margin:15px 0px;
+  width:100%; /* TODO: stop hardcoding */
+  top: 0px;
+  left: 360px;
+  position: fixed !important;
+  border-top:1px solid rgba(255, 255, 255, 0.32);
+  border-bottom:1px solid rgba(255, 255, 255, 0.32);
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.diagramContainer h3 {
+  font-size: 3em;
+  color: rgba(255,255,255,0.25);
+  position:relative;
+  bottom:0px;
 }
 
 /* SUBWRAPPER */

@@ -86,10 +86,8 @@ class GUI extends React.Component {
               <Route path="/terrain/" component={TerrainContainer} />
             </div>
           )}
-          
 
         </Drawer>
-
     );
   }
 }
