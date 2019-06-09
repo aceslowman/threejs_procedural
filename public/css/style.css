@@ -83,8 +83,8 @@ html, body, .container, #root {
 
 .diagramContainer {
   display:flex;
-  align-items: center;
-  justify-content: center;
+  /* align-items: center; */
+  /* justify-content: center; */
   height:90px;
   margin:15px 0px;
   width:100%; /* TODO: stop hardcoding */
@@ -98,14 +98,16 @@ html, body, .container, #root {
 
 .diagramContainer h3 {
   font-size: 3em;
-  color: rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.55);
   position:relative;
-  bottom:0px;
+  bottom:-50px;
+  margin-left:15px;
 }
 
 /* SUBWRAPPER */
 #subwrapper {
   padding:16px;
+  overflow-y:scroll;
 }
 
 /* APP */

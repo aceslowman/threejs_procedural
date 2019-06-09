@@ -1,6 +1,10 @@
 import { connect } from 'react-redux';
 import Terrain from './Terrain';
 
+import { selectPass } from '../../../redux/actions/diagrams';
+
+// TODO: break up into terrain reducer
+
 const updatePassParam = (pId, param, val) => {
   console.log([pId, param, val]);
   return ({
@@ -91,6 +95,9 @@ const mapDispatchToProps = dispatch => ({
   },
   updateDiagramActivePass: (pass) => {
     dispatch(updateDiagramActivePass(pass));
+  },
+  selectPass: (passId) => {
+    dispatch(selectPass(passId))
   }
 });
 

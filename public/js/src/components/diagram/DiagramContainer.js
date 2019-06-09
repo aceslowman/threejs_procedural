@@ -1,6 +1,8 @@
 import { connect } from 'react-redux';
 import Diagram from './Diagram';
 
+import { selectPass } from '../../redux/actions/diagrams';
+
 //REACTREDUXCONFIG---------------------------------
 const mapStateToProps = state => {
     const { maps, passes, diagrams } = state;
@@ -14,15 +16,9 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => ({
-    // addCamera: (camera) => {
-    //     dispatch(addCamera(camera))
-    // },
-    // setActiveCamera: (camera) => {
-    //     dispatch(setActiveCamera(camera))
-    // },
-    // addOrbit: (orbit) => {
-    //     dispatch(addOrbit(orbit))
-    // }
+    selectPass: (passId) => {
+        dispatch(selectPass(passId))
+    }
 });
 
 export default connect(

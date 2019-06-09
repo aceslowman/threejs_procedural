@@ -36,19 +36,32 @@ class Diagram extends React.Component {
     }
   }
 
+  handlePassSelect(e){
+    this.props.selectPass(e.entity.id);
+  }
+
   assembleDiagram(){
     if(this.state.currentMap){
       this.nodes = [];
       this.links = [];
 
       let i = 0; 
-      let prevOutPort; //hold on to previous out port to link passes
+
+      //hold on to previous out port to link passes
+      let prevOutPort; 
 
       for (let p in this.state.currentMap.passes) {
         let pass_id = this.state.currentMap.passes[p];
         let pass = this.props.passes.byId[pass_id];
 
         let node = new DefaultNodeModel(pass.name, `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255})`);
+     
+        // hijacking node id, for association with pass id
+        node.id = pass_id;
+
+        // now I need to make sure the selected pass is highlighted
+        node.selected = this.props.diagrams.activePass == pass_id ? true : false;
+
         let inPort = node.addInPort("In");
         let outPort = node.addOutPort("Out");
         node.setPosition(25 + (i*100),25);
@@ -73,7 +86,7 @@ class Diagram extends React.Component {
 
       models.forEach(item => {
         item.addListener({
-          selectionChanged: (e) => { console.log(e); }
+          selectionChanged: (e) => this.handlePassSelect(e)
         });
       });
     }

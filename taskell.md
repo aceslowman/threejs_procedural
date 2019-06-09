@@ -32,9 +32,10 @@
     > Storm React Diagrams should work well as a backbone of a shader graph display, but I am yet to figure out a simple configuration that works for me. It looks extensible enough tho... j
     * [x] Create a new Diagram panel, an expandable drawer along the bottom of the Sketch panel
     * [x] Get a number of adjustable parameters to display on the Widget. (I actually should be able to do this using a custom widget)
-    * [ ] Change currently displayed diagram based on selected map. This might require a closer pairing of the Diagram and the GUI.
+    * [x] Change currently displayed diagram based on selected map. This might require a closer pairing of the Diagram and the GUI.
     * [x] Disable panning, so that orbitControls still function.
     * [x] Diagram assembly is being triggered twice as much as it should
+    * [ ] open / highlight current pass in MapTools and diagram
 
 ## Done
 

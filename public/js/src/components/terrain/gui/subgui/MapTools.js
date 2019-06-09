@@ -24,10 +24,10 @@ const styles = theme => ({
     root: {
         padding: '16px !important',
         margin: '4px 4px 16px 4px',
-        border: '1px solid white'
+        border: '1px solid rgba(255, 255, 255, 0.12);'
     },
     highlighted: {
-        border: '3px solid blue'
+        border: '1px solid rgba(255,255,255,0.6)'
     },
     type: {
         padding: '8px 0px'
@@ -38,23 +38,27 @@ class MapTools extends React.Component {
     constructor(props) {
         super(props);
 
+        this.passes = [];
+
         this.state = {
             selected: false
         }
     }
 
     handleClick(){
-        // console.log('hellllllo');
-        // this.setState({ selected: !this.state.selected});
         this.props.selectMap(this.props.map);
-        // change border width
+    }
 
-        // console.log(styles)
+    handlePassSelect(id) {
+        this.props.selectPass(id);
     }
 
     componentDidMount() {
-        // console.log(this.mount);
-        // this.mount.addEventListener('mousedown', () => this.handleClick());
+        this.assembleControls();
+    }
+
+    componentDidUpdate() {
+        this.assembleControls();
     }
 
     assembleControls() {
@@ -149,8 +153,10 @@ class MapTools extends React.Component {
                 }
             }
 
+            console.log([this.props.diagrams.activePass, map.passes[p]])
+
             passes.push(
-                <ExpansionPanel key={p}>
+                <ExpansionPanel key={map.passes[p]} expanded={this.props.diagrams.activePass == map.passes[p] ? true : false} onClick={(e)=>this.handlePassSelect(map.passes[p])}>
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                         <Typography variant="h5" className={classes.heading}>{pass.name}</Typography>
                     </ExpansionPanelSummary>
@@ -171,12 +177,11 @@ class MapTools extends React.Component {
             );
         }
         
-        return passes;
+        this.passes = passes;
     }
 
     render() {
         const {classes} = this.props;
-        let passes = this.assembleControls();
 
         return (
             <Paper className={`${classes.root} ${this.props.selected ? classes.highlighted : ''}`} ref={mount => { this.mount = mount }} onClick={() => this.handleClick()}>
@@ -184,7 +189,7 @@ class MapTools extends React.Component {
                     <Grid item xs={12}>
                         <Typography className={classes.type} variant="h5">{this.props.map.name}</Typography>
                     </Grid>
-                    {passes}
+                    {this.passes}
                 </Grid>
             </Paper>
         );
