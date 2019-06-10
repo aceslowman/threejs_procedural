@@ -36,6 +36,11 @@
     * [x] Disable panning, so that orbitControls still function.
     * [x] Diagram assembly is being triggered twice as much as it should
     * [ ] open / highlight current pass in MapTools and diagram
+    * [ ] Should I attempt to store all diagrams, and then switch between them? Instead of generating them on the fly? I'm having listener issues, and this might simplify.
+- Incorporate WebGL classes into React classes. (this way, all logic for the store is condensed)
+    > This feels a little odd, conflating the WebGL classes with the React Components, but React is calling the shots here, structurally. This will simplify subscription, and likely improve efficiency, especially as the app scales.
+    * [ ] Condense Terrain
+    * [ ] Condense Camera
 
 ## Done
 

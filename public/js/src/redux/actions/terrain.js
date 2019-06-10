@@ -7,3 +7,14 @@ export function addTerrain(terrain){
         }
     });
 };
+
+export const updateTerrain = (param, val) => {
+    return ({
+        type: 'UPDATE_TERRAIN',
+        param: param,
+        value: val,
+        meta: {
+            throttle: 40
+        }
+    });
+}

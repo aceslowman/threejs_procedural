@@ -1,21 +1,19 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 
+import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import Paper from '@material-ui/core/Paper';
-import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
 import InputLabel from '@material-ui/core/InputLabel';
 import Typography from '@material-ui/core/Typography';
 import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions';
-
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-
 import UpIcon from '@material-ui/icons/KeyboardArrowUp';
 import DownIcon from '@material-ui/icons/KeyboardArrowDown';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -53,13 +51,9 @@ class MapTools extends React.Component {
         this.props.selectPass(id);
     }
 
-    componentDidMount() {
-        this.assembleControls();
-    }
+    componentWillMount() { this.assembleControls() }
 
-    componentDidUpdate() {
-        this.assembleControls();
-    }
+    componentDidUpdate() { this.assembleControls() }
 
     assembleControls() {
         const { classes } = this.props;
@@ -153,8 +147,6 @@ class MapTools extends React.Component {
                 }
             }
 
-            console.log([this.props.diagrams.activePass, map.passes[p]])
-
             passes.push(
                 <ExpansionPanel key={map.passes[p]} expanded={this.props.diagrams.activePass == map.passes[p] ? true : false} onClick={(e)=>this.handlePassSelect(map.passes[p])}>
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
@@ -170,8 +162,8 @@ class MapTools extends React.Component {
                     </ExpansionPanelDetails>
                     <ExpansionPanelActions>
                         <IconButton disabled size="small"><DeleteIcon /></IconButton>
-                        <IconButton disabled size="small"><UpIcon /></IconButton>
-                        <IconButton disabled size="small"><DownIcon /></IconButton>
+                        {/* <IconButton disabled size="small"><UpIcon /></IconButton>
+                        <IconButton disabled size="small"><DownIcon /></IconButton> */}
                     </ExpansionPanelActions>
                 </ExpansionPanel>
             );

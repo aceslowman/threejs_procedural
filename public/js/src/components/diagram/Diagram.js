@@ -1,17 +1,13 @@
 import React from 'react';
 import { DiagramEngine, DiagramModel, DefaultNodeModel, LinkModel, DiagramWidget, PortModel } from "storm-react-diagrams";
 
-// Material UI
-import { withStyles } from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
-import { SwipeableDrawer } from '@material-ui/core';
-
 require("storm-react-diagrams/dist/style.min.css");
 
 class Diagram extends React.Component {
   constructor(props) {
     super(props);
 
+    // TODO: store an array of models, which contain nodes and links
     this.nodes = [];
     this.links = [];
 
@@ -21,7 +17,10 @@ class Diagram extends React.Component {
     };
   }
   
-  componentDidMount(){
+  componentWillMount(){
+    this.engine = new DiagramEngine();
+    this.engine.installDefaultFactories();
+
     this.assembleDiagram();
   }
 
@@ -37,6 +36,7 @@ class Diagram extends React.Component {
   }
 
   handlePassSelect(e){
+    console.log('hit');
     this.props.selectPass(e.entity.id);
   }
 
@@ -72,16 +72,9 @@ class Diagram extends React.Component {
         prevOutPort = outPort;
         i++;
       }
-    }
-  }
 
-  render() {
-    const engine = new DiagramEngine();
-    engine.installDefaultFactories();
+      let model = new DiagramModel();
 
-    let model = new DiagramModel();
-
-    if(this.state.currentMap){
       let models = model.addAll(...this.nodes, ...this.links);
 
       models.forEach(item => {
@@ -89,16 +82,18 @@ class Diagram extends React.Component {
           selectionChanged: (e) => this.handlePassSelect(e)
         });
       });
-    }
 
-    engine.setDiagramModel(model);
+      this.engine.setDiagramModel(model);
+    } 
+  }
 
+  render() {
     return (
       <div>
         {this.state.open && 
         (<div className="diagramContainer">
           <h3>{this.state.currentMap.name}</h3>
-          <DiagramWidget className="srd-demo-canvas" diagramEngine={engine} allowLooseLinks={false} />
+          <DiagramWidget className="srd-demo-canvas" diagramEngine={this.engine} allowLooseLinks={false} />
         </div>)}
       </div>
     );

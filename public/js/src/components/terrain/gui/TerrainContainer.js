@@ -1,71 +1,20 @@
 import { connect } from 'react-redux';
 import Terrain from './Terrain';
 
+import { updateTerrain } from '../../../redux/actions/terrain';
+
 import { selectPass } from '../../../redux/actions/diagrams';
 
-// TODO: break up into terrain reducer
+import { 
+  updatePassParam, 
+  updatePassDefine, 
+  updatePassUniform 
+} from '../../../redux/actions/passes';
 
-const updatePassParam = (pId, param, val) => {
-  console.log([pId, param, val]);
-  return ({
-    type: 'UPDATE_PASS_PARAM',
-    passId: pId,
-    param: param,
-    value: val,
-    meta: {
-      throttle: 40
-    }
-  });
-}
-
-const updatePassDefine = (pId, dId, val) => {
-  return ({
-    type: 'UPDATE_PASS_DEFINE',
-    passId: pId,
-    defineId: dId,
-    value: val,
-    meta: {
-      throttle: 40
-    }
-  });
-};
-
-const updatePassUniform = (pId, uId, val) => {
-  return ({
-    type: 'UPDATE_PASS_UNIFORM',
-    passId: pId,
-    uniformId: uId,
-    value: val,
-    meta: {
-      throttle: 40
-    }
-  });
-};
-
-const updateTerrain = (param, val) => {
-  return ({
-    type: 'UPDATE_TERRAIN',
-    param: param,
-    value: val,
-    meta: {
-      throttle: 40
-    }
-  });
-}
-
-const updateDiagramActiveMap = (map) => {
-  return ({
-    type: 'SET_ACTIVE_MAP',
-    map: map
-  });
-}
-
-const updateDiagramActivePass = (pass) => {
-  return ({
-    type: 'SET_ACTIVE_PASS',
-    pass: pass
-  });
-}
+import { 
+  updateDiagramActiveMap, 
+  updateDiagramActivePass 
+} from '../../../redux/actions/diagrams';
 
 const mapStateToProps = state => {
   const { terrain, maps, passes, diagrams } = state;

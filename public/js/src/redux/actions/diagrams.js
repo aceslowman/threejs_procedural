@@ -4,3 +4,17 @@ export const selectPass = passId => {
         id: passId
     });
 }
+
+export const updateDiagramActiveMap = (map) => {
+    return ({
+        type: 'SET_ACTIVE_MAP',
+        map: map
+    });
+}
+
+export const updateDiagramActivePass = (pass) => {
+    return ({
+        type: 'SET_ACTIVE_PASS',
+        pass: pass
+    });
+}

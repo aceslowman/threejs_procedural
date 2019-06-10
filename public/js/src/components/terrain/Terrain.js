@@ -30,13 +30,6 @@ export default class Terrain {
 
         store.dispatch(addTerrain(this));
 
-        //TEMP:
-        // connecting to store.
-        // observeStore(store, getTerrain, (v)=> this.updateTerrain(v));
-        // observeStore(store, getPasses, (v)=> this.updatePasses(v));
-
-        //TEMP:
-        // also trying redux-watch
         let watchPasses = watch(() => getPasses(store.getState()));
         store.subscribe(watchPasses(this.updatePasses));
     }

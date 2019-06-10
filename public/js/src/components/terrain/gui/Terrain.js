@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter, Route, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 
 import MapTools from './subgui/MapTools';
@@ -19,7 +19,6 @@ class Terrain extends React.Component {
   }
 
   handleMapSelect(map){ 
-    console.log('selecting map...');
     this.props.updateDiagramActiveMap(map)
   }
 
@@ -38,7 +37,6 @@ class Terrain extends React.Component {
   }
 
   render() {
-    this.assembleMaps();
     const {classes} = this.props;
 
     return (

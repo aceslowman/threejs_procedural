@@ -36,9 +36,7 @@ class GUI extends React.Component {
   };
 
   render() {
-    console.log(this.props)
     return (
-
         <Drawer 
           id="GUI"
           variant="permanent"
