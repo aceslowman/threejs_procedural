@@ -5,9 +5,13 @@ import { Provider } from 'react-redux'
 
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 
-import Sketch from './components/sketch/SketchContainer';
-import GUI from './components/gui/GUI';
+import GUI from './components/GUI';
 import Diagram from './components/diagram/DiagramContainer';
+
+import * as THREE from 'three';
+import Stats from "stats-js";
+import Camera from './components/camera/CameraContainer';
+import Terrain from './components/terrain/TerrainContainer';
 
 import store from './redux/store';
 
@@ -36,9 +40,116 @@ class App extends React.Component {
   constructor(props){
     super(props);
 
+    this.clock    = new THREE.Clock();
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.scene    = new THREE.Scene();
+
+    this.entities = [];
+
     this.state = {
-      sketchReady: false
+      allReady: false,
+      cameraReady: false,
+      terrainReady: false
     }
+  }
+
+  setupStats() {
+    this.stats = new Stats();
+    this.stats.domElement.style.position = 'absolute';
+    this.stats.domElement.style.right = '0px';
+    this.stats.domElement.style.left = '';
+    this.stats.domElement.style.bottom = '0px';
+    this.stats.domElement.style.top = '';
+    this.stats.domElement.style.display = 'visible';
+    document.getElementById('APP').appendChild(this.stats.domElement);
+  }
+
+  handleCameraReady(cam) {
+    this.camera = cam;
+    this.setState({cameraReady: true});
+  }
+
+  handleTerrainReady(terrain){
+    this.terrain = terrain;
+    this.setState({terrainReady: true});
+  }
+
+  //LIFECYCLE-----------------------------------------------------
+  componentDidMount() {
+    this.width = this.mount.clientWidth;
+    this.height = this.mount.clientHeight;
+
+    this.camera.aspect = this.width / this.height;
+    this.camera.updateProjectionMatrix();
+
+    this.renderer.setSize(this.width, this.height);
+    this.mount.appendChild(this.renderer.domElement);
+
+    this.registerListeners();
+    this.setupStats();
+    this.start();
+  }
+
+  componentDidUpdate(){
+    if(this.state.cameraReady){
+      console.log('CAMERA READY!');
+    }
+
+    if(this.state.terrainReady){
+      console.log('TERRAIN READY!');
+    }
+  }
+
+  componentWillUnmount() {
+    this.removeListeners();
+    this.stop();
+    this.mount.removeChild(this.renderer.domElement);
+  }
+
+  //LISTENERS-----------------------------------------------------
+  registerListeners(){
+    window.addEventListener('resize', this.handleResize);
+  }
+
+  removeListeners(){
+    window.removeEventListener('resize', this.handleResize);
+  }
+
+  handleResize = () => {
+    this.width = this.mount.clientWidth;
+    this.height = this.mount.clientHeight;
+
+    this.camera.aspect = this.width / this.height;
+    this.camera.updateProjectionMatrix();
+
+    this.renderer.setSize(this.width, this.height);
+  }
+
+  //--------------------------------------------------------------
+  start = () => {
+    if (!this.frameId) this.frameId = requestAnimationFrame(this.animate);
+  }
+
+  stop = () => {
+    cancelAnimationFrame(this.frameId);
+  }
+
+  animate = () => {
+    this.renderScene();
+    this.frameId = window.requestAnimationFrame(this.animate);
+  }
+
+  renderScene = () => {
+    this.stats.begin();
+
+    for (let i = 0; i < this.entities.length; i++) {
+      this.entities[i].update();
+    }
+
+    this.renderer.render(this.scene, this.camera);
+
+    this.terrain.update();
+    this.stats.end();
   }
 
   handleSketchReady(){
@@ -51,17 +162,34 @@ class App extends React.Component {
         <MuiThemeProvider theme={theme}>
           <Provider store={store}>
             <div className="container">
-              {/* {this.state.sketchReady && <GUI /> } */}
-              <GUI ready={this.state.sketchReady}/>
+              <GUI ready={this.state.sketchReady}>
+                {<Camera 
+                  renderer={this.renderer} 
+                  width={this.width} 
+                  height={this.height} 
+                  cameraUpdate={(c) => this.handleCameraUpdate(c)} 
+                  cameraReady={(c) => this.handleCameraReady(c)} 
+                />}
+                {<Terrain 
+                  renderer={this.renderer} 
+                  scene={this.scene} 
+                  width={512} 
+                  height={512} 
+                  detail={512} 
+                  amplitude={150} 
+                  terrainReady={(t) => this.handleTerrainReady(t)} 
+                />}
+              </GUI>
               <div id="SKETCHCONTAINER">
-                <Sketch onReady={() => this.handleSketchReady()} />
-                {this.state.sketchReady && <Diagram />}
+                <div id="APP" ref={mount => { this.mount = mount }} />
+                <Diagram ready={this.state.sketchReady} />
               </div>
             </div>
           </Provider>
         </MuiThemeProvider>
-      </HashRouter>)
-    }
+      </HashRouter>
+    )
+  }
 }
 
 ReactDOM.render(

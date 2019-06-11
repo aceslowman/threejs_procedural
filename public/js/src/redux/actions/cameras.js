@@ -1,3 +1,15 @@
+export const updateCamera = (camId, param, val) => {
+    return ({
+        type: 'UPDATE_CAMERA',
+        cameraId: camId,
+        param: param,
+        value: val,
+        meta: {
+            throttle: 40
+        }
+    });
+};
+
 export function changeView(view){
     return ({
         type: 'CHANGE_VIEW',

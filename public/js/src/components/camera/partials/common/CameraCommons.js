@@ -14,6 +14,16 @@ const styles = theme => ({
 class CameraCommons extends React.Component {
     constructor(props) {
         super(props);
+
+        this.state = {
+            zoom: props.camera.zoom
+        }
+    }
+
+    setZoom(v){
+        this.props.camera.zoom = v;
+        this.props.camera.updateProjectionMatrix();
+        this.setState({zoom: v});
     }
     
     render(){
@@ -29,15 +39,15 @@ class CameraCommons extends React.Component {
                         variant="filled"
                         margin="dense"
                         style={styles.textfield}
-                        value={this.props.camera.object.zoom}
-                        onChange={(e) => this.props.updateCamera(this.props.camera.object.uuid, 'zoom', e.target.value)}
+                        value={this.props.camera.zoom}
+                        onChange={(e) => this.setZoom(e.target.value)}
                     />
                     <Slider
                         id="zoom"
                         min={0}
                         max={10}
-                        value={Number(this.props.camera.object.zoom)}
-                        onChange={(e, v) => this.props.updateCamera(this.props.camera.object.uuid, 'zoom', v)}
+                        value={Number(this.props.camera.zoom)}
+                        onChange={(e, v) => this.setZoom(v)}
                     />
                 </Grid>
             </div>

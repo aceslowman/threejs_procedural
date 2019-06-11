@@ -1,20 +1,20 @@
 import { connect } from 'react-redux';
 import Terrain from './Terrain';
 
-import { updateTerrain } from '../../../redux/actions/terrain';
-
-import { selectPass } from '../../../redux/actions/diagrams';
+import { updateTerrain } from '../../redux/actions/terrain';
+import { addMap } from '../../redux/actions/maps';
 
 import { 
   updatePassParam, 
   updatePassDefine, 
   updatePassUniform 
-} from '../../../redux/actions/passes';
+} from '../../redux/actions/passes';
 
 import { 
+  selectPass,
   updateDiagramActiveMap, 
   updateDiagramActivePass 
-} from '../../../redux/actions/diagrams';
+} from '../../redux/actions/diagrams';
 
 const mapStateToProps = state => {
   const { terrain, maps, passes, diagrams } = state;
@@ -46,7 +46,10 @@ const mapDispatchToProps = dispatch => ({
     dispatch(updateDiagramActivePass(pass));
   },
   selectPass: (passId) => {
-    dispatch(selectPass(passId))
+    dispatch(selectPass(passId));
+  },
+  addMap: (map, name) => {
+    dispatch(addMap(map, name));
   }
 });
 

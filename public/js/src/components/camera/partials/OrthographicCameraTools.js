@@ -1,6 +1,6 @@
 import React from 'react';
-import CameraCommons from '../common/CameraCommons'
-import CameraViews from '../common/CameraViews';
+import CameraCommons from './common/CameraCommons'
+import CameraViews from './common/CameraViews';
 
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';

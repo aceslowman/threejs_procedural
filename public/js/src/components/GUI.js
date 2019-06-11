@@ -15,8 +15,8 @@ import Typography from '@material-ui/core/Typography';
 import Navigation from './Navigation';
 
 // CONTAINERS
-import CameraContainer from '../camera/gui/CameraContainer';
-import TerrainContainer from '../terrain/gui/TerrainContainer';
+import CameraContainer from './camera/CameraContainer';
+import TerrainContainer from './terrain/TerrainContainer';
 
 class GUI extends React.Component {
   constructor(props) {
@@ -36,6 +36,8 @@ class GUI extends React.Component {
   };
 
   render() {
+    console.log(this.props.children);
+
     return (
         <Drawer 
           id="GUI"
@@ -77,13 +79,15 @@ class GUI extends React.Component {
           <Navigation handleDrawerClose={() => this.handleDrawerClose()} handleDrawerOpen={() => this.handleDrawerOpen()} />
           <Divider />
 
-          {this.props.ready && (
+          {/* {this.props.ready && (
             <div id="subwrapper" style={{ display: this.state.open ? 'block' : 'none' }}>
               <Route path="/" exact component={CameraContainer} />
               <Route path="/camera/" component={CameraContainer} />
               <Route path="/terrain/" component={TerrainContainer} />
             </div>
-          )}
+          )} */}
+
+          {this.props.children}
 
         </Drawer>
     );

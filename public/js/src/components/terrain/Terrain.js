@@ -1,3 +1,9 @@
+import React from 'react';
+import { withRouter } from 'react-router-dom';
+import { withStyles } from '@material-ui/core/styles';
+
+import MapTools from './partials/MapTools';
+
 import * as THREE from 'three';
 
 import ProceduralMap from '../../procedural/ProceduralMap';
@@ -5,181 +11,201 @@ import ProceduralMap from '../../procedural/ProceduralMap';
 import FractalNoise from "../../shaders/fractalnoise.js";
 import FractalWarp from "../../shaders/fractalwarp.js";
 
-import store, {observeStore} from '../../redux/store';
-import {getTerrain, getPasses} from '../../redux/selectors'; 
-import {addMap} from '../../redux/actions/maps';
-import {addTerrain} from '../../redux/actions/terrain';
-import watch from 'redux-watch';
+const styles = theme => ({
+  root: {
+    padding: 8,
+    margin: '4px 4px 16px 4px'
+  }
+});
 
-import { diff } from 'deep-object-diff';
+class Terrain extends React.Component {
+  constructor(props) {
+    super(props);
 
-export default class Terrain {
-    constructor(renderer, scene, options){
-        this.renderer  = renderer;
-        this.scene     = scene;
+    this.renderer = props.renderer;
+    this.scene = props.scene;
 
-        this.width     = options.width;
-        this.height    = options.height;
-        this.detail    = options.detail;
-        this.amplitude = options.amplitude;
-        this.seed      = Math.random() * 10000;        
+    this.width = props.width;
+    this.height = props.height;
+    this.detail = props.detail;
+    this.amplitude = props.amplitude;
+    this.seed = Math.random() * 10000;
 
-        this.verbose = false;
+    this.verbose = false;
 
-        this.initialize();
+    this.initialize();
 
-        store.dispatch(addTerrain(this));
+    this.state = {
+      ready: false
+    }
+  }
 
-        let watchPasses = watch(() => getPasses(store.getState()));
-        store.subscribe(watchPasses(this.updatePasses));
+  componentDidMount() {
+    this.ready();
+  }
+
+  ready() {
+    this.setState({ ready: true });
+    this.props.terrainReady(this);
+  }
+
+  initialize() {
+    this.initializeElevation();
+    this.initializeColors();
+    this.initializeMesh();
+
+    this.setupDebug();
+  }
+
+  initializeElevation() {
+    let map = new ProceduralMap(this.renderer, {
+      width: this.width,
+      height: this.height
+    });
+
+    let passes = [
+      new FractalNoise(8, this.seed),
+      new FractalWarp(4, this.seed)
+    ];
+
+    for (let pass of passes) {
+      let p = new THREE.ShaderPass(pass.shaderMaterial);
+      map.composer.addPass(p);
     }
 
-    updateTerrain(value){
-        console.log('terrain changed', value);
+    map.composer.swapBuffers();
+    map.render();
+
+    this.elevation = map;
+    this.props.addMap(map, 'Elevation');
+  }
+
+  initializeColors() {
+    let map = new ProceduralMap(this.renderer, {
+      width: this.width,
+      height: this.height
+    });
+
+    let passes = [
+      new FractalNoise(8, this.seed),
+      new FractalWarp(4, this.seed),
+      // TODO: implement a lookup table shader!
+    ];
+
+    for (let pass of passes) {
+      let p = new THREE.ShaderPass(pass.shaderMaterial);
+      map.composer.addPass(p);
     }
 
-    updatePasses(newPasses, oldPasses) {
-        console.log('newVal', newPasses);
-        console.log('oldVal', oldPasses);
+    map.composer.swapBuffers();
+    map.render();
 
-        let d = diff(oldPasses, newPasses);
+    this.colors = map;
+    this.props.addMap(map, 'Colors');
+  }
 
-        console.log('DIFF',d);
+  initializeMesh() {
+    this.geometry = new THREE.PlaneBufferGeometry(
+      this.width,
+      this.height,
+      this.detail,
+      this.detail
+    );
+
+    this.displaceGeometry();
+
+    // this.material = new THREE.MeshBasicMaterial({
+    //     map: this.colors.target,
+    // });
+
+    this.material = new THREE.MeshNormalMaterial();
+
+    this.mesh = new THREE.Mesh(this.geometry, this.material);
+
+    this.scene.add(this.mesh);
+  }
+
+  update() {
+    this.elevation.render();
+  }
+
+  setupDebug() {
+    var helper = new THREE.Box3Helper(this.geometry.boundingBox, 0xffff00);
+    this.scene.add(helper);
+  }
+
+  displaceGeometry() {
+    const displacement_buffer = this.elevation.getBufferArray();
+    const positions = this.geometry.getAttribute('position').array;
+    const uvs = this.geometry.getAttribute('uv').array;
+    const count = this.geometry.getAttribute('position').count;
+
+    for (let i = 0; i < count; i++) {
+      const u = uvs[i * 2];
+      const v = uvs[i * 2 + 1];
+      const x = Math.floor(u * (this.elevation.width - 1.0));
+      const y = Math.floor(v * (this.elevation.height - 1.0));
+      const d_index = (y * this.elevation.height + x) * 4;
+      let r = displacement_buffer[d_index];
+
+      positions[i * 3 + 2] = (r * this.amplitude);
+
+      if (!r) {
+        // TODO: implement some sort of check that prevents this.
+        console.warn('cannot find value in displacement buffer');
+      }
     }
 
-    initializeElevation(){
-        let map = new ProceduralMap(this.renderer, {
-            width: this.width,
-            height: this.height
-        });
+    this.geometry.getAttribute('position').needsUpdate = true;
+    this.geometry.computeVertexNormals();
+    this.geometry.computeFaceNormals();
+    this.geometry.computeBoundingBox();
+    this.geometry.computeBoundingSphere();
 
-        let passes = [
-            new FractalNoise(8, this.seed),
-            new FractalWarp(4, this.seed)
-        ];
+    this.geometry.translate(0, 0, -this.geometry.boundingBox.min.z);
+  }
 
-        for (let pass of passes) {
-            let p = new THREE.ShaderPass(pass.shaderMaterial);
-            map.composer.addPass(p);
-        }
+  globalBoundsCheck(a) {
+    let h_w = (this.width / 2);
+    let h_h = (this.height / 2);
 
-        map.composer.swapBuffers();
-        map.render();
-
-        this.elevation = map;
-        store.dispatch(addMap(map, 'Elevation'));
+    if (a.x >= h_w || a.x <= -h_w || a.y >= h_h || a.y <= -h_h) {
+      if (this.verbose) console.warn('endpoint was out of bounds', a);
+      return false;
     }
 
-    initializeColors(){
-        let map = new ProceduralMap(this.renderer, {
-            width: this.width,
-            height: this.height
-        });
+    return true;
+  }
 
-        let passes = [
-            new FractalNoise(8, this.seed),
-            new FractalWarp(4, this.seed),
-            // TODO: implement a lookup table shader!
-        ];
+  // GUI ----------------------------------------------------------------
 
-        for (let pass of passes) {
-            let p = new THREE.ShaderPass(pass.shaderMaterial);
-            map.composer.addPass(p);
-        }
+  handleMapSelect(map){ 
+    this.props.updateDiagramActiveMap(map)
+  }
 
-        map.composer.swapBuffers();
-        map.render();
+  assembleMaps(){
+    let maps = [];
 
-        this.colors = map;
-        store.dispatch(addMap(map, 'Colors'));
+    for(let m in this.props.maps){
+      let map = this.props.maps[m];
+      let selected;
+      this.props.diagrams && this.props.diagrams.activeMap == m ? selected = true : selected = false; 
+
+      maps.push(<MapTools key={m} map={map} {...this.props} selected={selected} selectMap={(e)=>this.handleMapSelect(e)}/>);
     }
 
-    initializeMesh() {
-        this.geometry = new THREE.PlaneBufferGeometry(
-            this.width,
-            this.height,
-            this.detail,
-            this.detail
-        );
+    return maps;
+  }
 
-        this.displaceGeometry();
+  render() {
+    const {classes} = this.props;
 
-        // this.material = new THREE.MeshBasicMaterial({
-        //     map: this.colors.target,
-        // });
-
-        this.material = new THREE.MeshNormalMaterial();
-
-        this.mesh = new THREE.Mesh(this.geometry, this.material);
-
-        this.scene.add(this.mesh);
-    }
-
-    initialize(){
-        this.initializeElevation();
-        this.initializeColors();
-        this.initializeMesh();
-
-        this.setupDebug();
-    }
-
-    update(){
-        this.elevation.render();
-    }
-
-    setupDebug() {
-        var helper = new THREE.Box3Helper(this.geometry.boundingBox, 0xffff00);
-        this.scene.add(helper);
-    }
-
-    /**
-    * Displace the buffer geometry using a given Map
-    */
-    displaceGeometry() {
-        const displacement_buffer = this.elevation.getBufferArray();
-        const positions = this.geometry.getAttribute('position').array;
-        const uvs = this.geometry.getAttribute('uv').array;
-        const count = this.geometry.getAttribute('position').count;
-
-        for (let i = 0; i < count; i++) {
-            const u = uvs[i * 2];
-            const v = uvs[i * 2 + 1];
-            const x = Math.floor(u * (this.elevation.width - 1.0));
-            const y = Math.floor(v * (this.elevation.height - 1.0));
-            const d_index = (y * this.elevation.height + x) * 4;
-            let r = displacement_buffer[d_index];
-
-            positions[i * 3 + 2] = (r * this.amplitude);
-
-            if (!r) {
-                // TODO: implement some sort of check that prevents this.
-                console.warn('cannot find value in displacement buffer');
-            }
-        }
-
-        this.geometry.getAttribute('position').needsUpdate = true;
-        this.geometry.computeVertexNormals();
-        this.geometry.computeFaceNormals();
-        this.geometry.computeBoundingBox();
-        this.geometry.computeBoundingSphere();
-
-        this.geometry.translate(0, 0, -this.geometry.boundingBox.min.z);
-    }
-
-    /**
-    * Checks to see if a given point is within bounds of the terrain.
-    * @param {Vector2} a - the point to be checked
-    * @returns {Boolean} true if within bounds, false if not
-    */
-    globalBoundsCheck(a) {
-        let h_w = (this.width / 2);
-        let h_h = (this.height / 2);
-
-        if (a.x >= h_w || a.x <= -h_w || a.y >= h_h || a.y <= -h_h) {
-            if (this.verbose) console.warn('endpoint was out of bounds', a);
-            return false;
-        }
-
-        return true;
-    }
+    return (
+      <div className="subnavigation">
+        {this.assembleMaps()}
+      </div>
+    );
+  }
 }
+
+export default withStyles(styles)(withRouter(Terrain));
