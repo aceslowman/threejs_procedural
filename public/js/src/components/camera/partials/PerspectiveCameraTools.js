@@ -1,6 +1,4 @@
 import React from 'react';
-import CameraCommons from './common/CameraCommons';
-import CameraViews from './common/CameraViews';
 
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
@@ -26,34 +24,41 @@ const styles = theme => ({
 class PerspectiveCameraTools extends React.Component {
     constructor(props) {
         super(props);
+
+        this.state = {
+            focalLength: props.camera.getFocalLength()
+        };
+    }
+
+    setFocalLength(v) {
+        this.props.camera.setFocalLength(v);
+        this.setState({focalLength: this.props.camera.getFocalLength()})
     }
 
     render() {
         const {classes} = this.props;
 
         return (
-            <React.Fragment>
-                <Grid item xs={12}>
-                    <TextField
-                        fullWidth
-                        id="focal_length-number"
-                        label="Focal Length"
-                        type="number"
-                        variant="filled"
-                        margin="dense"
-                        style={styles.textfield}
-                        // value={this.props.camera.focalLength}
-                        onChange={(e) => this.props.updateCamera(this.props.camera.name, 'focalLength', e.target.value)}
-                    />
-                    <Slider
-                        id="focal_length"
-                        min={0}
-                        max={75}
-                        // value={Number(this.props.camera.focalLength)}
-                        onChange={(e, v) => this.props.updateCamera(this.props.camera.name, 'focalLength', v)}
-                    />
-                </Grid>
-            </React.Fragment>
+            <Grid item xs={12}>
+                <TextField
+                    fullWidth
+                    id="focal_length-number"
+                    label="Focal Length"
+                    type="number"
+                    variant="filled"
+                    margin="dense"
+                    style={styles.textfield}
+                    value={this.state.focalLength}
+                    onChange={(e) => this.setFocalLength(e.target.value)}
+                />
+                <Slider
+                    id="focal_length"
+                    min={0}
+                    max={75}
+                    value={Number(this.state.focalLength)}
+                    onChange={(e, v) => this.setFocalLength(v)}
+                />
+            </Grid>
         );
     }
 };
