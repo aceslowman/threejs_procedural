@@ -43,7 +43,8 @@
     * [x] Condense Camera
     * [x] Use App.js as the new Sketch.js
     * [ ] Reconnect Redux to the Terrain
-    * [ ] Reconnect Redux to the Camera
+    * [x] Reconnect Redux to the Camera
+    * [x] Fix issue where Ortho cam is not displaying terrain properly. This is caused by the camera frustum not receiving valid initial inputs.
 
 ## Done
 

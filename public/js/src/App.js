@@ -44,12 +44,19 @@ class App extends React.Component {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.scene    = new THREE.Scene();
 
+    //TEMP
+    this.renderer.setClearColor('blue');
+
     this.entities = [];
 
     this.state = {
       allReady: false,
       cameraReady: false,
-      terrainReady: false
+      terrainReady: false,
+      canvasReady: false,
+      width: '',
+      height: '',
+      startFlag: false
     }
   }
 
@@ -69,6 +76,10 @@ class App extends React.Component {
     this.setState({cameraReady: true});
   }
 
+  handleCameraChange(cam) {
+    this.camera = cam;
+  }
+
   handleTerrainReady(terrain){
     this.terrain = terrain;
     this.setState({terrainReady: true});
@@ -76,18 +87,21 @@ class App extends React.Component {
 
   //LIFECYCLE-----------------------------------------------------
   componentDidMount() {
-    this.width = this.mount.clientWidth;
-    this.height = this.mount.clientHeight;
+    let width = this.mount.clientWidth;
+    let height = this.mount.clientHeight;
 
-    this.camera.aspect = this.width / this.height;
-    this.camera.updateProjectionMatrix();
-
-    this.renderer.setSize(this.width, this.height);
+    this.renderer.setSize(width, height);
     this.mount.appendChild(this.renderer.domElement);
 
     this.registerListeners();
     this.setupStats();
-    this.start();
+
+    this.setState({ 
+      width: this.mount.clientWidth, 
+      height: this.mount.clientHeight,
+      canvasReady: true,
+      startFlag: true 
+    });
   }
 
   componentDidUpdate(){
@@ -97,6 +111,11 @@ class App extends React.Component {
 
     if(this.state.terrainReady){
       console.log('TERRAIN READY!');
+    }
+
+    if(this.state.startFlag){
+      this.start();
+      this.setState({startFlag: false})
     }
   }
 
@@ -116,13 +135,15 @@ class App extends React.Component {
   }
 
   handleResize = () => {
-    this.width = this.mount.clientWidth;
-    this.height = this.mount.clientHeight;
+    let width = this.mount.clientWidth;
+    let height = this.mount.clientHeight;
 
-    this.camera.aspect = this.width / this.height;
-    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(width, height);
 
-    this.renderer.setSize(this.width, this.height);
+    this.setState({ 
+      width: this.mount.clientWidth, 
+      height: this.mount.clientHeight 
+    });
   }
 
   //--------------------------------------------------------------
@@ -145,7 +166,7 @@ class App extends React.Component {
     for (let i = 0; i < this.entities.length; i++) {
       this.entities[i].update();
     }
-
+    
     this.renderer.render(this.scene, this.camera);
 
     this.terrain.update();
@@ -163,14 +184,15 @@ class App extends React.Component {
           <Provider store={store}>
             <div className="container">
               <GUI ready={this.state.sketchReady}>
-                {<Camera 
+                {this.state.canvasReady && <Camera 
                   renderer={this.renderer} 
-                  width={this.width} 
-                  height={this.height} 
-                  cameraUpdate={(c) => this.handleCameraUpdate(c)} 
+                  scene={this.scene} 
+                  width={this.state.width} 
+                  height={this.state.height} 
                   cameraReady={(c) => this.handleCameraReady(c)} 
+                  cameraChange={(c) => this.handleCameraChange(c)}
                 />}
-                {<Terrain 
+                {this.state.canvasReady && <Terrain 
                   renderer={this.renderer} 
                   scene={this.scene} 
                   width={512} 
