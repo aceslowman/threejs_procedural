@@ -152,7 +152,7 @@ class Camera extends React.Component {
 
     return (
       <div className="subnavigation">
-        {this.state.ready && (<CameraViews {...this.props} />)}
+        {this.state.ready && (<CameraViews camera={this.state.activeCamera} view="ANGLE" {...this.props} />)}
 
         {this.state.ready && (
         <Paper className={classes.root}>

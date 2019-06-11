@@ -19,6 +19,34 @@ const styles = theme => ({
 class CameraViews extends React.Component {
     constructor(props) {
         super(props);
+
+        this.changeView(props.view);
+
+        this.state = {
+            view: props.view
+        }
+    }
+
+    changeView(view){
+        this.props.camera.up.set(0, 0, 1);
+
+        switch (view) {
+            case 'SIDE':
+                this.props.camera.position.set(1100, 0, 0);
+                this.props.camera.lookAt(0, 0, 0);
+                break;
+            case 'TOP':
+                this.props.camera.position.set(0, 0, 1000);
+                this.props.camera.lookAt(0, 0, 0);
+                break;
+            case 'ANGLE':
+                this.props.camera.position.set(600, 600, 600);
+                this.props.camera.lookAt(0, 0, 0);
+                break;
+        }
+
+        this.props.camera.updateMatrixWorld();
+        this.setState({view: view});
     }
 
     render() {
@@ -36,13 +64,13 @@ class CameraViews extends React.Component {
                         <Typography variant="h6" align="center">Camera Views</Typography>
                     </Grid>
                     <Grid item xs={4}>
-                        <Button onClick={()=>this.props.changeView("SIDE")} fullWidth variant="outlined">Side</Button>
+                        <Button onClick={()=>this.changeView("SIDE")} fullWidth variant="outlined">Side</Button>
                     </Grid>
                     <Grid item xs={4}>
-                        <Button onClick={()=>this.props.changeView("TOP")} fullWidth variant="outlined">Top</Button>
+                        <Button onClick={()=>this.changeView("TOP")} fullWidth variant="outlined">Top</Button>
                     </Grid>
                     <Grid item xs={4}>
-                        <Button onClick={()=>this.props.changeView("ANGLE")} fullWidth variant="outlined">Angle</Button>
+                        <Button onClick={()=>this.changeView("ANGLE")} fullWidth variant="outlined">Angle</Button>
                     </Grid>
                 </Grid>  
             </Paper>
