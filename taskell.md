@@ -21,7 +21,6 @@
 
 ## Doing
 
-- [feature] Allow GUI to filter different navigation elements (terrain, flora, fauna, etc)
 - Connect the Terrain to redux store.
     > The only thing holding me back on this is properly filtering out passes that haven't changed.
     * [ ] update the correct pass with the updated value
@@ -90,6 +89,8 @@
 - Add gui folder to Terrain and Camera
 - Re-enable the Camera GUI
 - Begin implementing Storm React Diagrams
+- [feature] Allow GUI to filter different navigation elements (terrain, flora, fauna, etc)
+    > Current thought: I will initialize the WebGL within the constructor, leaving all react life-cycle methods specific to the GUI being rendered. 
 
 ## Backburner
 

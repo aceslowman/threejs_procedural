@@ -17,7 +17,8 @@ import store from './redux/store';
 
 const theme = createMuiTheme({
   typography: {
-    fontSize: 12
+    fontSize: 12,
+    useNextVariants: true
   },
   spacing: {
     unit: 4
@@ -183,9 +184,8 @@ class App extends React.Component {
         <MuiThemeProvider theme={theme}>
           <Provider store={store}>
             <div className="container">
-              <GUI ready={this.state.canvasReady}>
+              <GUI ready={this.state.sketchReady}>
                 {this.state.canvasReady && <Camera 
-                  // ref="Camera" // to make node accessible within GUI
                   renderer={this.renderer} 
                   scene={this.scene} 
                   width={this.state.width} 
@@ -194,7 +194,6 @@ class App extends React.Component {
                   cameraChange={(c) => this.handleCameraChange(c)}
                 />}
                 {this.state.canvasReady && <Terrain 
-                  // ref="Terrain" // to make node accessible within GUI
                   renderer={this.renderer} 
                   scene={this.scene} 
                   width={512} 

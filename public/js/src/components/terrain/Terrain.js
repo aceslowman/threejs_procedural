@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Route} from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 
 import MapTools from './partials/MapTools';
@@ -162,9 +162,7 @@ class Terrain extends React.Component {
     }
     
     return (
-      <div className="subnavigation">
-        {maps}
-      </div>
+      <Route path="/terrain/" render={() => <React.Fragment>{maps}</React.Fragment>} />
     );
   }
 }

@@ -33,8 +33,8 @@ class GUI extends React.Component {
 
   render() {
     // Below I am attempting to pass my components 
-    // let Camera = this.props.children.filter(a => a.ref == "Camera")[0];
-    // let Terrain = this.props.children.filter(a => a.ref == "Terrain")[0];
+    let Camera = this.props.children.filter(a => a.ref == "Camera")[0];
+    let Terrain = this.props.children.filter(a => a.ref == "Terrain")[0];
 
     // console.log("COMPONENTS", [Camera, Terrain]);
 
@@ -78,20 +78,6 @@ class GUI extends React.Component {
           <Divider />
           <Navigation handleDrawerClose={() => this.handleDrawerClose()} handleDrawerOpen={() => this.handleDrawerOpen()} />
           <Divider />
-
-          {/* 
-            the problem I'm encountering is this:
-
-            I am initializing my webgl 
-          */}
-
-          {/* {this.props.ready && (
-            <div id="subwrapper" style={{ display: this.state.open ? 'block' : 'none' }}>
-              <Route path="/" exact render={()=>Camera} />
-              <Route path="/camera/" render={()=>Camera} />
-              <Route path="/terrain/" render={()=>Terrain} />
-            </div>
-          )} */}
 
           {this.props.children}
 
