@@ -51,30 +51,13 @@ class MapTools extends React.Component {
         this.props.selectPass(id);
     }
 
-    componentWillMount() { 
+    componentDidMount() { 
         this.assembleControls() 
     }
 
-    componentDidUpdate() { 
+    /* for some reason, 'willUpdate' prevents the 'dbl click to change value' issue */
+    componentWillUpdate() { 
         this.assembleControls() 
-    }
-
-    updatePassParam(pass_id, name, value) {
-        console.log('updatePassParam', [pass_id, name, value]);
-
-        // this.props.map.composer.passes[pass_id][name]
-    }
-
-    updatePassDefine(pass_id, name, value) {
-        console.log('updatePassDefine', [pass_id, name, value]);
-
-        // this.props.map.composer.passes[pass_id].defines
-    }
-    
-    updatePassUniform(pass_id, name, value) {
-        console.log('updatePassUniform', [pass_id, name, value]);
-
-        // this.props.map.composer.passes[pass_id].uniforms[name].value = value;
     }
 
     assembleControls() {
@@ -96,7 +79,7 @@ class MapTools extends React.Component {
                     <Checkbox
                         key={`${p}_enabled_input`}
                         checked={pass.enabled}
-                        onChange={(e) => this.updatePassParam(p,'enabled', e.target.checked)}
+                        onChange={(e) => this.props.updatePassParam(map.name,p,'enabled', e.target.checked)}
                     />
                 </Grid>
             );
@@ -107,7 +90,7 @@ class MapTools extends React.Component {
                     <Checkbox
                         key={`${p}_rendertoscreen_input`}
                         checked={pass.renderToScreen}
-                        onChange={(e) => this.updatePassParam(p,'rendertoscreen', e.target.checked)}
+                        onChange={(e) => this.props.updatePassParam(map.name,p,'rendertoscreen', e.target.checked)}
                     />
                 </Grid>
             );
@@ -124,7 +107,7 @@ class MapTools extends React.Component {
                             type="number"
                             variant="filled"
                             margin="dense"
-                            onChange={(e)=>this.updatePassDefine(p,d, e.target.value)}
+                            onChange={(e)=>this.props.updatePassDefine(map.name,p,d, e.target.value)}
                         />
                     </Grid>
                 );
@@ -145,7 +128,7 @@ class MapTools extends React.Component {
                                 type="number"
                                 variant="filled"
                                 margin="dense"
-                                onChange={(e) => this.updatePassUniform(p,u, e.target.value)}
+                                onChange={(e) => this.props.updatePassUniform(map.name,p,u,e.target.value)}
                             />
                         </Grid>
                     );
@@ -180,8 +163,8 @@ class MapTools extends React.Component {
                     </ExpansionPanelDetails>
                     <ExpansionPanelActions>
                         <IconButton disabled size="small"><DeleteIcon /></IconButton>
-                        {/* <IconButton disabled size="small"><UpIcon /></IconButton>
-                        <IconButton disabled size="small"><DownIcon /></IconButton> */}
+                        <IconButton disabled size="small"><UpIcon /></IconButton>
+                        <IconButton disabled size="small"><DownIcon /></IconButton>
                     </ExpansionPanelActions>
                 </ExpansionPanel>
             );

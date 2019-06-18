@@ -42,7 +42,7 @@ class Terrain extends React.Component {
         this.detail
       ),
       maps: {
-        elevation: new ProceduralMap(this.renderer, {
+        Elevation: new ProceduralMap(this.renderer, {
           name: "Elevation",
           width: this.width,
           height: this.height,
@@ -51,7 +51,7 @@ class Terrain extends React.Component {
             new FractalWarp(4, this.seed)
           ]
         }),
-        colors: new ProceduralMap(this.renderer, {
+        Colors: new ProceduralMap(this.renderer, {
           name: "Colors",
           width: this.width,
           height: this.height,
@@ -94,7 +94,7 @@ class Terrain extends React.Component {
   }
 
   update() {
-    this.state.maps.elevation.render();
+    this.state.maps.Elevation.render();
   }
 
   setupDebug() {
@@ -103,7 +103,7 @@ class Terrain extends React.Component {
   }
 
   displaceGeometry() {
-    const displacement_buffer = this.state.maps.elevation.getBufferArray();
+    const displacement_buffer = this.state.maps.Elevation.getBufferArray();
     const positions = this.state.geometry.getAttribute('position').array;
     const uvs = this.state.geometry.getAttribute('uv').array;
     const count = this.state.geometry.getAttribute('position').count;
@@ -111,9 +111,9 @@ class Terrain extends React.Component {
     for (let i = 0; i < count; i++) {
       const u = uvs[i * 2];
       const v = uvs[i * 2 + 1];
-      const x = Math.floor(u * (this.state.maps.elevation.width - 1.0));
-      const y = Math.floor(v * (this.state.maps.elevation.height - 1.0));
-      const d_index = (y * this.state.maps.elevation.height + x) * 4;
+      const x = Math.floor(u * (this.state.maps.Elevation.width - 1.0));
+      const y = Math.floor(v * (this.state.maps.Elevation.height - 1.0));
+      const d_index = (y * this.state.maps.Elevation.height + x) * 4;
       let r = displacement_buffer[d_index];
 
       positions[i * 3 + 2] = (r * this.amplitude);
@@ -151,14 +151,47 @@ class Terrain extends React.Component {
     this.props.updateDiagramActiveMap(map)
   }
 
+  updatePassParam(map_id, pass_id, name, value) {
+    console.log('updatePassParam', [map_id, pass_id, name, value]);
+
+    // this.props.map.composer.passes[pass_id][name]
+  }
+
+  updatePassDefine(map_id, pass_id, name, value) {
+    console.log('updatePassDefine', [map_id, pass_id, name, value]);
+
+    // this.props.map.composer.passes[pass_id].defines
+  }
+
+  updatePassUniform(map_id, pass_id, name, value) {
+    // update uniform
+    this.state.maps[map_id].composer.passes[pass_id].uniforms[name].value = value;
+    
+    // update this specific map (i.e. Elevation or Color)
+    this.state.maps[map_id].render();
+
+    // this is a big bottleneck, but likely unavoidable as long as I'm displacing on the CPU
+    this.displaceGeometry();
+  }
+
   render() {
     const {classes} = this.props;
 
     let maps = [];
 
+    // use map()
     for (let m in this.state.maps) {
       let map = this.state.maps[m];
-      maps.push(<MapTools key={m} map={map} {...this.props} selected={false} selectMap={(e) => this.handleMapSelect(e)} />);
+      maps.push(<MapTools 
+          key={m} 
+          map={map} 
+          {...this.props} 
+          selected={false} 
+          selectMap={(e) => this.handleMapSelect(e)} 
+          updatePassDefine={(m,i,n,v) => this.updatePassDefine(m,i,n,v)}
+          updatePassUniform={(m,i,n,v) => this.updatePassUniform(m,i,n,v)}
+          updatePassParam={(m,i,n,v) => this.updatePassParam(m,i,n,v)}
+        />);
     }
     
     return (

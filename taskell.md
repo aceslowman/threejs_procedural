@@ -22,30 +22,6 @@
 
 ## Doing
 
-- Connect the Terrain to redux store.
-    > The only thing holding me back on this is properly filtering out passes that haven't changed.
-    * [ ] update the correct pass with the updated value
-    * [ ] generate uuid in Terrain.initializeElevation() so that I can keep track of passes while deserializing.
-- Research Storm React Diagrams
-    > This seems incredibly useful for displaying a material graph, post processing graph, etc etc. I think it would work well as a drawer, pulled up from the bottom of the window. I should put a hold on any more 'maps and  passes' ui until I get started implementing this.
-    * [ ] Can I create adjustable parameters IN the widget?
-- Implement Storm React Diagrams
-    > Storm React Diagrams should work well as a backbone of a shader graph display, but I am yet to figure out a simple configuration that works for me. It looks extensible enough tho... j
-    * [x] Create a new Diagram panel, an expandable drawer along the bottom of the Sketch panel
-    * [x] Get a number of adjustable parameters to display on the Widget. (I actually should be able to do this using a custom widget)
-    * [x] Change currently displayed diagram based on selected map. This might require a closer pairing of the Diagram and the GUI.
-    * [x] Disable panning, so that orbitControls still function.
-    * [x] Diagram assembly is being triggered twice as much as it should
-    * [ ] open / highlight current pass in MapTools and diagram
-    * [ ] Should I attempt to store all diagrams, and then switch between them? Instead of generating them on the fly? I'm having listener issues, and this might simplify.
-- Incorporate WebGL classes into React classes. (this way, all logic for the store is condensed)
-    > This feels a little odd, conflating the WebGL classes with the React Components, but React is calling the shots here, structurally. This will simplify subscription, and likely improve efficiency, especially as the app scales.
-    * [x] Condense Terrain
-    * [x] Condense Camera
-    * [x] Use App.js as the new Sketch.js
-    * [ ] Reconnect Redux to the Terrain
-    * [x] Reconnect Redux to the Camera
-    * [x] Fix issue where Ortho cam is not displaying terrain properly. This is caused by the camera frustum not receiving valid initial inputs.
 
 ## Done
 
@@ -92,6 +68,14 @@
 - Begin implementing Storm React Diagrams
 - [feature] Allow GUI to filter different navigation elements (terrain, flora, fauna, etc)
     > Current thought: I will initialize the WebGL within the constructor, leaving all react life-cycle methods specific to the GUI being rendered. 
+- Incorporate WebGL classes into React classes. (this way, all logic for the store is condensed)
+    > This feels a little odd, conflating the WebGL classes with the React Components, but React is calling the shots here, structurally. This will simplify subscription, and likely improve efficiency, especially as the app scales.
+    * [x] Condense Terrain
+    * [x] Condense Camera
+    * [x] Use App.js as the new Sketch.js
+    * [x] Reconnect Redux to the Terrain
+    * [x] Reconnect Redux to the Camera
+    * [x] Fix issue where Ortho cam is not displaying terrain properly. This is caused by the camera frustum not receiving valid initial inputs.
 
 ## Backburner
 
@@ -104,3 +88,15 @@
     * [ ] Update reducer to match
     * [ ] Update containers to match
     * [ ] Update presentation components where relevant.
+- Research Storm React Diagrams
+    > This seems incredibly useful for displaying a material graph, post processing graph, etc etc. I think it would work well as a drawer, pulled up from the bottom of the window. I should put a hold on any more 'maps and  passes' ui until I get started implementing this.
+    * [ ] Can I create adjustable parameters IN the widget?
+- Implement Storm React Diagrams
+    > Storm React Diagrams should work well as a backbone of a shader graph display, but I am yet to figure out a simple configuration that works for me. It looks extensible enough tho... j
+    * [x] Create a new Diagram panel, an expandable drawer along the bottom of the Sketch panel
+    * [x] Get a number of adjustable parameters to display on the Widget. (I actually should be able to do this using a custom widget)
+    * [x] Change currently displayed diagram based on selected map. This might require a closer pairing of the Diagram and the GUI.
+    * [x] Disable panning, so that orbitControls still function.
+    * [x] Diagram assembly is being triggered twice as much as it should
+    * [ ] open / highlight current pass in MapTools and diagram
+    * [ ] Should I attempt to store all diagrams, and then switch between them? Instead of generating them on the fly? I'm having listener issues, and this might simplify.
