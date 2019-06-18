@@ -26,7 +26,7 @@ class CameraViews extends React.Component {
     }
 
     componentDidMount(){
-        this.changeView(this.props.view);
+        // this.changeView(this.props.view);
     }
 
     changeView(view){

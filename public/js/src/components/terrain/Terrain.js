@@ -162,7 +162,12 @@ class Terrain extends React.Component {
     }
     
     return (
-      <Route path="/terrain/" render={() => <React.Fragment>{maps}</React.Fragment>} />
+      
+      <Route path="/terrain/" render={() => (
+        <React.Fragment>
+          {maps}
+        </React.Fragment>
+      )} />
     );
   }
 }

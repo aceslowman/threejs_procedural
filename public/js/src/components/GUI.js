@@ -79,6 +79,20 @@ class GUI extends React.Component {
           <Navigation handleDrawerClose={() => this.handleDrawerClose()} handleDrawerOpen={() => this.handleDrawerOpen()} />
           <Divider />
 
+          {/* 
+            the problem I'm encountering is this:
+
+            I am initializing my webgl 
+          */}
+
+          {/* {this.props.ready && (
+            <div id="subwrapper" style={{ display: this.state.open ? 'block' : 'none' }}>
+              <Route path="/" exact render={()=>Camera} />
+              <Route path="/camera/" render={()=>Camera} />
+              <Route path="/terrain/" render={()=>Terrain} />
+            </div>
+          )}  */}
+
           {this.props.children}
 
         </Drawer>

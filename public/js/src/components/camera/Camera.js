@@ -135,33 +135,37 @@ class Camera extends React.Component {
     // seperate classes out, so that they aren't sent to children
     const { classes, ...other } = this.props;
 
+    let gui = (
+      <React.Fragment>
+        <CameraViews camera={this.state.activeCamera} view="ANGLE" {...this.other} />
+
+        <Paper className={classes.root}>
+          <Grid container justify={'space-around'} alignItems={'center'} spacing={16}>
+            <Grid item xs={12}>
+              <Typography variant="h6" align="center">Camera Type</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Button color={this.state.activeCamera.type == "OrthographicCamera" ? 'primary' : 'default'} onClick={() => this.changeActiveCamera("OrthographicCamera")} fullWidth variant="outlined">Orthographic</Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button color={this.state.activeCamera.type == "PerspectiveCamera" ? 'primary' : 'default'} onClick={() => this.changeActiveCamera("PerspectiveCamera")} fullWidth variant="outlined">Perspective</Button>
+            </Grid>
+          </Grid>
+        </Paper>
+
+        <Paper className={classes.root}>
+          <CameraCommons {...this.other} camera={this.state.activeCamera} />
+          {this.state.activeCamera.type == "PerspectiveCamera" && <PerspectiveCameraTools {...this.other} camera={this.state.activeCamera} />}
+          {this.state.activeCamera.type == "OrthographicCamera" && <OrthographicCameraTools {...this.other} camera={this.state.activeCamera} />}
+        </Paper>
+      </React.Fragment>
+    );
+
     return (
-        <Route path="/camera/" render={() => (
-            <React.Fragment>
-              <CameraViews camera={this.state.activeCamera} view="ANGLE" {...this.other} />
-
-              <Paper className={classes.root}>
-                <Grid container justify={'space-around'} alignItems={'center'} spacing={16}>
-                  <Grid item xs={12}>
-                    <Typography variant="h6" align="center">Camera Type</Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Button color={this.state.activeCamera.type == "OrthographicCamera" ? 'primary' : 'default'} onClick={() => this.changeActiveCamera("OrthographicCamera")} fullWidth variant="outlined">Orthographic</Button>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Button color={this.state.activeCamera.type == "PerspectiveCamera" ? 'primary' : 'default'} onClick={() => this.changeActiveCamera("PerspectiveCamera")} fullWidth variant="outlined">Perspective</Button>
-                  </Grid>
-                </Grid>
-              </Paper>
-
-              <Paper className={classes.root}>
-                <CameraCommons {...this.other} camera={this.state.activeCamera} />
-                {this.state.activeCamera.type == "PerspectiveCamera" && <PerspectiveCameraTools {...this.other} camera={this.state.activeCamera} />}
-                {this.state.activeCamera.type == "OrthographicCamera" && <OrthographicCameraTools {...this.other} camera={this.state.activeCamera} />}
-              </Paper>
-            </React.Fragment>
-          )
-        } />
+      <React.Fragment>
+        <Route path="/" exact render={() => gui} />
+        <Route path="/camera/" render={() => gui} />
+      </React.Fragment>
     );
   }
 }

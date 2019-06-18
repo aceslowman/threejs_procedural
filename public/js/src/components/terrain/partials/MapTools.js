@@ -51,9 +51,13 @@ class MapTools extends React.Component {
         this.props.selectPass(id);
     }
 
-    componentWillMount() { this.assembleControls() }
+    componentWillMount() { 
+        this.assembleControls() 
+    }
 
-    componentDidUpdate() { this.assembleControls() }
+    componentDidUpdate() { 
+        this.assembleControls() 
+    }
 
     updatePassParam(pass_id, name, value) {
         console.log('updatePassParam', [pass_id, name, value]);

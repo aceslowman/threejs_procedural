@@ -18,6 +18,7 @@
 - [organization] Move all actions (like in TerrainContainer.js) into the respective actions folder
 - [enhancement] When changing camera type, duplicate / copy over any parent transform.
 - [bug] Camera aspect ratio is not being correctly updated onWindowResize.
+- [optimization] large drops in fps when changing gui navigation. due to unmounting/remounting.
 
 ## Doing
 
