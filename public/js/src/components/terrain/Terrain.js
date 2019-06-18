@@ -22,25 +22,55 @@ class Terrain extends React.Component {
   constructor(props) {
     super(props);
 
-    this.renderer = props.renderer;
-    this.scene = props.scene;
+    this.renderer  = props.renderer;
+    this.scene     = props.scene;
 
-    this.width = props.width;
-    this.height = props.height;
-    this.detail = props.detail;
+    this.width     = props.width;
+    this.height    = props.height;
+    this.detail    = props.detail;
     this.amplitude = props.amplitude;
-    this.seed = Math.random() * 10000;
+    this.seed      = Math.random() * 10000;
 
-    this.verbose = false;
-
-    this.initialize();
+    this.verbose   = false;
 
     this.state = {
-      ready: false
+      ready: false,
+      geometry: new THREE.PlaneBufferGeometry(
+        this.width,
+        this.height,
+        this.detail,
+        this.detail
+      ),
+      maps: {
+        elevation: new ProceduralMap(this.renderer, {
+          name: "Elevation",
+          width: this.width,
+          height: this.height,
+          passes: [
+            new FractalNoise(8, this.seed),
+            new FractalWarp(4, this.seed)
+          ]
+        }),
+        colors: new ProceduralMap(this.renderer, {
+          name: "Colors",
+          width: this.width,
+          height: this.height,
+          passes: [
+            new FractalNoise(8, this.seed),
+            new FractalWarp(4, this.seed)
+          ]
+        }),
+      }
     }
   }
 
   componentDidMount() {
+    // this.initializeElevation();
+    // this.initializeColors();
+    this.initializeMesh();
+
+    this.setupDebug();
+
     this.ready();
   }
 
@@ -49,103 +79,41 @@ class Terrain extends React.Component {
     this.props.terrainReady(this);
   }
 
-  initialize() {
-    this.initializeElevation();
-    this.initializeColors();
-    this.initializeMesh();
-
-    this.setupDebug();
-  }
-
-  initializeElevation() {
-    let map = new ProceduralMap(this.renderer, {
-      width: this.width,
-      height: this.height
-    });
-
-    let passes = [
-      new FractalNoise(8, this.seed),
-      new FractalWarp(4, this.seed)
-    ];
-
-    for (let pass of passes) {
-      let p = new THREE.ShaderPass(pass.shaderMaterial);
-      map.composer.addPass(p);
-    }
-
-    map.composer.swapBuffers();
-    map.render();
-
-    this.elevation = map;
-    this.props.addMap(map, 'Elevation');
-  }
-
-  initializeColors() {
-    let map = new ProceduralMap(this.renderer, {
-      width: this.width,
-      height: this.height
-    });
-
-    let passes = [
-      new FractalNoise(8, this.seed),
-      new FractalWarp(4, this.seed),
-      // TODO: implement a lookup table shader!
-    ];
-
-    for (let pass of passes) {
-      let p = new THREE.ShaderPass(pass.shaderMaterial);
-      map.composer.addPass(p);
-    }
-
-    map.composer.swapBuffers();
-    map.render();
-
-    this.colors = map;
-    this.props.addMap(map, 'Colors');
-  }
-
   initializeMesh() {
-    this.geometry = new THREE.PlaneBufferGeometry(
-      this.width,
-      this.height,
-      this.detail,
-      this.detail
-    );
 
     this.displaceGeometry();
-
     // this.material = new THREE.MeshBasicMaterial({
     //     map: this.colors.target,
     // });
 
     this.material = new THREE.MeshNormalMaterial();
 
-    this.mesh = new THREE.Mesh(this.geometry, this.material);
+    this.mesh = new THREE.Mesh(this.state.geometry, this.material);
 
     this.scene.add(this.mesh);
   }
 
   update() {
-    this.elevation.render();
+    this.state.maps.elevation.render();
   }
 
   setupDebug() {
-    var helper = new THREE.Box3Helper(this.geometry.boundingBox, 0xffff00);
+    var helper = new THREE.Box3Helper(this.state.geometry.boundingBox, 0xffff00);
     this.scene.add(helper);
   }
 
   displaceGeometry() {
-    const displacement_buffer = this.elevation.getBufferArray();
-    const positions = this.geometry.getAttribute('position').array;
-    const uvs = this.geometry.getAttribute('uv').array;
-    const count = this.geometry.getAttribute('position').count;
+    const displacement_buffer = this.state.maps.elevation.getBufferArray();
+    const positions = this.state.geometry.getAttribute('position').array;
+    const uvs = this.state.geometry.getAttribute('uv').array;
+    const count = this.state.geometry.getAttribute('position').count;
 
     for (let i = 0; i < count; i++) {
       const u = uvs[i * 2];
       const v = uvs[i * 2 + 1];
-      const x = Math.floor(u * (this.elevation.width - 1.0));
-      const y = Math.floor(v * (this.elevation.height - 1.0));
-      const d_index = (y * this.elevation.height + x) * 4;
+      const x = Math.floor(u * (this.state.maps.elevation.width - 1.0));
+      const y = Math.floor(v * (this.state.maps.elevation.height - 1.0));
+      const d_index = (y * this.state.maps.elevation.height + x) * 4;
       let r = displacement_buffer[d_index];
 
       positions[i * 3 + 2] = (r * this.amplitude);
@@ -156,13 +124,13 @@ class Terrain extends React.Component {
       }
     }
 
-    this.geometry.getAttribute('position').needsUpdate = true;
-    this.geometry.computeVertexNormals();
-    this.geometry.computeFaceNormals();
-    this.geometry.computeBoundingBox();
-    this.geometry.computeBoundingSphere();
+    this.state.geometry.getAttribute('position').needsUpdate = true;
+    this.state.geometry.computeVertexNormals();
+    this.state.geometry.computeFaceNormals();
+    this.state.geometry.computeBoundingBox();
+    this.state.geometry.computeBoundingSphere();
 
-    this.geometry.translate(0, 0, -this.geometry.boundingBox.min.z);
+    this.state.geometry.translate(0, 0, -this.state.geometry.boundingBox.min.z);
   }
 
   globalBoundsCheck(a) {
@@ -183,26 +151,19 @@ class Terrain extends React.Component {
     this.props.updateDiagramActiveMap(map)
   }
 
-  assembleMaps(){
-    let maps = [];
-
-    for(let m in this.props.maps){
-      let map = this.props.maps[m];
-      let selected;
-      this.props.diagrams && this.props.diagrams.activeMap == m ? selected = true : selected = false; 
-
-      maps.push(<MapTools key={m} map={map} {...this.props} selected={selected} selectMap={(e)=>this.handleMapSelect(e)}/>);
-    }
-
-    return maps;
-  }
-
   render() {
     const {classes} = this.props;
 
+    let maps = [];
+
+    for (let m in this.state.maps) {
+      let map = this.state.maps[m];
+      maps.push(<MapTools key={m} map={map} {...this.props} selected={false} selectMap={(e) => this.handleMapSelect(e)} />);
+    }
+    
     return (
       <div className="subnavigation">
-        {this.assembleMaps()}
+        {maps}
       </div>
     );
   }

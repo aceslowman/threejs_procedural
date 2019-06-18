@@ -55,6 +55,24 @@ class MapTools extends React.Component {
 
     componentDidUpdate() { this.assembleControls() }
 
+    updatePassParam(pass_id, name, value) {
+        console.log('updatePassParam', [pass_id, name, value]);
+
+        // this.props.map.composer.passes[pass_id][name]
+    }
+
+    updatePassDefine(pass_id, name, value) {
+        console.log('updatePassDefine', [pass_id, name, value]);
+
+        // this.props.map.composer.passes[pass_id].defines
+    }
+    
+    updatePassUniform(pass_id, name, value) {
+        console.log('updatePassUniform', [pass_id, name, value]);
+
+        // this.props.map.composer.passes[pass_id].uniforms[name].value = value;
+    }
+
     assembleControls() {
         const { classes } = this.props;
 
@@ -65,34 +83,31 @@ class MapTools extends React.Component {
         // setup pass props
         let passes = [];
 
-        for (let p in map.passes) {
-            let pass = this.props.passes[map.passes[p]];
-
-            // enabled
+        for (let p in map.composer.passes) {
+            let pass = map.composer.passes[p];
+            
             let enabled = (
                 <Grid item xs={5} key={`${p}_enabled`}>
                     <InputLabel margin="dense" key={`${p}_enabled_label`}>Enabled</InputLabel>
                     <Checkbox
                         key={`${p}_enabled_input`}
-                        checked={pass.params.enabled}
-                        onChange={(e) => this.props.updatePassParam(map.passes[p], 'enabled', e.target.checked)}
+                        checked={pass.enabled}
+                        onChange={(e) => this.updatePassParam(p,'enabled', e.target.checked)}
                     />
                 </Grid>
             );
 
-            // render to screen
             let rendertoscreen = (
                 <Grid item xs={7} key={`${p}_rendertoscreen`}>
                     <InputLabel margin="dense" key={`${p}_rendertoscreen_label`}>Render To Screen</InputLabel>
                     <Checkbox
                         key={`${p}_rendertoscreen_input`}
-                        checked={pass.params.renderToScreen}
-                        onChange={(e) => this.props.updatePassParam(map.passes[p], 'renderToScreen', e.target.checked)}
+                        checked={pass.renderToScreen}
+                        onChange={(e) => this.updatePassParam(p,'rendertoscreen', e.target.checked)}
                     />
                 </Grid>
             );
 
-            // defines
             let defines = [];
             for (let d in pass.defines) {
                 let define = pass.defines[d];
@@ -105,13 +120,12 @@ class MapTools extends React.Component {
                             type="number"
                             variant="filled"
                             margin="dense"
-                            onChange={(e) => this.props.updatePassDefine(map.passes[p], d, e.target.value)}
+                            onChange={(e)=>this.updatePassDefine(p,d, e.target.value)}
                         />
                     </Grid>
                 );
             }
 
-            // uniforms
             let uniforms = [];
             for (let u in pass.uniforms) {
                 let uniform = pass.uniforms[u];
@@ -127,7 +141,7 @@ class MapTools extends React.Component {
                                 type="number"
                                 variant="filled"
                                 margin="dense"
-                                onChange={(e) => this.props.updatePassUniform(map.passes[p], u, e.target.value)}
+                                onChange={(e) => this.updatePassUniform(p,u, e.target.value)}
                             />
                         </Grid>
                     );
@@ -148,9 +162,9 @@ class MapTools extends React.Component {
             }
 
             passes.push(
-                <ExpansionPanel key={map.passes[p]} expanded={this.props.diagrams.activePass == map.passes[p] ? true : false} onClick={(e)=>this.handlePassSelect(map.passes[p])}>
+                <ExpansionPanel key={p}>
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant="h5" className={classes.heading}>{pass.name}</Typography>
+                        <Typography variant="h5" className={classes.heading}>{map.passes[p].constructor.name}</Typography>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
                         <Grid container>

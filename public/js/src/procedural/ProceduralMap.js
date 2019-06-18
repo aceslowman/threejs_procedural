@@ -11,6 +11,15 @@ export default class ProceduralMap{
     this.width  = options.width  || 256;
     this.height = options.height || 256;
 
+    let temp_seed = Math.random() * 10000;
+
+    this.passes = options.passes || [
+      new FractalNoise(8, temp_seed),
+      new FractalWarp(4, temp_seed)
+    ];
+
+    this.name = options.name || "default map";
+
     this.target = new THREE.WebGLRenderTarget(this.width, this.height, {
       minFilter: THREE.LinearMipMapLinearFilter,
 			magFilter: THREE.LinearFilter,
@@ -21,6 +30,14 @@ export default class ProceduralMap{
 
     this.composer = new THREE.EffectComposer(this.renderer, this.target);
     this.composer.setSize(this.width, this.height);
+  
+    for (let pass of this.passes) {
+      let p = new THREE.ShaderPass(pass.shaderMaterial);
+      this.composer.addPass(p);
+    }
+
+    this.composer.swapBuffers();
+    this.render();
   }
 
   render(){

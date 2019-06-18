@@ -33,8 +33,6 @@ class Camera extends React.Component {
     this.width    = props.width;
     this.height   = props.height;
 
-    // TODO: fix initial width and height.
-
     let ortho = new THREE.OrthographicCamera(
       this.width / - 2,
       this.width / 2,

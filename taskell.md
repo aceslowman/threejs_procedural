@@ -2,25 +2,26 @@
 
 - Research RayTracing Renderer
     > Raytracing Renderer (kept within renderers/RaytracingRenderer.js) would be a great option here, allowing me to do some high quality non-realtime renders. Perfect!
-- Camera aspect ratio is not being correctly updated onWindowResize.
 - Define initial state in reducer, instead of mixing it into the 'sketch' logic.
     > This sounds preferable, and allows the Sketch component to be pretty slim. Sketch should 'run' the app, and all custom configurables (serializables?) would be initialized in their respective reducer. 
     * [ ] Read up on how to best organize reducers.
     * [ ] Implement Normalizr?
     * [ ] If I'm serializing objects before inserting them into the store, should I use the reducer to store the initial state?
 - Begin implementing simple tree map.
-- Correct FBM artifact issue.
+- [bug] Correct FBM artifact issue.
     > Currently small artifacts exist after a FractalWarp pass.
     * [ ] Check sampling functions
     * [ ] Check negative dot product
     * [ ] Check for divide by zero
     * [ ] Clamp values?
-- Begin implementing RayTracing Renderer mode.
-- Begin implementing Storm React Diagrams
-- Move all actions (like in TerrainContainer.js) into the respective actions folder
+- [feature] Begin implementing RayTracing Renderer mode.
+- [organization] Move all actions (like in TerrainContainer.js) into the respective actions folder
+- [enhancement] When changing camera type, duplicate / copy over any parent transform.
+- [bug] Camera aspect ratio is not being correctly updated onWindowResize.
 
 ## Doing
 
+- [feature] Allow GUI to filter different navigation elements (terrain, flora, fauna, etc)
 - Connect the Terrain to redux store.
     > The only thing holding me back on this is properly filtering out passes that haven't changed.
     * [ ] update the correct pass with the updated value
@@ -88,6 +89,7 @@
 - Enable Orthographic Camera
 - Add gui folder to Terrain and Camera
 - Re-enable the Camera GUI
+- Begin implementing Storm React Diagrams
 
 ## Backburner
 

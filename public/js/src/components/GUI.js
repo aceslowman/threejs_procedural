@@ -14,10 +14,6 @@ import Typography from '@material-ui/core/Typography';
 
 import Navigation from './Navigation';
 
-// CONTAINERS
-import CameraContainer from './camera/CameraContainer';
-import TerrainContainer from './terrain/TerrainContainer';
-
 class GUI extends React.Component {
   constructor(props) {
     super(props);
@@ -36,7 +32,11 @@ class GUI extends React.Component {
   };
 
   render() {
-    console.log(this.props.children);
+    // Below I am attempting to pass my components 
+    // let Camera = this.props.children.filter(a => a.ref == "Camera")[0];
+    // let Terrain = this.props.children.filter(a => a.ref == "Terrain")[0];
+
+    // console.log("COMPONENTS", [Camera, Terrain]);
 
     return (
         <Drawer 
@@ -79,11 +79,17 @@ class GUI extends React.Component {
           <Navigation handleDrawerClose={() => this.handleDrawerClose()} handleDrawerOpen={() => this.handleDrawerOpen()} />
           <Divider />
 
+          {/* 
+            the problem I'm encountering is this:
+
+            I am initializing my webgl 
+          */}
+
           {/* {this.props.ready && (
             <div id="subwrapper" style={{ display: this.state.open ? 'block' : 'none' }}>
-              <Route path="/" exact component={CameraContainer} />
-              <Route path="/camera/" component={CameraContainer} />
-              <Route path="/terrain/" component={TerrainContainer} />
+              <Route path="/" exact render={()=>Camera} />
+              <Route path="/camera/" render={()=>Camera} />
+              <Route path="/terrain/" render={()=>Terrain} />
             </div>
           )} */}
 

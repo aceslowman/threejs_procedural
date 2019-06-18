@@ -183,8 +183,9 @@ class App extends React.Component {
         <MuiThemeProvider theme={theme}>
           <Provider store={store}>
             <div className="container">
-              <GUI ready={this.state.sketchReady}>
+              <GUI ready={this.state.canvasReady}>
                 {this.state.canvasReady && <Camera 
+                  // ref="Camera" // to make node accessible within GUI
                   renderer={this.renderer} 
                   scene={this.scene} 
                   width={this.state.width} 
@@ -193,11 +194,12 @@ class App extends React.Component {
                   cameraChange={(c) => this.handleCameraChange(c)}
                 />}
                 {this.state.canvasReady && <Terrain 
+                  // ref="Terrain" // to make node accessible within GUI
                   renderer={this.renderer} 
                   scene={this.scene} 
                   width={512} 
                   height={512} 
-                  detail={512} 
+                  detail={128} 
                   amplitude={150} 
                   terrainReady={(t) => this.handleTerrainReady(t)} 
                 />}
