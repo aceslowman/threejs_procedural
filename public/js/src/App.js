@@ -198,7 +198,7 @@ class App extends React.Component {
                   scene={this.scene} 
                   width={512} 
                   height={512} 
-                  detail={128} 
+                  detail={512} 
                   amplitude={150} 
                   terrainReady={(t) => this.handleTerrainReady(t)} 
                 />}

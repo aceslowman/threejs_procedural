@@ -152,13 +152,14 @@ class Terrain extends React.Component {
   }
 
   updatePassParam(map_id, pass_id, name, value) {
-    console.log('updatePassParam', [map_id, pass_id, name, value]);
-
-    // this.props.map.composer.passes[pass_id][name]
+    // update parameter
+    this.state.maps[map_id].composer.passes[pass_id][name] = value;
+    this.updateMap(this.state.maps[map_id]);
   }
 
   updatePassDefine(map_id, pass_id, name, value) {
     console.log('updatePassDefine', [map_id, pass_id, name, value]);
+    console.log(this.state.maps[map_id].composer.passes[pass_id][name]);
 
     // this.props.map.composer.passes[pass_id].defines
   }
@@ -166,9 +167,12 @@ class Terrain extends React.Component {
   updatePassUniform(map_id, pass_id, name, value) {
     // update uniform
     this.state.maps[map_id].composer.passes[pass_id].uniforms[name].value = value;
-    
+    this.updateMap(this.state.maps[map_id]);
+  }
+
+  updateMap(map){
     // update this specific map (i.e. Elevation or Color)
-    this.state.maps[map_id].render();
+    map.render();
 
     // this is a big bottleneck, but likely unavoidable as long as I'm displacing on the CPU
     this.displaceGeometry();

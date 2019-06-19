@@ -22,6 +22,10 @@
 
 ## Doing
 
+- [improvement] create custom GUI for each type of shader pass.
+    > This will be a component that is exported from the shader class.
+    * [ ] Create custom FractalNoise
+    * [ ] Create custom FractalWarp
 
 ## Done
 
