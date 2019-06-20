@@ -22,7 +22,6 @@ class Terrain extends React.Component {
 
     this.renderer  = props.renderer;
     this.scene     = props.scene;
-
     this.width     = props.width;
     this.height    = props.height;
     this.detail    = props.detail;
@@ -31,20 +30,20 @@ class Terrain extends React.Component {
 
     this.verbose   = false;
 
+    this.geometry  = new THREE.PlaneBufferGeometry(
+      this.width,
+      this.height,
+      this.detail,
+      this.detail
+    );
+
     this.state = {
       ready: false,
-      geometry: new THREE.PlaneBufferGeometry(
-        this.width,
-        this.height,
-        this.detail,
-        this.detail
-      )
+      // geometry: this.geometry // possibly not needed
     }
   }
 
   componentDidMount() {
-    /* Component has mounted, which means that maps are ready. 
-    Displacement should happen in ProceduralMap.componentDidMount */
     this.initializeMesh();
     this.setupDebug();
     this.ready();
@@ -57,24 +56,20 @@ class Terrain extends React.Component {
 
   initializeMesh() {
     this.material = new THREE.MeshNormalMaterial();
-    this.mesh = new THREE.Mesh(this.state.geometry, this.material);
+    this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.scene.add(this.mesh);
   }
 
-  update() {
-    this.state.maps.Elevation.render();
-  }
-
   setupDebug() {
-    var helper = new THREE.Box3Helper(this.state.geometry.boundingBox, 0xffff00);
+    var helper = new THREE.Box3Helper(this.geometry.boundingBox, 0xffff00);
     this.scene.add(helper);
   }
 
   displaceGeometry(displacement_buffer, width, height) {
-    const positions = this.state.geometry.getAttribute('position').array;
-    const uvs = this.state.geometry.getAttribute('uv').array;
-    const count = this.state.geometry.getAttribute('position').count;
-
+    const positions = this.geometry.getAttribute('position').array;
+    const uvs = this.geometry.getAttribute('uv').array;
+    const count = this.geometry.getAttribute('position').count;
+    
     for (let i = 0; i < count; i++) {
       const u = uvs[i * 2];
       const v = uvs[i * 2 + 1];
@@ -84,20 +79,15 @@ class Terrain extends React.Component {
       let r = displacement_buffer[d_index];
 
       positions[i * 3 + 2] = (r * this.amplitude);
-
-      if (!r) {
-        // TODO: implement some sort of check that prevents this.
-        console.warn('cannot find value in displacement buffer');
-      }
     }
 
-    this.state.geometry.getAttribute('position').needsUpdate = true;
-    this.state.geometry.computeVertexNormals();
-    this.state.geometry.computeFaceNormals();
-    this.state.geometry.computeBoundingBox();
-    this.state.geometry.computeBoundingSphere();
+    this.geometry.getAttribute('position').needsUpdate = true;
+    this.geometry.computeVertexNormals();
+    this.geometry.computeFaceNormals();
+    this.geometry.computeBoundingBox();
+    this.geometry.computeBoundingSphere();
 
-    this.state.geometry.translate(0, 0, -this.state.geometry.boundingBox.min.z);
+    this.geometry.translate(0, 0, -this.geometry.boundingBox.min.z);
   }
 
   globalBoundsCheck(a) {

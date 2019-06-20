@@ -79,6 +79,7 @@ class FractalNoise extends React.Component{
     });
 
     this.init();
+    props.ready(this.shaderMaterial);
   }
 
   /*
@@ -222,23 +223,6 @@ class FractalNoise extends React.Component{
     this.shaderMaterial.fragmentShader = this.frag;
   }
 
-  componentDidMount(){
-
-  }
-
-  handleUpdate(type, e){
-    switch(type){
-      case "PARAM":
-        break;
-      case "DEFINE":
-        break;
-      case "UNIFORM":
-        break;
-    }
-
-    this.props.updatePass(this.shaderMaterial)
-  }
-
   render() {
     const {classes} = this.props;
 
@@ -257,6 +241,7 @@ class FractalNoise extends React.Component{
                 onChange={(e) => {
                     e.persist();
                     this.setState(state => (state.params.enabled = e.target.checked));
+                    this.props.updatePassParam("FractalNoise", "enabled", e.target.checked);
                   }
                 }
               />
@@ -409,6 +394,45 @@ class FractalNoise extends React.Component{
                       e.persist();
                       this.setState(state => (state.uniforms.s_z = e.target.value));
                     }
+                  }
+                />
+              </Grid>
+            </Grid>
+
+            <Grid container alignItems="center">
+
+              <Grid item xs={3} align="center">
+                <InputLabel margin="dense">Map</InputLabel>
+              </Grid>
+
+              <Grid item xs={4}>
+                <TextField
+                  label="min"
+                  value={this.state.uniforms.map_min}
+                  inputProps={{ step: 0.1 }}
+                  type="number"
+                  variant="filled"
+                  margin="dense"
+                  onChange={(e) => {
+                    e.persist();
+                    this.setState(state => (state.uniforms.map_min = e.target.value));
+                  }
+                  }
+                />
+              </Grid>
+
+              <Grid item xs={5}>
+                <TextField
+                  label="max"
+                  value={this.state.uniforms.map_max}
+                  inputProps={{ step: 0.1 }}
+                  type="number"
+                  variant="filled"
+                  margin="dense"
+                  onChange={(e) => {
+                    e.persist();
+                    this.setState(state => (state.uniforms.map_max = e.target.value));
+                  }
                   }
                 />
               </Grid>

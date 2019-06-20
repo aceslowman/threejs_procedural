@@ -170,7 +170,6 @@ class App extends React.Component {
     
     this.renderer.render(this.scene, this.camera);
 
-    this.terrain.update();
     this.stats.end();
   }
 
