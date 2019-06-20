@@ -2,14 +2,12 @@ import React from 'react';
 import { withRouter, Route} from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 
-import MapTools from './partials/MapTools';
-
 import * as THREE from 'three';
 
-import ProceduralMap from '../../procedural/ProceduralMap';
+import ProceduralMap from '../map/ProceduralMap';
 
-import FractalNoise from "../../shaders/fractalnoise.js";
-import FractalWarp from "../../shaders/fractalwarp.js";
+import FractalNoise from "../../shaders/FractalNoise.js";
+import FractalWarp from "../../shaders/FractalWarp.js";
 
 const styles = theme => ({
   root: {
@@ -40,37 +38,15 @@ class Terrain extends React.Component {
         this.height,
         this.detail,
         this.detail
-      ),
-      maps: {
-        Elevation: new ProceduralMap(this.renderer, {
-          name: "Elevation",
-          width: this.width,
-          height: this.height,
-          passes: [
-            new FractalNoise(8, this.seed),
-            new FractalWarp(4, this.seed)
-          ]
-        }),
-        Colors: new ProceduralMap(this.renderer, {
-          name: "Colors",
-          width: this.width,
-          height: this.height,
-          passes: [
-            new FractalNoise(8, this.seed),
-            new FractalWarp(4, this.seed)
-          ]
-        }),
-      }
+      )
     }
   }
 
   componentDidMount() {
-    // this.initializeElevation();
-    // this.initializeColors();
+    /* Component has mounted, which means that maps are ready. 
+    Displacement should happen in ProceduralMap.componentDidMount */
     this.initializeMesh();
-
     this.setupDebug();
-
     this.ready();
   }
 
@@ -80,16 +56,8 @@ class Terrain extends React.Component {
   }
 
   initializeMesh() {
-
-    this.displaceGeometry();
-    // this.material = new THREE.MeshBasicMaterial({
-    //     map: this.colors.target,
-    // });
-
     this.material = new THREE.MeshNormalMaterial();
-
     this.mesh = new THREE.Mesh(this.state.geometry, this.material);
-
     this.scene.add(this.mesh);
   }
 
@@ -102,8 +70,7 @@ class Terrain extends React.Component {
     this.scene.add(helper);
   }
 
-  displaceGeometry() {
-    const displacement_buffer = this.state.maps.Elevation.getBufferArray();
+  displaceGeometry(displacement_buffer, width, height) {
     const positions = this.state.geometry.getAttribute('position').array;
     const uvs = this.state.geometry.getAttribute('uv').array;
     const count = this.state.geometry.getAttribute('position').count;
@@ -111,9 +78,9 @@ class Terrain extends React.Component {
     for (let i = 0; i < count; i++) {
       const u = uvs[i * 2];
       const v = uvs[i * 2 + 1];
-      const x = Math.floor(u * (this.state.maps.Elevation.width - 1.0));
-      const y = Math.floor(v * (this.state.maps.Elevation.height - 1.0));
-      const d_index = (y * this.state.maps.Elevation.height + x) * 4;
+      const x = Math.floor(u * (width - 1.0));
+      const y = Math.floor(v * (height - 1.0));
+      const d_index = (y * height + x) * 4;
       let r = displacement_buffer[d_index];
 
       positions[i * 3 + 2] = (r * this.amplitude);
@@ -145,64 +112,22 @@ class Terrain extends React.Component {
     return true;
   }
 
-  // GUI ----------------------------------------------------------------
-
-  handleMapSelect(map){ 
-    this.props.updateDiagramActiveMap(map)
-  }
-
-  updatePassParam(map_id, pass_id, name, value) {
-    // update parameter
-    this.state.maps[map_id].composer.passes[pass_id][name] = value;
-    this.updateMap(this.state.maps[map_id]);
-  }
-
-  updatePassDefine(map_id, pass_id, name, value) {
-    console.log('updatePassDefine', [map_id, pass_id, name, value]);
-    console.log(this.state.maps[map_id].composer.passes[pass_id][name]);
-
-    // this.props.map.composer.passes[pass_id].defines
-  }
-
-  updatePassUniform(map_id, pass_id, name, value) {
-    // update uniform
-    this.state.maps[map_id].composer.passes[pass_id].uniforms[name].value = value;
-    this.updateMap(this.state.maps[map_id]);
-  }
-
-  updateMap(map){
-    // update this specific map (i.e. Elevation or Color)
-    map.render();
-
-    // this is a big bottleneck, but likely unavoidable as long as I'm displacing on the CPU
-    this.displaceGeometry();
-  }
-
   render() {
     const {classes} = this.props;
-
-    let maps = [];
-
-    // use map()
-    for (let m in this.state.maps) {
-      let map = this.state.maps[m];
-      maps.push(<MapTools 
-          key={m} 
-          map={map} 
-          {...this.props} 
-          selected={false} 
-          selectMap={(e) => this.handleMapSelect(e)} 
-          updatePassDefine={(m,i,n,v) => this.updatePassDefine(m,i,n,v)}
-          updatePassUniform={(m,i,n,v) => this.updatePassUniform(m,i,n,v)}
-          updatePassParam={(m,i,n,v) => this.updatePassParam(m,i,n,v)}
-        />);
-    }
     
     return (
-      
       <Route path="/terrain/" render={() => (
         <React.Fragment>
-          {maps}
+          <ProceduralMap
+            name="Elevation"
+            renderer={this.renderer}
+            width={this.width}
+            height={this.height}
+            displaceGeometry={(d,w,h)=>this.displaceGeometry(d,w,h)}
+            >
+            <FractalNoise />
+            {/* <FractalWarp /> */}
+          </ProceduralMap>
         </React.Fragment>
       )} />
     );

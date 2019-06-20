@@ -2,12 +2,6 @@
 
 - Research RayTracing Renderer
     > Raytracing Renderer (kept within renderers/RaytracingRenderer.js) would be a great option here, allowing me to do some high quality non-realtime renders. Perfect!
-- Define initial state in reducer, instead of mixing it into the 'sketch' logic.
-    > This sounds preferable, and allows the Sketch component to be pretty slim. Sketch should 'run' the app, and all custom configurables (serializables?) would be initialized in their respective reducer. 
-    * [ ] Read up on how to best organize reducers.
-    * [ ] Implement Normalizr?
-    * [ ] If I'm serializing objects before inserting them into the store, should I use the reducer to store the initial state?
-- Begin implementing simple tree map.
 - [bug] Correct FBM artifact issue.
     > Currently small artifacts exist after a FractalWarp pass.
     * [ ] Check sampling functions
@@ -15,7 +9,6 @@
     * [ ] Check for divide by zero
     * [ ] Clamp values?
 - [feature] Begin implementing RayTracing Renderer mode.
-- [organization] Move all actions (like in TerrainContainer.js) into the respective actions folder
 - [enhancement] When changing camera type, duplicate / copy over any parent transform.
 - [bug] Camera aspect ratio is not being correctly updated onWindowResize.
 - [optimization] large drops in fps when changing gui navigation. due to unmounting/remounting.
@@ -23,9 +16,11 @@
 ## Doing
 
 - [improvement] create custom GUI for each type of shader pass.
-    > This will be a component that is exported from the shader class.
+    > Each shader pass (which makes up a 'Map') should have it's own custom  GUI. Does this require me to shove FractalNoise into a React component for example?
     * [ ] Create custom FractalNoise
     * [ ] Create custom FractalWarp
+- [improvement] make ProceduralMap a React component.
+    > This should simplify management in some ways. 
 
 ## Done
 
@@ -104,3 +99,10 @@
     * [x] Diagram assembly is being triggered twice as much as it should
     * [ ] open / highlight current pass in MapTools and diagram
     * [ ] Should I attempt to store all diagrams, and then switch between them? Instead of generating them on the fly? I'm having listener issues, and this might simplify.
+- Define initial state in reducer, instead of mixing it into the 'sketch' logic.
+    > This sounds preferable, and allows the Sketch component to be pretty slim. Sketch should 'run' the app, and all custom configurables (serializables?) would be initialized in their respective reducer. 
+    * [ ] Read up on how to best organize reducers.
+    * [ ] Implement Normalizr?
+    * [ ] If I'm serializing objects before inserting them into the store, should I use the reducer to store the initial state?
+- Begin implementing simple tree map.
+- [organization] Move all actions (like in TerrainContainer.js) into the respective actions folder

@@ -1,23 +1,41 @@
+import React from 'react';
 import * as THREE from 'three';
 
-export default class FractalNoise {
+export default class FractalWarp extends React.Component{
   constructor(octaves, seed){
+    super();
+
+    // TODO: this should be populated from props.
+    this.state = {
+      defines: {
+        'NUM_OCTAVES': octaves,
+        'SEED': seed
+      },
+      uniforms: {
+        tDiffuse: '',
+        map_min: -1.0,
+        map_max: 1.0,
+        s_x: 0.2 ,
+        s_y: 0.2 ,
+        s_z: 0.4 ,
+      },
+    }
+
+    // TODO: this should be populated from state.
     this.shaderMaterial = new THREE.ShaderMaterial({
       defines: {
         'NUM_OCTAVES': octaves,
         'SEED': seed
       },
       uniforms: {
-        o_x: { value: 0.00 },
-        o_y: { value: 0.00 },
-        o_z: { value: 0.00 },
-        s_x: { value: 1.00 },
-        s_y: { value: 1.00 },
-        s_z: { value: 1.00 },
-        map_min: { value: -1.00 },
-        map_max: { value: 1.00 },
+        tDiffuse: { value: '' },
+        map_min: {value: -1.0},
+        map_max: {value: 1.0},
+        s_x: { value: 0.2 },
+        s_y: { value: 0.2 },
+        s_z: { value: 0.4 },
       },
-      name: "FractalNoise"
+      name: "FractalWarp"
     });
 
     this.compile();
@@ -120,20 +138,13 @@ export default class FractalNoise {
       varying vec2 vUv;
       varying vec3 vPosition;
 
-      uniform float o_x;
-      uniform float o_y;
-      uniform float o_z;
+      uniform sampler2D tDiffuse;
 
       uniform float s_x;
       uniform float s_y;
       uniform float s_z;
-
       uniform float map_min;
       uniform float map_max;
-
-      float map(float value, float min1, float max1, float min2, float max2) {
-        return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
-      }
 
       float fbm(vec3 x) {
       	float v = 0.0;
@@ -147,20 +158,42 @@ export default class FractalNoise {
       	return v;
       }
 
+      float map(float value, float min1, float max1, float min2, float max2) {
+        return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
+      }
+
       void main() {
-        vec3 offset = vec3(o_x,o_y,o_z);
-        vec3 scale = vec3(s_x,s_y,s_z);
+        vec4 src = texture2D(tDiffuse, vUv);
 
-        vec3 p = (vPosition * scale) + offset;
-
-        float n = fbm(p);
+        vec3 scalar = vec3(s_x,s_y,s_z);
+        float n = fbm(src.rgb * scalar);
 
         float c = map(n, -1.0, 1.0, map_min, map_max);
+
         gl_FragColor = vec4(c, c, c, 1.0);
+        // gl_FragColor = src;
       }
     `;
+
+    /*
+      ARTIFACT ISSUE:
+
+      map is not the problem
+      scalar is unconfirmed but not likely
+      src is fine
+    */
 
     this.shaderMaterial.vertexShader   = this.vert;
     this.shaderMaterial.fragmentShader = this.frag;
   }
+
+  render() {
+    return (
+      <div> 
+        <h2 style={{color:'white'}}>FRACTAL WARP Hey hey ho ho, this react shit has got to go.</h2>
+      </div>
+    );
+  }
 };
+
+
