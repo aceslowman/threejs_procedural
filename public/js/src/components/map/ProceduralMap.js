@@ -32,30 +32,28 @@ export default class ProceduralMap extends React.Component {
         };
     }
 
-    updatePassParam(pass_id, name, value) {
-        // console.log(map_id);
-        console.log(this.composer) // currently no children added to composer!
-        this.composer.passes[pass_id][name] = value;
-        // this.updateMap(this.state.maps[map_id]);
-        // update parameter
-        // this.state.maps[map_id].composer.passes[pass_id][name] = value;
-        // this.updateMap(this.state.maps[map_id]);
+    updateComposer(){
+        this.composer.swapBuffers(); // must call to make render valid
         this.composer.render();
 
-        // this.props.displaceGeometry(this.getBufferArray(), this.width, this.height);
+        this.props.displaceGeometry(this.getBufferArray(), this.width, this.height);
     }
 
-    updatePassDefine(map_id, pass_id, name, value) {
-        // console.log('updatePassDefine', [map_id, pass_id, name, value]);
-        // console.log(this.state.maps[map_id].composer.passes[pass_id][name]);
-
-        // this.props.map.composer.passes[pass_id].defines
+    updatePassParam(pass_id, name, value) {
+        this.composer.passes[pass_id][name] = value;
+        this.updateComposer();
     }
 
-    updatePassUniform(map_id, pass_id, name, value) {
-        // update uniform
-        // this.state.maps[map_id].composer.passes[pass_id].uniforms[name].value = value;
-        // this.updateMap(this.state.maps[map_id]);
+    updatePassDefine(pass_id, name, value) {
+        console.log(this.composer.passes[pass_id].material.defines);
+        this.composer.passes[pass_id].material.defines[name] = value;
+        this.composer.passes[pass_id].material.needsUpdate = true; // necessary when updating defines
+        this.updateComposer();
+    }
+
+    updatePassUniform(pass_id, name, value) {
+        this.composer.passes[pass_id].uniforms[name].value = value;
+        this.updateComposer();
     }
 
     addPass(pass) {
@@ -81,10 +79,11 @@ export default class ProceduralMap extends React.Component {
     render() {
         return(
             <div>
-                {React.Children.map(this.passes, child => React.cloneElement(child, {
+                {React.Children.map(this.passes, (child, i) => React.cloneElement(child, {
+                    index:i,
                     updatePassParam: (p,n,v) => this.updatePassParam(p,n,v),     // pass the update props on to the
-                    updatePassDefine: (m,p,n,v) => this.updatePassDefine(m,p,n,v),   // props.children
-                    updatePassUniform: (m,p,n,v) => this.updatePassUniform(m,p,n,v), 
+                    updatePassDefine: (p,n,v) => this.updatePassDefine(p,n,v),   // props.children
+                    updatePassUniform: (p,n,v) => this.updatePassUniform(p,n,v), 
                     ready: (p) => this.addPass(p),
                     composer: this.composer, 
                     octaves: '10', 

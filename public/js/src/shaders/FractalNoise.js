@@ -36,46 +36,44 @@ class FractalNoise extends React.Component{
   constructor(props){
     super(props);
 
-    // TODO: this should be populated from props.
     this.state = {
       defines: {
         'NUM_OCTAVES': props.octaves,
         'SEED': props.seed
       },
       uniforms: {
-        o_x: 0.00,
-        o_y: 0.00,
-        o_z: 0.00,
-        s_x: 1.00,
-        s_y: 1.00,
-        s_z: 1.00,
-        map_min: -1.00,
-        map_max: 1.00,
+        o_x: props.o_x || 0.00,
+        o_y: props.o_y || 0.00,
+        o_z: props.o_z || 0.00,
+        s_x: props.s_x || 1.00,
+        s_y: props.s_y || 1.00,
+        s_z: props.s_z || 1.00,
+        map_min: props.map_min || -1.00,
+        map_max: props.map_max || 1.00,
       },
       params: {
-        enabled: true,
-        renderToScreen: true
+        enabled: props.enabled || true,
+        renderToScreen: props.renderToScreen || true
       },
       name: "FractalNoise"
     }
 
-    // TODO: this should be populated from state.
     this.shaderMaterial = new THREE.ShaderMaterial({
       defines: {
-        'NUM_OCTAVES': props.octaves,
-        'SEED': props.seed
+        'NUM_OCTAVES': this.state.defines.NUM_OCTAVES,
+        'SEED': this.state.defines.SEED
       },
       uniforms: {
-        o_x: { value: 0.00 },
-        o_y: { value: 0.00 },
-        o_z: { value: 0.00 },
-        s_x: { value: 1.00 },
-        s_y: { value: 1.00 },
-        s_z: { value: 1.00 },
-        map_min: { value: -1.00 },
-        map_max: { value: 1.00 },
+        o_x: { value: this.state.uniforms.o_x  },
+        o_y: { value: this.state.uniforms.o_y  },
+        o_z: { value: this.state.uniforms.o_z  },
+        s_x: { value: this.state.uniforms.s_x  },
+        s_y: { value: this.state.uniforms.s_y  },
+        s_z: { value: this.state.uniforms.s_z  },
+        map_min: { value: this.state.uniforms.map_min },
+        map_max: { value: this.state.uniforms.map_max },
       },
-      name: "FractalNoise"
+      name: this.state.name
     });
 
     this.init();
@@ -227,13 +225,16 @@ class FractalNoise extends React.Component{
     const {classes} = this.props;
 
     return (
-      <ExpansionPanel expanded={true}>
+      <ExpansionPanel defaultExpanded={true}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
           <Typography variant="h5" className={classes.heading}>FractalNoise</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <Grid container>
 
+            
+            
+            {/* ENABLE */}
             <Grid item xs={12} align="right">
               <InputLabel margin="dense">Enabled</InputLabel>
               <Checkbox
@@ -241,12 +242,15 @@ class FractalNoise extends React.Component{
                 onChange={(e) => {
                     e.persist();
                     this.setState(state => (state.params.enabled = e.target.checked));
-                    this.props.updatePassParam("FractalNoise", "enabled", e.target.checked);
+                    this.props.updatePassParam(this.props.index, "enabled", e.target.checked);
                   }
                 }
               />
             </Grid>
 
+            
+            
+            {/* RENDER TO SCREEN */}
             <Grid item xs={12} align="right">
               <InputLabel margin="dense">Render to Screen</InputLabel>
               <Checkbox
@@ -254,11 +258,15 @@ class FractalNoise extends React.Component{
                 onChange={(e) => {
                     e.persist();
                     this.setState(state => (state.params.renderToScreen = e.target.checked));
+                    this.props.updatePassParam(this.props.index, "renderToScreen", e.target.checked);
                   }
                 }
               />
             </Grid>
 
+            
+            
+            {/* OCTAVES */}
             <Grid item xs={6}>
               <TextField
                 label="Octaves"
@@ -269,11 +277,15 @@ class FractalNoise extends React.Component{
                 onChange={(e) => {
                     e.persist();
                     this.setState(state => (state.defines.NUM_OCTAVES = e.target.value));
+                    this.props.updatePassDefine(this.props.index, "NUM_OCTAVES", e.target.value);
                   }
                 }
               />
             </Grid>
 
+            
+            
+            {/* SEED */}
             <Grid item xs={6}>
               <TextField
                 label="Seed"
@@ -284,11 +296,15 @@ class FractalNoise extends React.Component{
                 onChange={(e) => {
                     e.persist();
                     this.setState(state => (state.defines.SEED = e.target.value));
+                    this.props.updatePassDefine(this.props.index, "SEED", e.target.value);
                   }
                 }
               />
             </Grid>
 
+            
+            
+            {/* OFFSET GROUP */}
             <Grid container alignItems="center">
 
               <Grid item xs={3} align="center">
@@ -306,6 +322,7 @@ class FractalNoise extends React.Component{
                   onChange={(e) => {
                     e.persist();
                     this.setState(state => (state.uniforms.o_x = e.target.value));
+                    this.props.updatePassUniform(this.props.index, "o_x", e.target.value);
                   }
                 }
                 />
@@ -322,6 +339,7 @@ class FractalNoise extends React.Component{
                   onChange={(e) => {
                     e.persist();
                     this.setState(state => (state.uniforms.o_y = e.target.value));
+                    this.props.updatePassUniform(this.props.index, "o_y", e.target.value);
                   }
                 }
                 />
@@ -338,12 +356,16 @@ class FractalNoise extends React.Component{
                   onChange={(e) => {
                     e.persist();
                     this.setState(state => (state.uniforms.o_z = e.target.value));
+                    this.props.updatePassUniform(this.props.index, "o_z", e.target.value);
                   }
                 }
                 />
               </Grid>
             </Grid>
 
+            
+            
+            {/* SCALE GROUP */}
             <Grid container alignItems="center">
 
               <Grid item xs={3} align="center">
@@ -361,6 +383,7 @@ class FractalNoise extends React.Component{
                   onChange={(e) => {
                       e.persist();
                       this.setState(state => (state.uniforms.s_x = e.target.value));
+                      this.props.updatePassUniform(this.props.index, "s_x", e.target.value);
                     }
                   }
                 />
@@ -377,6 +400,7 @@ class FractalNoise extends React.Component{
                   onChange={(e) => {
                       e.persist();
                       this.setState(state => (state.uniforms.s_y = e.target.value));
+                      this.props.updatePassUniform(this.props.index, "s_y", e.target.value);
                     }
                   }
                 />
@@ -393,12 +417,16 @@ class FractalNoise extends React.Component{
                   onChange={(e) => {
                       e.persist();
                       this.setState(state => (state.uniforms.s_z = e.target.value));
+                      this.props.updatePassUniform(this.props.index, "s_z", e.target.value);
                     }
                   }
                 />
               </Grid>
             </Grid>
 
+            
+            
+            {/* MAP GROUP */}
             <Grid container alignItems="center">
 
               <Grid item xs={3} align="center">
@@ -414,9 +442,10 @@ class FractalNoise extends React.Component{
                   variant="filled"
                   margin="dense"
                   onChange={(e) => {
-                    e.persist();
-                    this.setState(state => (state.uniforms.map_min = e.target.value));
-                  }
+                      e.persist();
+                      this.setState(state => (state.uniforms.map_min = e.target.value));
+                      this.props.updatePassUniform(this.props.index, "map_min", e.target.value);
+                    }
                   }
                 />
               </Grid>
@@ -430,9 +459,10 @@ class FractalNoise extends React.Component{
                   variant="filled"
                   margin="dense"
                   onChange={(e) => {
-                    e.persist();
-                    this.setState(state => (state.uniforms.map_max = e.target.value));
-                  }
+                      e.persist();
+                      this.setState(state => (state.uniforms.map_max = e.target.value));
+                      this.props.updatePassUniform(this.props.index, "map_max", e.target.value);
+                    }
                   }
                 />
               </Grid>

@@ -39,7 +39,6 @@ class Terrain extends React.Component {
 
     this.state = {
       ready: false,
-      // geometry: this.geometry // possibly not needed
     }
   }
 

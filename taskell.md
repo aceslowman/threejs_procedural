@@ -12,6 +12,7 @@
 - [enhancement] When changing camera type, duplicate / copy over any parent transform.
 - [bug] Camera aspect ratio is not being correctly updated onWindowResize.
 - [optimization] large drops in fps when changing gui navigation. due to unmounting/remounting.
+- [bug] prevent maps from reinitializing each time the Terrain navigation is selected
 
 ## Doing
 
@@ -19,6 +20,7 @@
     > Each shader pass (which makes up a 'Map') should have it's own custom  GUI. Does this require me to shove FractalNoise into a React component for example?
     * [ ] Create custom FractalNoise
     * [ ] Create custom FractalWarp
+    * [x] Figure out how to handle DEFINES
 - [improvement] make ProceduralMap a React component.
     > This should simplify management in some ways. 
 
