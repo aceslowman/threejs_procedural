@@ -9,6 +9,30 @@ import ProceduralMap from '../map/ProceduralMap';
 import FractalNoise from "../../shaders/FractalNoise.js";
 import FractalWarp from "../../shaders/FractalWarp.js";
 
+import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import Paper from '@material-ui/core/Paper';
+import TextField from '@material-ui/core/TextField';
+import Checkbox from '@material-ui/core/Checkbox';
+import InputLabel from '@material-ui/core/InputLabel';
+import Typography from '@material-ui/core/Typography';
+import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import UpIcon from '@material-ui/icons/KeyboardArrowUp';
+import DownIcon from '@material-ui/icons/KeyboardArrowDown';
+import DeleteIcon from '@material-ui/icons/Delete';
+import Input from '@material-ui/core/Input';
+import OutlinedInput from '@material-ui/core/OutlinedInput';
+import FilledInput from '@material-ui/core/FilledInput';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+
+
 const styles = theme => ({
   root: {
     padding: 8,
@@ -39,7 +63,27 @@ class Terrain extends React.Component {
 
     this.state = {
       ready: false,
+      detail: props.detail,
+      width: props.width,
+      height: props.height
     }
+  }
+
+  updateMesh(name, v) {
+    this.setState({[name]: v});
+
+    this.scene.remove(this.mesh)
+
+    this.geometry = new THREE.PlaneBufferGeometry(
+      this.state.width,
+      this.state.height,
+      v,
+      v    
+    );
+
+    this.initializeMesh();
+    // this.setupDebug();
+    // need to displace mesh
   }
 
   componentDidMount() {
@@ -107,15 +151,40 @@ class Terrain extends React.Component {
     return (
       <Route path="/terrain/" render={() => (
         <React.Fragment>
+          <Paper className={classes.root}>
+            <Grid container justify={'center'} alignItems={'center'} alignContent='center' spacing={16}>
+              <Grid item xs={12}>
+                <Typography variant="h6" align="center">Mesh Settings</Typography>
+              </Grid>
+              <Grid item>
+                <FormControl>
+                  <InputLabel htmlFor="detail-helper">detail</InputLabel>
+                  <Select
+                    value={this.state.detail}
+                    onChange={(e)=>this.updateMesh("detail", e.target.value)}
+                  >
+                    <MenuItem value={64}>
+                      <em>64</em>
+                    </MenuItem>
+                    <MenuItem value={128}>128</MenuItem>
+                    <MenuItem value={256}>256</MenuItem>
+                    <MenuItem value={512}>512</MenuItem>
+                  </Select>
+                  <FormHelperText>resolution of mesh</FormHelperText>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </Paper>
           <ProceduralMap
             name="Elevation"
             renderer={this.renderer}
             width={this.width}
             height={this.height}
             displaceGeometry={(d,w,h)=>this.displaceGeometry(d,w,h)}
+            seed={this.seed}
             >
-            <FractalNoise />
-            {/* <FractalWarp /> */}
+              <FractalNoise />
+              {/* <FractalWarp /> */}
           </ProceduralMap>
         </React.Fragment>
       )} />
@@ -123,4 +192,4 @@ class Terrain extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(Terrain));
+export default withStyles(styles)(Terrain);

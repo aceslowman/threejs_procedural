@@ -1,25 +1,83 @@
 import React from 'react';
 import * as THREE from 'three';
 
-export default class FractalWarp extends React.Component{
-  constructor(octaves, seed){
-    super();
+import { withStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import Paper from '@material-ui/core/Paper';
+import TextField from '@material-ui/core/TextField';
+import Checkbox from '@material-ui/core/Checkbox';
+import InputLabel from '@material-ui/core/InputLabel';
+import Typography from '@material-ui/core/Typography';
+import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import UpIcon from '@material-ui/icons/KeyboardArrowUp';
+import DownIcon from '@material-ui/icons/KeyboardArrowDown';
+import DeleteIcon from '@material-ui/icons/Delete';
+
+const styles = theme => ({
+  root: {
+    padding: '16px !important',
+    margin: '4px 4px 16px 4px',
+    border: '1px solid rgba(255, 255, 255, 0.12);'
+  },
+  highlighted: {
+    border: '1px solid rgba(255,255,255,0.6)'
+  },
+  type: {
+    padding: '8px 0px'
+  }
+});
+
+class FractalWarp extends React.Component{
+  constructor(props){
+    super(props);
 
     // TODO: this should be populated from props.
     this.state = {
       defines: {
-        'NUM_OCTAVES': octaves,
-        'SEED': seed
+        'NUM_OCTAVES': props.octaves,
+        'SEED': props.seed
       },
       uniforms: {
-        tDiffuse: '',
-        map_min: -1.0,
-        map_max: 1.0,
-        s_x: 0.2 ,
-        s_y: 0.2 ,
-        s_z: 0.4 ,
+        tDiffuse: props.tDiffuse || '',
+        map_min: props.map_min || -1.0,
+        map_max: props.map_max || 1.0,
+        s_x: props.s_x || 0.2 ,
+        s_y: props.s_y || 0.2 ,
+        s_z: props.s_z || 0.4 ,
       },
+      params: {
+        enabled: props.enabled || true,
+        renderToScreen: props.renderToScreen || true
+      },
+      name: "FractalWarp"
     }
+
+    // this.state = {
+    //   defines: {
+    //     'NUM_OCTAVES': props.octaves,
+    //     'SEED': props.seed
+    //   },
+    //   uniforms: {
+    //     o_x: props.o_x || 0.00,
+    //     o_y: props.o_y || 0.00,
+    //     o_z: props.o_z || 0.00,
+    //     s_x: props.s_x || 1.00,
+    //     s_y: props.s_y || 1.00,
+    //     s_z: props.s_z || 1.00,
+    //     map_min: props.map_min || -1.00,
+    //     map_max: props.map_max || 1.00,
+    //   },
+    //   params: {
+    //     enabled: props.enabled || true,
+    //     renderToScreen: props.renderToScreen || true
+    //   },
+    //   name: "FractalNoise"
+    // }
 
     // TODO: this should be populated from state.
     this.shaderMaterial = new THREE.ShaderMaterial({
@@ -188,12 +246,262 @@ export default class FractalWarp extends React.Component{
   }
 
   render() {
+    const { classes } = this.props;
+
     return (
-      <div> 
-        <h2 style={{color:'white'}}>FRACTAL WARP Hey hey ho ho, this react shit has got to go.</h2>
-      </div>
+      <ExpansionPanel defaultExpanded={true}>
+        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography variant="h5" className={classes.heading}>FractalWarp</Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails>
+          <Grid container>
+
+
+
+            {/* ENABLE */}
+            <Grid item xs={12} align="right">
+              <InputLabel margin="dense">Enabled</InputLabel>
+              <Checkbox
+                checked={this.state.params.enabled}
+                onChange={(e) => {
+                  e.persist();
+                  this.setState(state => (state.params.enabled = e.target.checked));
+                  this.props.updatePassParam(this.props.index, "enabled", e.target.checked);
+                }
+                }
+              />
+            </Grid>
+
+
+
+            {/* RENDER TO SCREEN */}
+            <Grid item xs={12} align="right">
+              <InputLabel margin="dense">Render to Screen</InputLabel>
+              <Checkbox
+                checked={this.state.params.renderToScreen}
+                onChange={(e) => {
+                  e.persist();
+                  this.setState(state => (state.params.renderToScreen = e.target.checked));
+                  this.props.updatePassParam(this.props.index, "renderToScreen", e.target.checked);
+                }
+                }
+              />
+            </Grid>
+
+
+
+            {/* OCTAVES */}
+            <Grid item xs={6}>
+              <TextField
+                label="Octaves"
+                value={this.state.defines.NUM_OCTAVES}
+                type="number"
+                variant="filled"
+                margin="dense"
+                onChange={(e) => {
+                  e.persist();
+                  this.setState(state => (state.defines.NUM_OCTAVES = e.target.value));
+                  this.props.updatePassDefine(this.props.index, "NUM_OCTAVES", e.target.value);
+                }
+                }
+              />
+            </Grid>
+
+
+
+            {/* SEED */}
+            <Grid item xs={6}>
+              <TextField
+                label="Seed"
+                value={this.state.defines.SEED}
+                type="number"
+                variant="filled"
+                margin="dense"
+                onChange={(e) => {
+                  e.persist();
+                  this.setState(state => (state.defines.SEED = e.target.value));
+                  this.props.updatePassDefine(this.props.index, "SEED", e.target.value);
+                }
+                }
+              />
+            </Grid>
+
+
+
+            {/* OFFSET GROUP */}
+            <Grid container alignItems="center">
+
+              <Grid item xs={3} align="center">
+                <InputLabel margin="dense">Offset</InputLabel>
+              </Grid>
+
+              <Grid item xs={3}>
+                <TextField
+                  label="x"
+                  value={this.state.uniforms.o_x}
+                  inputProps={{ step: 0.1 }}
+                  type="number"
+                  variant="filled"
+                  margin="dense"
+                  onChange={(e) => {
+                    e.persist();
+                    this.setState(state => (state.uniforms.o_x = e.target.value));
+                    this.props.updatePassUniform(this.props.index, "o_x", e.target.value);
+                  }
+                  }
+                />
+              </Grid>
+
+              <Grid item xs={3}>
+                <TextField
+                  label="y"
+                  value={this.state.uniforms.o_y}
+                  inputProps={{ step: 0.1 }}
+                  type="number"
+                  variant="filled"
+                  margin="dense"
+                  onChange={(e) => {
+                    e.persist();
+                    this.setState(state => (state.uniforms.o_y = e.target.value));
+                    this.props.updatePassUniform(this.props.index, "o_y", e.target.value);
+                  }
+                  }
+                />
+              </Grid>
+
+              <Grid item xs={3}>
+                <TextField
+                  label="z"
+                  value={this.state.uniforms.o_z}
+                  inputProps={{ step: 0.1 }}
+                  type="number"
+                  variant="filled"
+                  margin="dense"
+                  onChange={(e) => {
+                    e.persist();
+                    this.setState(state => (state.uniforms.o_z = e.target.value));
+                    this.props.updatePassUniform(this.props.index, "o_z", e.target.value);
+                  }
+                  }
+                />
+              </Grid>
+            </Grid>
+
+
+
+            {/* SCALE GROUP */}
+            <Grid container alignItems="center">
+
+              <Grid item xs={3} align="center">
+                <InputLabel margin="dense">Scale</InputLabel>
+              </Grid>
+
+              <Grid item xs={3}>
+                <TextField
+                  label="x"
+                  value={this.state.uniforms.s_x}
+                  inputProps={{ step: 0.1 }}
+                  type="number"
+                  variant="filled"
+                  margin="dense"
+                  onChange={(e) => {
+                    e.persist();
+                    this.setState(state => (state.uniforms.s_x = e.target.value));
+                    this.props.updatePassUniform(this.props.index, "s_x", e.target.value);
+                  }
+                  }
+                />
+              </Grid>
+
+              <Grid item xs={3}>
+                <TextField
+                  label="y"
+                  value={this.state.uniforms.s_y}
+                  inputProps={{ step: 0.1 }}
+                  type="number"
+                  variant="filled"
+                  margin="dense"
+                  onChange={(e) => {
+                    e.persist();
+                    this.setState(state => (state.uniforms.s_y = e.target.value));
+                    this.props.updatePassUniform(this.props.index, "s_y", e.target.value);
+                  }
+                  }
+                />
+              </Grid>
+
+              <Grid item xs={3}>
+                <TextField
+                  label="z"
+                  value={this.state.uniforms.s_z}
+                  inputProps={{ step: 0.1 }}
+                  type="number"
+                  variant="filled"
+                  margin="dense"
+                  onChange={(e) => {
+                    e.persist();
+                    this.setState(state => (state.uniforms.s_z = e.target.value));
+                    this.props.updatePassUniform(this.props.index, "s_z", e.target.value);
+                  }
+                  }
+                />
+              </Grid>
+            </Grid>
+
+
+
+            {/* MAP GROUP */}
+            <Grid container alignItems="center">
+
+              <Grid item xs={3} align="center">
+                <InputLabel margin="dense">Map</InputLabel>
+              </Grid>
+
+              <Grid item xs={4}>
+                <TextField
+                  label="min"
+                  value={this.state.uniforms.map_min}
+                  inputProps={{ step: 0.1 }}
+                  type="number"
+                  variant="filled"
+                  margin="dense"
+                  onChange={(e) => {
+                    e.persist();
+                    this.setState(state => (state.uniforms.map_min = e.target.value));
+                    this.props.updatePassUniform(this.props.index, "map_min", e.target.value);
+                  }
+                  }
+                />
+              </Grid>
+
+              <Grid item xs={5}>
+                <TextField
+                  label="max"
+                  value={this.state.uniforms.map_max}
+                  inputProps={{ step: 0.1 }}
+                  type="number"
+                  variant="filled"
+                  margin="dense"
+                  onChange={(e) => {
+                    e.persist();
+                    this.setState(state => (state.uniforms.map_max = e.target.value));
+                    this.props.updatePassUniform(this.props.index, "map_max", e.target.value);
+                  }
+                  }
+                />
+              </Grid>
+            </Grid>
+
+          </Grid>
+        </ExpansionPanelDetails>
+        <ExpansionPanelActions>
+          <IconButton disabled size="small"><DeleteIcon /></IconButton>
+          <IconButton disabled size="small"><UpIcon /></IconButton>
+          <IconButton disabled size="small"><DownIcon /></IconButton>
+        </ExpansionPanelActions>
+      </ExpansionPanel>
     );
   }
 };
 
-
+export default withStyles(styles)(FractalWarp);

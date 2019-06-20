@@ -12,7 +12,6 @@
 - [enhancement] When changing camera type, duplicate / copy over any parent transform.
 - [bug] Camera aspect ratio is not being correctly updated onWindowResize.
 - [optimization] large drops in fps when changing gui navigation. due to unmounting/remounting.
-- [bug] prevent maps from reinitializing each time the Terrain navigation is selected
 
 ## Doing
 
@@ -23,6 +22,8 @@
     * [x] Figure out how to handle DEFINES
 - [improvement] make ProceduralMap a React component.
     > This should simplify management in some ways. 
+- [bug] prevent maps from reinitializing each time the Terrain navigation is selected
+    > pass parameters are currently being overwritten whenever the component (FractalNoise) is being re-rendered.
 
 ## Done
 

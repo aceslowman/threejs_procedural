@@ -3,6 +3,9 @@ import * as THREE from 'three';
 
 import { EffectComposer } from '../../utilities/EffectComposer/EffectComposer.js';
 
+import FractalNoise from "../../shaders/FractalNoise.js";
+import FractalWarp from "../../shaders/FractalWarp.js";
+
 export default class ProceduralMap extends React.Component {
     constructor(props){
         super(props);
@@ -45,7 +48,6 @@ export default class ProceduralMap extends React.Component {
     }
 
     updatePassDefine(pass_id, name, value) {
-        console.log(this.composer.passes[pass_id].material.defines);
         this.composer.passes[pass_id].material.defines[name] = value;
         this.composer.passes[pass_id].material.needsUpdate = true; // necessary when updating defines
         this.updateComposer();
@@ -79,6 +81,7 @@ export default class ProceduralMap extends React.Component {
     render() {
         return(
             <div>
+                {/* Passes should be managed by  */}
                 {React.Children.map(this.passes, (child, i) => React.cloneElement(child, {
                     index:i,
                     updatePassParam: (p,n,v) => this.updatePassParam(p,n,v),     // pass the update props on to the
