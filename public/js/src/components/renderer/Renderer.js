@@ -87,10 +87,20 @@ class Renderer extends React.Component {
                             <Typography variant="h6" align="center">Rendering</Typography>
                         </Grid>
                         <Grid item xs={6}>
-                            <Button onClick={() => this.changeRenderer("NORMAL")} fullWidth variant="outlined">Normal</Button>
+                            <Button 
+                            onClick={() => this.changeRenderer("NORMAL")} 
+                            fullWidth 
+                            variant="outlined">
+                                Normal
+                            </Button>
                         </Grid>
                         <Grid item xs={6}>
-                            <Button onClick={() => this.changeRenderer("RAYTRACING")} fullWidth variant="outlined">Raytracing</Button>
+                            <Button 
+                            onClick={() => this.changeRenderer("RAYTRACING")} 
+                            fullWidth 
+                            variant="outlined">
+                                Raytracing
+                            </Button>
                         </Grid>
                     </Grid>
                 </Paper>

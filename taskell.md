@@ -14,8 +14,6 @@
 ## Doing
 
 - [feature] Begin implementing RayTracing Renderer mode.
-- [bug] orbitControls are not receiving the updated renderer domElement when changed in Renderer.
-- 
 
 ## Done
 
@@ -79,6 +77,7 @@
     * [x] Figure out how to handle DEFINES
 - [bug] Camera aspect ratio is not being correctly updated onWindowResize.
 - [feature] Create new Renderer component & GUI, and pass it up to App.js using onRef().
+- [bug] orbitControls are not receiving the updated renderer domElement when changed in Renderer.
 
 ## Backburner
 

@@ -29,7 +29,6 @@ class Camera extends React.Component {
   constructor(props){
     super(props);
 
-    this.renderer = props.renderer;
     this.scene    = props.scene;
     this.width    = props.width;
     this.height   = props.height;
@@ -81,6 +80,12 @@ class Camera extends React.Component {
     this.ready();
   }
 
+  componentDidUpdate(prevProps){
+    if (prevProps.renderer != this.props.renderer) {
+      this.setupOrbit();
+    };
+  }
+
   ready(){
     this.setState({ready: true, activeCamera: this.state.cameras.perspective});
     this.props.cameraReady(this.state.cameras.perspective);
@@ -89,7 +94,7 @@ class Camera extends React.Component {
   setupOrbit() {
     this.orbitControls = new OrbitControls(
       this.state.activeCamera,
-      this.renderer.domElement
+      this.props.renderer.domElement
     );
 
     this.orbitControls.dampingFactor = 0.8;
