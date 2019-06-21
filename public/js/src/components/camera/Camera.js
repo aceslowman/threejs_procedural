@@ -146,18 +146,42 @@ class Camera extends React.Component {
               <Typography variant="h6" align="center">Camera Type</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Button color={this.state.activeCamera.type == "OrthographicCamera" ? 'primary' : 'default'} onClick={() => this.changeActiveCamera("OrthographicCamera")} fullWidth variant="outlined">Orthographic</Button>
+              <Button 
+                color={this.state.activeCamera.type == "OrthographicCamera" ? 'primary' : 'default'} 
+                onClick={() => this.changeActiveCamera("OrthographicCamera")} 
+                fullWidth 
+                variant="outlined"
+              >
+                Orthographic
+              </Button>
             </Grid>
             <Grid item xs={6}>
-              <Button color={this.state.activeCamera.type == "PerspectiveCamera" ? 'primary' : 'default'} onClick={() => this.changeActiveCamera("PerspectiveCamera")} fullWidth variant="outlined">Perspective</Button>
+              <Button 
+                color={this.state.activeCamera.type == "PerspectiveCamera" ? 'primary' : 'default'} 
+                onClick={() => this.changeActiveCamera("PerspectiveCamera")} 
+                fullWidth 
+                variant="outlined"
+              >
+                Perspective
+              </Button>
             </Grid>
           </Grid>
         </Paper>
 
         <Paper className={classes.root}>
           <CameraCommons {...this.other} camera={this.state.activeCamera} />
-          {this.state.activeCamera.type == "PerspectiveCamera" && <PerspectiveCameraTools {...this.other} camera={this.state.activeCamera} />}
-          {this.state.activeCamera.type == "OrthographicCamera" && <OrthographicCameraTools {...this.other} camera={this.state.activeCamera} />}
+          {this.state.activeCamera.type == "PerspectiveCamera" && 
+            <PerspectiveCameraTools 
+              {...this.other} 
+              camera={this.state.activeCamera} 
+            />
+          }
+          {this.state.activeCamera.type == "OrthographicCamera" && 
+            <OrthographicCameraTools 
+              {...this.other} 
+              camera={this.state.activeCamera} 
+            />
+          }
         </Paper>
       </React.Fragment>
     );

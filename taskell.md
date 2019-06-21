@@ -17,13 +17,12 @@
 
 - [improvement] create custom GUI for each type of shader pass.
     > Each shader pass (which makes up a 'Map') should have it's own custom  GUI. Does this require me to shove FractalNoise into a React component for example?
-    * [ ] Create custom FractalNoise
+    * [x] Create custom FractalNoise
     * [ ] Create custom FractalWarp
     * [x] Figure out how to handle DEFINES
-- [improvement] make ProceduralMap a React component.
-    > This should simplify management in some ways. 
 - [bug] prevent maps from reinitializing each time the Terrain navigation is selected
     > pass parameters are currently being overwritten whenever the component (FractalNoise) is being re-rendered. I think my solution will be to just entirely remove react-router. My goal is not to mount / unmount, or at least it can't be as long as my webgl is tightly entwined with my gui. I can picture a way around this, by accessing the webgl via onRef.... but I'll leave that on the backburner
+    * [ ] filter out navigation items in GUI.
 
 ## Done
 
@@ -78,6 +77,8 @@
     * [x] Reconnect Redux to the Terrain
     * [x] Reconnect Redux to the Camera
     * [x] Fix issue where Ortho cam is not displaying terrain properly. This is caused by the camera frustum not receiving valid initial inputs.
+- [improvement] make ProceduralMap a React component.
+    > This should simplify management in some ways. 
 
 ## Backburner
 

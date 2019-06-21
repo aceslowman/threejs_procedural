@@ -54,16 +54,6 @@ html, body, .container, #root {
     width: 0px;  /* Remove scrollbar space */
     background: transparent;  /* Optional: just make scrollbar invisible */
 }
-/* Optional: show position indicator in red */
-::-webkit-scrollbar-thumb {
-    background: #FF0000;
-}
-
-/*
-  overflow-y: scroll;
-  padding-right: 17px;
-  box-sizing: content-box;
-*/
 
 .diagram_open {
   /* z-index: 1; */
@@ -175,7 +165,7 @@ html, body, .container, #root {
   background-color: rgba(255,255,255,0.5);
   padding: 1px;
   position: absolute;
-  z-index:: 100;
+  z-index: 100;
 }
 
 .road_label h6 {

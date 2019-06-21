@@ -91,7 +91,7 @@ export default class ProceduralMap extends React.Component {
                     updatePassUniform: (p,n,v) => this.updatePassUniform(p,n,v), 
                     ready: (p) => this.addPass(p),
                     composer: this.composer, 
-                    octaves: '10', 
+                    octaves: 8, 
                     seed: this.seed
                 }))}
             </div>
