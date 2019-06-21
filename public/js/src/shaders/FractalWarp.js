@@ -57,52 +57,30 @@ class FractalWarp extends React.Component{
       name: "FractalWarp"
     }
 
-    // this.state = {
-    //   defines: {
-    //     'NUM_OCTAVES': props.octaves,
-    //     'SEED': props.seed
-    //   },
-    //   uniforms: {
-    //     o_x: props.o_x || 0.00,
-    //     o_y: props.o_y || 0.00,
-    //     o_z: props.o_z || 0.00,
-    //     s_x: props.s_x || 1.00,
-    //     s_y: props.s_y || 1.00,
-    //     s_z: props.s_z || 1.00,
-    //     map_min: props.map_min || -1.00,
-    //     map_max: props.map_max || 1.00,
-    //   },
-    //   params: {
-    //     enabled: props.enabled || true,
-    //     renderToScreen: props.renderToScreen || true
-    //   },
-    //   name: "FractalNoise"
-    // }
-
-    // TODO: this should be populated from state.
     this.shaderMaterial = new THREE.ShaderMaterial({
       defines: {
-        'NUM_OCTAVES': octaves,
-        'SEED': seed
+        'NUM_OCTAVES': this.state.defines.NUM_OCTAVES,
+        'SEED': this.state.defines.SEED
       },
       uniforms: {
         tDiffuse: { value: '' },
-        map_min: {value: -1.0},
-        map_max: {value: 1.0},
-        s_x: { value: 0.2 },
-        s_y: { value: 0.2 },
-        s_z: { value: 0.4 },
+        map_min: { value: this.state.uniforms.map_min },
+        map_max: { value: this.state.uniforms.map_max },
+        s_x: { value: this.state.uniforms.s_x },
+        s_y: { value: this.state.uniforms.s_y },
+        s_z: { value: this.state.uniforms.s_z },
       },
       name: "FractalWarp"
     });
 
-    this.compile();
+    this.init();
+    props.addPass(this.shaderMaterial);
   }
 
   /*
-    call compile() if the shader constants needs to be reset.
+    call init() if the shader constants needs to be reset.
   */
-  compile(){
+  init(){
     const noise = `
       //	Simplex 3D Noise
       //	by Ian McEwan, Ashima Arts
@@ -249,7 +227,7 @@ class FractalWarp extends React.Component{
     const { classes } = this.props;
 
     return (
-      <ExpansionPanel defaultExpanded={true}>
+      <ExpansionPanel defaultExpanded={false}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
           <Typography variant="h5" className={classes.heading}>FractalWarp</Typography>
         </ExpansionPanelSummary>
@@ -325,69 +303,6 @@ class FractalWarp extends React.Component{
                 }
               />
             </Grid>
-
-
-
-            {/* OFFSET GROUP */}
-            <Grid container alignItems="center">
-
-              <Grid item xs={3} align="center">
-                <InputLabel margin="dense">Offset</InputLabel>
-              </Grid>
-
-              <Grid item xs={3}>
-                <TextField
-                  label="x"
-                  value={this.state.uniforms.o_x}
-                  inputProps={{ step: 0.1 }}
-                  type="number"
-                  variant="filled"
-                  margin="dense"
-                  onChange={(e) => {
-                    e.persist();
-                    this.setState(state => (state.uniforms.o_x = e.target.value));
-                    this.props.updatePassUniform(this.props.index, "o_x", e.target.value);
-                  }
-                  }
-                />
-              </Grid>
-
-              <Grid item xs={3}>
-                <TextField
-                  label="y"
-                  value={this.state.uniforms.o_y}
-                  inputProps={{ step: 0.1 }}
-                  type="number"
-                  variant="filled"
-                  margin="dense"
-                  onChange={(e) => {
-                    e.persist();
-                    this.setState(state => (state.uniforms.o_y = e.target.value));
-                    this.props.updatePassUniform(this.props.index, "o_y", e.target.value);
-                  }
-                  }
-                />
-              </Grid>
-
-              <Grid item xs={3}>
-                <TextField
-                  label="z"
-                  value={this.state.uniforms.o_z}
-                  inputProps={{ step: 0.1 }}
-                  type="number"
-                  variant="filled"
-                  margin="dense"
-                  onChange={(e) => {
-                    e.persist();
-                    this.setState(state => (state.uniforms.o_z = e.target.value));
-                    this.props.updatePassUniform(this.props.index, "o_z", e.target.value);
-                  }
-                  }
-                />
-              </Grid>
-            </Grid>
-
-
 
             {/* SCALE GROUP */}
             <Grid container alignItems="center">

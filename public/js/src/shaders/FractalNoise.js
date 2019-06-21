@@ -77,7 +77,7 @@ class FractalNoise extends React.Component{
     });
 
     this.init();
-    props.ready(this.shaderMaterial);
+    props.addPass(this.shaderMaterial);
   }
 
   /*
@@ -225,7 +225,7 @@ class FractalNoise extends React.Component{
     const {classes} = this.props;
 
     return (
-      <ExpansionPanel defaultExpanded={true}>
+      <ExpansionPanel defaultExpanded={false}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
           <Typography variant="h5" className={classes.heading}>FractalNoise</Typography>
         </ExpansionPanelSummary>

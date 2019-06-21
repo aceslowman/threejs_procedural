@@ -12,6 +12,7 @@ import * as THREE from 'three';
 import Stats from "stats-js";
 import Camera from './components/camera/CameraContainer';
 import Terrain from './components/terrain/TerrainContainer';
+import Renderer from './components/renderer/Renderer';
 
 import store from './redux/store';
 
@@ -27,8 +28,8 @@ const theme = createMuiTheme({
     borderRadius: 2
   },
   palette: {
-    type: 'dark',
-    background: '#ccc'
+    // type: 'dark',
+    // background: '#ccc'
   },
   overrides: {
     MuiPaper: {
@@ -42,7 +43,7 @@ class App extends React.Component {
     super(props);
 
     this.clock    = new THREE.Clock();
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    // this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.scene    = new THREE.Scene();
 
     //TEMP
@@ -57,7 +58,8 @@ class App extends React.Component {
       canvasReady: false,
       width: '',
       height: '',
-      startFlag: false
+      startFlag: false,
+      renderer: null
     }
   }
 
@@ -86,13 +88,29 @@ class App extends React.Component {
     this.setState({terrainReady: true});
   }
 
+  handleRendererChange(renderer) {
+    // renderer.setSize(this.width, this.height);
+    this.setState({renderer: renderer});
+
+    // TODO: this.mount is not available yet.
+    // this.mount.appendChild(this.state.renderer.domElement);
+    // document.getElementById('APP').appendChild(this.state.renderer.domElement);
+    if(this.mount) console.log('MOUNT EXISTS, back 2 handleRendererChange()');
+    // this.mount.appendChild(renderer.domElement);
+  }
+
+  handleSketchReady() {
+    this.setState({ sketchReady: true });
+  }
+
   //LIFECYCLE-----------------------------------------------------
   componentDidMount() {
-    let width = this.mount.clientWidth;
-    let height = this.mount.clientHeight;
+    // this.width = this.mount.clientWidth;
+    // this.height = this.mount.clientHeight;
 
-    this.renderer.setSize(width, height);
-    this.mount.appendChild(this.renderer.domElement);
+    // this.state.renderer.setSize(width, height);
+    if (this.state.renderer) console.log("renderer exists! come back to componentDidMount")
+    // this.mount.appendChild(this.state.renderer.domElement);
 
     this.registerListeners();
     this.setupStats();
@@ -168,13 +186,9 @@ class App extends React.Component {
       this.entities[i].update();
     }
     
-    this.renderer.render(this.scene, this.camera);
+    this.state.renderer.render(this.scene, this.camera);
 
     this.stats.end();
-  }
-
-  handleSketchReady(){
-    this.setState({sketchReady: true});
   }
 
   render() {
@@ -184,23 +198,32 @@ class App extends React.Component {
           <Provider store={store}>
             <div className="container">
               <GUI ready={this.state.sketchReady}>
-                {this.state.canvasReady && <Camera 
-                  renderer={this.renderer} 
+                <Renderer
+                  setRenderer={(r) => this.handleRendererChange(r)}
+                  width={this.state.width}
+                  height={this.state.height} 
+                />
+                {
+                  this.state.canvasReady && <Terrain
+                    renderer={this.state.renderer}
+                    scene={this.scene}
+                    width={512}
+                    height={512}
+                    detail={512}
+                    amplitude={150}
+                    terrainReady={(t) => this.handleTerrainReady(t)}
+                  />
+                }                 
+                {
+                  this.state.canvasReady && <Camera 
+                  renderer={this.state.renderer} 
                   scene={this.scene} 
                   width={this.state.width} 
                   height={this.state.height} 
                   cameraReady={(c) => this.handleCameraReady(c)} 
                   cameraChange={(c) => this.handleCameraChange(c)}
-                />}
-                {this.state.canvasReady && <Terrain 
-                  renderer={this.renderer} 
-                  scene={this.scene} 
-                  width={512} 
-                  height={512} 
-                  detail={256} 
-                  amplitude={150} 
-                  terrainReady={(t) => this.handleTerrainReady(t)} 
-                />}
+                />
+                }
               </GUI>
               <div id="SKETCHCONTAINER">
                 <div id="APP" ref={mount => { this.mount = mount }} />

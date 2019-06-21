@@ -1,28 +1,21 @@
 ## To Do
 
-- Research RayTracing Renderer
-    > Raytracing Renderer (kept within renderers/RaytracingRenderer.js) would be a great option here, allowing me to do some high quality non-realtime renders. Perfect!
+- [feature] implement adjustable smoothing on Terrain mesh
 - [bug] Correct FBM artifact issue.
     > Currently small artifacts exist after a FractalWarp pass.
     * [ ] Check sampling functions
     * [ ] Check negative dot product
     * [ ] Check for divide by zero
     * [ ] Clamp values?
-- [feature] Begin implementing RayTracing Renderer mode.
 - [enhancement] When changing camera type, duplicate / copy over any parent transform.
-- [bug] Camera aspect ratio is not being correctly updated onWindowResize.
-- [optimization] large drops in fps when changing gui navigation. due to unmounting/remounting.
+- Research RayTracing Renderer
+    > Raytracing Renderer (kept within renderers/RaytracingRenderer.js) would be a great option here, allowing me to do some high quality non-realtime renders. Perfect!
 
 ## Doing
 
-- [improvement] create custom GUI for each type of shader pass.
-    > Each shader pass (which makes up a 'Map') should have it's own custom  GUI. Does this require me to shove FractalNoise into a React component for example?
-    * [x] Create custom FractalNoise
-    * [ ] Create custom FractalWarp
-    * [x] Figure out how to handle DEFINES
-- [bug] prevent maps from reinitializing each time the Terrain navigation is selected
-    > pass parameters are currently being overwritten whenever the component (FractalNoise) is being re-rendered. I think my solution will be to just entirely remove react-router. My goal is not to mount / unmount, or at least it can't be as long as my webgl is tightly entwined with my gui. I can picture a way around this, by accessing the webgl via onRef.... but I'll leave that on the backburner
-    * [ ] filter out navigation items in GUI.
+- [feature] Begin implementing RayTracing Renderer mode.
+- [bug] orbitControls are not receiving the updated renderer domElement when changed in Renderer.
+- 
 
 ## Done
 
@@ -79,6 +72,13 @@
     * [x] Fix issue where Ortho cam is not displaying terrain properly. This is caused by the camera frustum not receiving valid initial inputs.
 - [improvement] make ProceduralMap a React component.
     > This should simplify management in some ways. 
+- [improvement] create custom GUI for each type of shader pass.
+    > Each shader pass (which makes up a 'Map') should have it's own custom  GUI. Does this require me to shove FractalNoise into a React component for example?
+    * [x] Create custom FractalNoise
+    * [x] Create custom FractalWarp
+    * [x] Figure out how to handle DEFINES
+- [bug] Camera aspect ratio is not being correctly updated onWindowResize.
+- [feature] Create new Renderer component & GUI, and pass it up to App.js using onRef().
 
 ## Backburner
 
@@ -110,3 +110,7 @@
     * [ ] If I'm serializing objects before inserting them into the store, should I use the reducer to store the initial state?
 - Begin implementing simple tree map.
 - [organization] Move all actions (like in TerrainContainer.js) into the respective actions folder
+- [optimization] large drops in fps when changing gui navigation. due to unmounting/remounting.
+- [bug] prevent maps from reinitializing each time the Terrain navigation is selected
+    > pass parameters are currently being overwritten whenever the component (FractalNoise) is being re-rendered. I think my solution will be to just entirely remove react-router. My goal is not to mount / unmount, or at least it can't be as long as my webgl is tightly entwined with my gui. I can picture a way around this, by accessing the webgl via onRef.... but I'll leave that on the backburner
+    * [ ] filter out navigation items in GUI.

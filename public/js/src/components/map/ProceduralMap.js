@@ -3,9 +3,6 @@ import * as THREE from 'three';
 
 import { EffectComposer } from '../../utilities/EffectComposer/EffectComposer.js';
 
-import FractalNoise from "../../shaders/FractalNoise.js";
-import FractalWarp from "../../shaders/FractalWarp.js";
-
 export default class ProceduralMap extends React.Component {
     constructor(props){
         super(props);
@@ -22,8 +19,8 @@ export default class ProceduralMap extends React.Component {
         this.target = new THREE.WebGLRenderTarget(this.width, this.height, {
             minFilter: THREE.LinearMipMapLinearFilter,
             magFilter: THREE.LinearFilter,
-            format: THREE.RGBAFormat, // important for readPixels()
-            type: THREE.FloatType,    // important for readPixels()
+            format: THREE.RGBAFormat,       // important for readPixels()
+            type: THREE.FloatType,          // important for readPixels()
             stencilBuffer: false
         });
 
@@ -38,7 +35,9 @@ export default class ProceduralMap extends React.Component {
     }
 
     updateComposer(){
-        this.composer.swapBuffers(); // must call to make render valid
+        // when there is one buffer present, swapBuffers() is necessary
+        // when there are two, swap. I need to know how this works though.
+        if(this.composer.passes.length == 0) this.composer.swapBuffers();
         this.composer.render();
 
         this.props.displaceGeometry();
@@ -64,7 +63,7 @@ export default class ProceduralMap extends React.Component {
         this.composer.addPass(new THREE.ShaderPass(pass));
         this.composer.render();
 
-        this.props.displaceGeometry(this.getBufferArray());
+        this.props.displaceGeometry();
     }
 
     getSample(x, y) {
@@ -82,19 +81,18 @@ export default class ProceduralMap extends React.Component {
 
     render() {
         return(
-            <div>
-                {/* Passes should be managed by  */}
+            <React.Fragment>
                 {React.Children.map(this.passes, (child, i) => React.cloneElement(child, {
                     index:i,
                     updatePassParam: (p,n,v) => this.updatePassParam(p,n,v),     // pass the update props on to the
                     updatePassDefine: (p,n,v) => this.updatePassDefine(p,n,v),   // props.children
                     updatePassUniform: (p,n,v) => this.updatePassUniform(p,n,v), 
-                    ready: (p) => this.addPass(p),
+                    addPass: (p) => this.addPass(p),
                     composer: this.composer, 
                     octaves: 8, 
                     seed: this.seed
                 }))}
-            </div>
+            </React.Fragment>
         )
     }
 };
