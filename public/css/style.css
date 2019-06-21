@@ -47,7 +47,23 @@ html, body, .container, #root {
   width: 60px;
   transition: width 900ms ease;
   overflow-x:hidden;
+
 }
+
+::-webkit-scrollbar {
+    width: 0px;  /* Remove scrollbar space */
+    background: transparent;  /* Optional: just make scrollbar invisible */
+}
+/* Optional: show position indicator in red */
+::-webkit-scrollbar-thumb {
+    background: #FF0000;
+}
+
+/*
+  overflow-y: scroll;
+  padding-right: 17px;
+  box-sizing: content-box;
+*/
 
 .diagram_open {
   /* z-index: 1; */

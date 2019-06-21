@@ -162,9 +162,8 @@ class Terrain extends React.Component {
                   value={this.state.detail}
                   onChange={(e)=>this.updateMesh("detail", e.target.value)}
                 >
-                  <MenuItem value={64}> 
-                    <em>64</em>
-                  </MenuItem>
+                  <MenuItem value={32}>32</MenuItem>
+                  <MenuItem value={64}>64</MenuItem>
                   <MenuItem value={128}>128</MenuItem>
                   <MenuItem value={256}>256</MenuItem>
                   <MenuItem value={512}>512</MenuItem>

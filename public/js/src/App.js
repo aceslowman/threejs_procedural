@@ -46,7 +46,7 @@ class App extends React.Component {
     this.scene    = new THREE.Scene();
 
     //TEMP
-    this.renderer.setClearColor('blue');
+    // this.renderer.setClearColor('blue');
 
     this.entities = [];
 
@@ -197,7 +197,7 @@ class App extends React.Component {
                   scene={this.scene} 
                   width={512} 
                   height={512} 
-                  detail={512} 
+                  detail={256} 
                   amplitude={150} 
                   terrainReady={(t) => this.handleTerrainReady(t)} 
                 />}
