@@ -33,13 +33,15 @@ export default class ProceduralMap extends React.Component {
         this.state = {
             passes: this.passes
         };
+
+        props.onRef(this);
     }
 
     updateComposer(){
         this.composer.swapBuffers(); // must call to make render valid
         this.composer.render();
 
-        this.props.displaceGeometry(this.getBufferArray(), this.width, this.height);
+        this.props.displaceGeometry();
     }
 
     updatePassParam(pass_id, name, value) {
@@ -62,7 +64,7 @@ export default class ProceduralMap extends React.Component {
         this.composer.addPass(new THREE.ShaderPass(pass));
         this.composer.render();
 
-        this.props.displaceGeometry(this.getBufferArray(), this.width, this.height);
+        this.props.displaceGeometry(this.getBufferArray());
     }
 
     getSample(x, y) {

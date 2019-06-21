@@ -82,8 +82,7 @@ class Terrain extends React.Component {
     );
 
     this.initializeMesh();
-    // this.setupDebug();
-    // need to displace mesh
+    this.displaceGeometry();
   }
 
   componentDidMount() {
@@ -108,7 +107,8 @@ class Terrain extends React.Component {
     this.scene.add(helper);
   }
 
-  displaceGeometry(displacement_buffer, width, height) {
+  displaceGeometry() {
+    const displacement_buffer = this.elevation.getBufferArray();
     const positions = this.geometry.getAttribute('position').array;
     const uvs = this.geometry.getAttribute('uv').array;
     const count = this.geometry.getAttribute('position').count;
@@ -116,9 +116,9 @@ class Terrain extends React.Component {
     for (let i = 0; i < count; i++) {
       const u = uvs[i * 2];
       const v = uvs[i * 2 + 1];
-      const x = Math.floor(u * (width - 1.0));
-      const y = Math.floor(v * (height - 1.0));
-      const d_index = (y * height + x) * 4;
+      const x = Math.floor(u * (this.width - 1.0));
+      const y = Math.floor(v * (this.height - 1.0));
+      const d_index = (y * this.height + x) * 4;
       let r = displacement_buffer[d_index];
 
       positions[i * 3 + 2] = (r * this.amplitude);
@@ -149,45 +149,47 @@ class Terrain extends React.Component {
     const {classes} = this.props;
     
     return (
-      <Route path="/terrain/" render={() => (
-        <React.Fragment>
-          <Paper className={classes.root}>
-            <Grid container justify={'center'} alignItems={'center'} alignContent='center' spacing={16}>
-              <Grid item xs={12}>
-                <Typography variant="h6" align="center">Mesh Settings</Typography>
-              </Grid>
-              <Grid item>
-                <FormControl>
-                  <InputLabel htmlFor="detail-helper">detail</InputLabel>
-                  <Select
-                    value={this.state.detail}
-                    onChange={(e)=>this.updateMesh("detail", e.target.value)}
-                  >
-                    <MenuItem value={64}>
-                      <em>64</em>
-                    </MenuItem>
-                    <MenuItem value={128}>128</MenuItem>
-                    <MenuItem value={256}>256</MenuItem>
-                    <MenuItem value={512}>512</MenuItem>
-                  </Select>
-                  <FormHelperText>resolution of mesh</FormHelperText>
-                </FormControl>
-              </Grid>
+      <React.Fragment>
+        <Paper className={classes.root}>
+          <Grid container justify={'center'} alignItems={'center'} alignContent='center' spacing={16}>
+            <Grid item xs={12}>
+              <Typography variant="h6" align="center">Mesh Settings</Typography>
             </Grid>
-          </Paper>
-          <ProceduralMap
-            name="Elevation"
-            renderer={this.renderer}
-            width={this.width}
-            height={this.height}
-            displaceGeometry={(d,w,h)=>this.displaceGeometry(d,w,h)}
-            seed={this.seed}
-            >
-              <FractalNoise />
-              {/* <FractalWarp /> */}
-          </ProceduralMap>
-        </React.Fragment>
-      )} />
+            <Grid item>
+              <FormControl>
+                <InputLabel htmlFor="detail-helper">detail</InputLabel>
+                <Select
+                  value={this.state.detail}
+                  onChange={(e)=>this.updateMesh("detail", e.target.value)}
+                >
+                  <MenuItem value={64}> 
+                    <em>64</em>
+                  </MenuItem>
+                  <MenuItem value={128}>128</MenuItem>
+                  <MenuItem value={256}>256</MenuItem>
+                  <MenuItem value={512}>512</MenuItem>
+                </Select>
+                <FormHelperText>resolution of mesh</FormHelperText>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </Paper>
+        <ProceduralMap
+          name="Elevation"
+          renderer={this.renderer}
+          width={this.width}
+          height={this.height}
+          displaceGeometry={() => this.displaceGeometry()}
+          seed={this.seed}
+          onRef={ref => {
+            this.elevation = ref;
+            console.log(ref);
+          }}
+        >
+          <FractalNoise />
+          {/* <FractalWarp /> */}
+        </ProceduralMap>
+      </React.Fragment>
     );
   }
 }

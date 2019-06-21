@@ -23,7 +23,7 @@
 - [improvement] make ProceduralMap a React component.
     > This should simplify management in some ways. 
 - [bug] prevent maps from reinitializing each time the Terrain navigation is selected
-    > pass parameters are currently being overwritten whenever the component (FractalNoise) is being re-rendered.
+    > pass parameters are currently being overwritten whenever the component (FractalNoise) is being re-rendered. I think my solution will be to just entirely remove react-router. My goal is not to mount / unmount, or at least it can't be as long as my webgl is tightly entwined with my gui. I can picture a way around this, by accessing the webgl via onRef.... but I'll leave that on the backburner
 
 ## Done
 

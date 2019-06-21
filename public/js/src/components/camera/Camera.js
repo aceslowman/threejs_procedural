@@ -132,10 +132,11 @@ class Camera extends React.Component {
   }
 
   render(){
-    // seperate classes out, so that they aren't sent to children
-    const { classes, ...other } = this.props;
+    
+    const { classes, ...other } = this.props; // seperate classes out so that
+                                              // they aren't sent to children
 
-    let gui = (
+    return (
       <React.Fragment>
         <CameraViews camera={this.state.activeCamera} view="ANGLE" {...this.other} />
 
@@ -158,13 +159,6 @@ class Camera extends React.Component {
           {this.state.activeCamera.type == "PerspectiveCamera" && <PerspectiveCameraTools {...this.other} camera={this.state.activeCamera} />}
           {this.state.activeCamera.type == "OrthographicCamera" && <OrthographicCameraTools {...this.other} camera={this.state.activeCamera} />}
         </Paper>
-      </React.Fragment>
-    );
-
-    return (
-      <React.Fragment>
-        <Route path="/" exact render={() => gui} />
-        <Route path="/camera/" render={() => gui} />
       </React.Fragment>
     );
   }
