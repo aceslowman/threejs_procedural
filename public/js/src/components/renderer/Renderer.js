@@ -54,18 +54,15 @@ class Renderer extends React.Component {
                 this.renderer = new THREE.WebGLRenderer({ antialias: true });
                 break;
             case 'RAYTRACING':
+                // this.renderer = new THREE.WebGLRenderer({ antialias: true });
                 this.renderer = new THREE.RaytracingRenderer({
                     workers: RAYTRACING_WORKERS,
-                    workerPath: '../utilities/raytracing.worker.js',
-                    randomize: true,
                     blockSize: 64
-                })
+                });
                 break;        
         }
 
         this.renderer.setSize(this.props.width, this.props.height);
-
-        // mount?
         document.getElementById('APP').appendChild(this.renderer.domElement);
 
         this.props.setRenderer(this.renderer);

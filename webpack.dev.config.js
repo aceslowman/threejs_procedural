@@ -8,7 +8,8 @@ module.exports = {
     entry: entry,
     output: {
         path: destination,
-        filename: 'bundle.js'
+        filename: 'bundle.js',
+        globalObject: 'this'
     },
     resolve: {
         modules: ['node_modules', 'src'],
@@ -28,6 +29,10 @@ module.exports = {
               test: /\.css$/,
               use: [{ loader: 'style-loader' }, { loader: 'css-loader' }],
             },
+            {
+              test: /\.worker\.js$/,
+              use: { loader: 'worker-loader', options: { publicPath: './js/dist/' } }
+            }
         ]
     },
     optimization: {

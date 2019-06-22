@@ -45,7 +45,7 @@
     "reselect": "^4.0.0",
     "stats-js": "^1.0.0-alpha1",
     "storm-react-diagrams": "^5.2.1",
-    "three": "^0.90.0",
+    "three": "^0.105.2",
     "uuid": "^3.3.2",
     "webpack-dev-server": "^3.1.14"
   },
@@ -60,6 +60,8 @@
     "webpack-bundle-analyzer": "^2.11.1",
     "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.1.14",
-    "webpack-notifier": "^1.7.0"
+    "webpack-notifier": "^1.7.0",
+    "worker-loader": "^2.0.0",
+    "worker-plugin": "^3.1.0"
   }
 }

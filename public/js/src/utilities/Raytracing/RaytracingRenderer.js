@@ -1,5 +1,7 @@
 import * as THREE from "three";
 
+import Worker from './raytracing.worker' 
+
 /**
  * RaytracingRenderer renders by raytracing it's scene. However, it does not
  * compute the pixels itself but it hands off and coordinates the taks for workers.
@@ -46,7 +48,9 @@ export default THREE.RaytracingRenderer = function (parameters) {
         workers = w || navigator.hardwareConcurrency || 4;
 
         while (pool.length < workers) {
-            var worker = new Worker(parameters.workerPath);
+            // var worker = new Worker(parameters.workerPath);
+            var worker = new Worker();
+            
             worker.id = workerId++;
 
             worker.onmessage = function (e) {

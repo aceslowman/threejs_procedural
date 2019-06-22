@@ -1,12 +1,10 @@
-import * as THREE from "three";
-
 /**
  * @author alteredq / http://alteredqualia.com/
  *
  * Full-screen textured quad shader
  */
 
-export default THREE.CopyShader = {
+THREE.CopyShader = {
 
 	uniforms: {
 

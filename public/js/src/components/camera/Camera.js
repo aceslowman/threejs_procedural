@@ -193,4 +193,4 @@ class Camera extends React.Component {
   }
 }
 
-export default withStyles(styles)(withRouter(Camera));
+export default withStyles(styles)(Camera);

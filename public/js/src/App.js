@@ -28,8 +28,8 @@ const theme = createMuiTheme({
     borderRadius: 2
   },
   palette: {
-    // type: 'dark',
-    // background: '#ccc'
+    type: 'dark',
+    background: '#ccc'
   },
   overrides: {
     MuiPaper: {
@@ -43,11 +43,8 @@ class App extends React.Component {
     super(props);
 
     this.clock    = new THREE.Clock();
-    // this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.scene    = new THREE.Scene();
-
-    //TEMP
-    // this.renderer.setClearColor('blue');
+    // this.scene.background = new THREE.Color('blue');
 
     this.entities = [];
 
@@ -89,14 +86,7 @@ class App extends React.Component {
   }
 
   handleRendererChange(renderer) {
-    // renderer.setSize(this.width, this.height);
     this.setState({renderer: renderer});
-
-    // TODO: this.mount is not available yet.
-    // this.mount.appendChild(this.state.renderer.domElement);
-    // document.getElementById('APP').appendChild(this.state.renderer.domElement);
-    if(this.mount) console.log('MOUNT EXISTS, back 2 handleRendererChange()');
-    // this.mount.appendChild(renderer.domElement);
   }
 
   handleSketchReady() {
@@ -105,13 +95,6 @@ class App extends React.Component {
 
   //LIFECYCLE-----------------------------------------------------
   componentDidMount() {
-    // this.width = this.mount.clientWidth;
-    // this.height = this.mount.clientHeight;
-
-    // this.state.renderer.setSize(width, height);
-    if (this.state.renderer) console.log("renderer exists! come back to componentDidMount")
-    // this.mount.appendChild(this.state.renderer.domElement);
-
     this.registerListeners();
     this.setupStats();
 
@@ -121,6 +104,36 @@ class App extends React.Component {
       canvasReady: true,
       startFlag: true 
     });
+
+    var intensity = 0.5;
+
+    var light = new THREE.PointLight(0xffaa55, intensity);
+    light.position.set(- 200, 100, 100);
+    light.physicalAttenuation = true;
+    this.scene.add(light);
+
+    var light = new THREE.PointLight(0x55aaff, intensity);
+    light.position.set(200, 100, 100);
+    light.physicalAttenuation = true;
+    this.scene.add(light);
+
+    var light = new THREE.PointLight(0xffffff, intensity * 1.5);
+    light.position.set(0, 0, 300);
+    light.physicalAttenuation = true;
+    this.scene.add(light);
+
+    var sphereGeometry = new THREE.SphereBufferGeometry(100, 16, 8);
+
+    var sphere = new THREE.Mesh(sphereGeometry, new THREE.MeshLambertMaterial());
+    sphere.scale.multiplyScalar(0.5);
+    sphere.position.set(- 50, - 250 + 5, - 50);
+    this.scene.add(sphere);
+
+    var sphere2 = new THREE.Mesh(sphereGeometry, new THREE.MeshLambertMaterial());
+    sphere2.scale.multiplyScalar(0.5);
+    sphere2.position.set(175, - 250 + 5, - 150);
+    this.scene.add(sphere2);
+
   }
 
   componentDidUpdate(){
@@ -181,13 +194,7 @@ class App extends React.Component {
 
   renderScene = () => {
     this.stats.begin();
-
-    for (let i = 0; i < this.entities.length; i++) {
-      this.entities[i].update();
-    }
-    
     this.state.renderer.render(this.scene, this.camera);
-
     this.stats.end();
   }
 

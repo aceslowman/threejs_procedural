@@ -98,7 +98,18 @@ class Terrain extends React.Component {
 
   initializeMesh() {
     this.material = new THREE.MeshNormalMaterial();
-    this.mesh = new THREE.Mesh(this.geometry, this.material);
+
+    var mirrorMaterialSmooth = new THREE.MeshPhongMaterial({
+      color: 0xffaa00,
+      specular: 0x222222,
+      shininess: 10000,
+      vertexColors: THREE.NoColors,
+      flatShading: false
+    });
+    mirrorMaterialSmooth.mirror = true;
+    mirrorMaterialSmooth.reflectivity = 0.3;
+
+    this.mesh = new THREE.Mesh(this.geometry, mirrorMaterialSmooth);
     this.scene.add(this.mesh);
   }
 
