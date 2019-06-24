@@ -32,10 +32,6 @@ class GUI extends React.Component {
   };
 
   render() {
-    // Below I am attempting to pass my components 
-    let Camera = this.props.children.filter(a => a.ref == "Camera")[0];
-    let Terrain = this.props.children.filter(a => a.ref == "Terrain")[0];
-
     return (
         <Drawer 
           id="GUI"

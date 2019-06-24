@@ -10,8 +10,6 @@ self.onmessage = function (e) {
     var data = e.data;
     if (!data) return;
 
-    console.log('hit');
-
     if (data.init) {
 
         var
@@ -158,7 +156,6 @@ THREE.RaytracingRendererWorker = function () {
             // ray didn't find anything
             // (here should come setting of background color?)
 
-            // if (intersections.length === 0) console.log('found nothing!');
             if (intersections.length === 0) return;
 
             // ray hit
@@ -179,6 +176,10 @@ THREE.RaytracingRendererWorker = function () {
             eyeVector.subVectors(ray.origin, point).normalize();
 
             // resolve pixel diffuse color
+            console.group();
+            console.log(material);
+            console.log(object)
+            console.groupEnd();
 
             if (material.isMeshLambertMaterial ||
                 material.isMeshPhongMaterial ||
@@ -197,6 +198,8 @@ THREE.RaytracingRendererWorker = function () {
                 diffuseColor.multiply(face.color);
 
             }
+
+            console.log(outputColor);
 
             // compute light shading
 
@@ -545,4 +548,4 @@ THREE.RaytracingRendererWorker = function () {
 
 };
 
-// Object.assign(THREE.RaytracingRendererWorker.prototype, THREE.EventDispatcher.prototype);
+Object.assign(THREE.RaytracingRendererWorker.prototype, THREE.EventDispatcher.prototype);

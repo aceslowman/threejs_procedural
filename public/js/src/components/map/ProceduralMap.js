@@ -1,7 +1,9 @@
 import React from 'react';
 import * as THREE from 'three';
 
-import { EffectComposer } from '../../utilities/EffectComposer/EffectComposer.js';
+// import { EffectComposer } from '../../utilities/EffectComposer/EffectComposer.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 
 export default class ProceduralMap extends React.Component {
     constructor(props){
@@ -24,8 +26,10 @@ export default class ProceduralMap extends React.Component {
             stencilBuffer: false
         });
 
-        this.composer = new THREE.EffectComposer(this.renderer, this.target);
+        this.composer = new EffectComposer(this.renderer, this.target);
         this.composer.setSize(this.width, this.height);
+
+        this.composer.swapBuffers(); // fixes issue where composer does not init
 
         this.state = {
             passes: this.passes
@@ -60,7 +64,11 @@ export default class ProceduralMap extends React.Component {
     }
 
     addPass(pass) {
-        this.composer.addPass(new THREE.ShaderPass(pass));
+        console.log('hit');
+        let shaderPass = new ShaderPass(pass);
+        shaderPass.enabled = true;
+
+        this.composer.addPass(shaderPass);
         this.composer.render();
 
         this.props.displaceGeometry();

@@ -14,6 +14,8 @@
 ## Doing
 
 - [feature] Begin implementing RayTracing Renderer mode.
+    > Currently, the obstacle is turning OFF the render cycle when switched over to raytracing, and then turning it back on when switched back to normal mode.
+- [improvement] each shader should actually contain an instance of ShaderPass.
 
 ## Done
 
@@ -78,6 +80,7 @@
 - [bug] Camera aspect ratio is not being correctly updated onWindowResize.
 - [feature] Create new Renderer component & GUI, and pass it up to App.js using onRef().
 - [bug] orbitControls are not receiving the updated renderer domElement when changed in Renderer.
+- [bug] fix issue where composer passes are not being properly initialized
 
 ## Backburner
 

@@ -2,7 +2,8 @@ import * as THREE from "three";
 import * as ASMATH from "../utilities/Math";
 import _ from "lodash";
 
-import { EffectComposer } from '../utilities/EffectComposer/EffectComposer.js';
+// import { EffectComposer } from '../utilities/EffectComposer/EffectComposer.js';
+import { EffectComposer } from 'three/jsm/postprocessing/EffectComposer.js';
 
 export default class ProceduralMap{
   constructor(renderer, options){

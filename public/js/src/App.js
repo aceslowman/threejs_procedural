@@ -9,7 +9,7 @@ import GUI from './components/GUI';
 import Diagram from './components/diagram/DiagramContainer';
 
 import * as THREE from 'three';
-import Stats from "stats-js";
+
 import Camera from './components/camera/CameraContainer';
 import Terrain from './components/terrain/TerrainContainer';
 import Renderer from './components/renderer/Renderer';
@@ -43,8 +43,6 @@ class App extends React.Component {
     super(props);
 
     this.clock    = new THREE.Clock();
-    this.scene    = new THREE.Scene();
-    // this.scene.background = new THREE.Color('blue');
 
     this.entities = [];
 
@@ -56,28 +54,19 @@ class App extends React.Component {
       width: '',
       height: '',
       startFlag: false,
-      renderer: null
+      renderer: null,
+      scene: new THREE.Scene()
     }
-  }
-
-  setupStats() {
-    this.stats = new Stats();
-    this.stats.domElement.style.position = 'absolute';
-    this.stats.domElement.style.right = '0px';
-    this.stats.domElement.style.left = '';
-    this.stats.domElement.style.bottom = '0px';
-    this.stats.domElement.style.top = '';
-    this.stats.domElement.style.display = 'visible';
-    document.getElementById('APP').appendChild(this.stats.domElement);
+    
+    this.state.scene.background = new THREE.Color('blue');
   }
 
   handleCameraReady(cam) {
-    this.camera = cam;
-    this.setState({cameraReady: true});
+    this.setState({camera: cam, cameraReady: true});
   }
 
   handleCameraChange(cam) {
-    this.camera = cam;
+    this.setState({camera: cam})
   }
 
   handleTerrainReady(terrain){
@@ -96,7 +85,6 @@ class App extends React.Component {
   //LIFECYCLE-----------------------------------------------------
   componentDidMount() {
     this.registerListeners();
-    this.setupStats();
 
     this.setState({ 
       width: this.mount.clientWidth, 
@@ -110,29 +98,29 @@ class App extends React.Component {
     var light = new THREE.PointLight(0xffaa55, intensity);
     light.position.set(- 200, 100, 100);
     light.physicalAttenuation = true;
-    this.scene.add(light);
+    this.state.scene.add(light);
 
     var light = new THREE.PointLight(0x55aaff, intensity);
     light.position.set(200, 100, 100);
     light.physicalAttenuation = true;
-    this.scene.add(light);
+    this.state.scene.add(light);
 
     var light = new THREE.PointLight(0xffffff, intensity * 1.5);
     light.position.set(0, 0, 300);
     light.physicalAttenuation = true;
-    this.scene.add(light);
+    this.state.scene.add(light);
 
     var sphereGeometry = new THREE.SphereBufferGeometry(100, 16, 8);
 
     var sphere = new THREE.Mesh(sphereGeometry, new THREE.MeshLambertMaterial());
     sphere.scale.multiplyScalar(0.5);
     sphere.position.set(- 50, - 250 + 5, - 50);
-    this.scene.add(sphere);
+    this.state.scene.add(sphere);
 
     var sphere2 = new THREE.Mesh(sphereGeometry, new THREE.MeshLambertMaterial());
     sphere2.scale.multiplyScalar(0.5);
     sphere2.position.set(175, - 250 + 5, - 150);
-    this.scene.add(sphere2);
+    this.state.scene.add(sphere2);
 
   }
 
@@ -144,16 +132,10 @@ class App extends React.Component {
     if(this.state.terrainReady){
       console.log('TERRAIN READY!');
     }
-
-    if(this.state.startFlag){
-      this.start();
-      this.setState({startFlag: false})
-    }
   }
 
   componentWillUnmount() {
     this.removeListeners();
-    this.stop();
     this.mount.removeChild(this.renderer.domElement);
   }
 
@@ -178,26 +160,6 @@ class App extends React.Component {
     });
   }
 
-  //--------------------------------------------------------------
-  start = () => {
-    if (!this.frameId) this.frameId = requestAnimationFrame(this.animate);
-  }
-
-  stop = () => {
-    cancelAnimationFrame(this.frameId);
-  }
-
-  animate = () => {
-    this.renderScene();
-    this.frameId = window.requestAnimationFrame(this.animate);
-  }
-
-  renderScene = () => {
-    this.stats.begin();
-    this.state.renderer.render(this.scene, this.camera);
-    this.stats.end();
-  }
-
   render() {
     return (
       <HashRouter>
@@ -209,22 +171,27 @@ class App extends React.Component {
                   setRenderer={(r) => this.handleRendererChange(r)}
                   width={this.state.width}
                   height={this.state.height} 
+                  start={this.start}
+                  stop={this.stop}
+                  render={this.renderScene}
+                  camera={this.state.camera}
+                  scene={this.state.scene}
                 />
                 {
                   this.state.canvasReady && <Terrain
                     renderer={this.state.renderer}
-                    scene={this.scene}
+                    scene={this.state.scene}
                     width={512}
                     height={512}
-                    detail={512}
+                    detail={128}
                     amplitude={150}
                     terrainReady={(t) => this.handleTerrainReady(t)}
                   />
-                }                 
+                }            
                 {
                   this.state.canvasReady && <Camera 
                   renderer={this.state.renderer} 
-                  scene={this.scene} 
+                  scene={this.state.scene} 
                   width={this.state.width} 
                   height={this.state.height} 
                   cameraReady={(c) => this.handleCameraReady(c)} 

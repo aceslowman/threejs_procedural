@@ -13,7 +13,11 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 
-import { RaytracingRenderer } from '../../utilities/Raytracing/RaytracingRenderer';
+import Stats from "stats-js";
+
+import { RaytracingRenderer } from 'three/examples/jsm/renderers/RaytracingRenderer';
+
+import Worker from '../../utilities/raytracing.worker.js';
 
 const RAYTRACING_WORKERS = navigator.hardwareConcurrency || 3;
 
@@ -37,7 +41,12 @@ class Renderer extends React.Component {
 
     componentDidMount(){
         this.renderer.setSize(this.props.width, this.props.height);
+
+        this.setupStats();
+
         document.getElementById('APP').appendChild(this.renderer.domElement);
+
+        this.start();
     }
 
     componentDidUpdate(prevProps){
@@ -52,13 +61,24 @@ class Renderer extends React.Component {
         switch(type){
             case 'NORMAL':
                 this.renderer = new THREE.WebGLRenderer({ antialias: true });
+                this.props.setRenderer(this.renderer);
+                this.start();
                 break;
-            case 'RAYTRACING':
-                // this.renderer = new THREE.WebGLRenderer({ antialias: true });
-                this.renderer = new THREE.RaytracingRenderer({
+            case 'RAYTRACING':            
+                this.stop(); 
+
+                this.renderer = new RaytracingRenderer({
                     workers: RAYTRACING_WORKERS,
+                    worker: Worker,
+                    // randomize: true,
                     blockSize: 64
                 });
+
+                this.renderer.setSize(this.props.width, this.props.height);
+                this.props.setRenderer(this.renderer);
+                
+                this.renderScene();
+                
                 break;        
         }
 
@@ -66,6 +86,37 @@ class Renderer extends React.Component {
         document.getElementById('APP').appendChild(this.renderer.domElement);
 
         this.props.setRenderer(this.renderer);
+    }
+
+    setupStats() {
+        this.stats = new Stats();
+        this.stats.domElement.style.position = 'absolute';
+        this.stats.domElement.style.right = '0px';
+        this.stats.domElement.style.left = '';
+        this.stats.domElement.style.bottom = '0px';
+        this.stats.domElement.style.top = '';
+        this.stats.domElement.style.display = 'visible';
+        document.getElementById('APP').appendChild(this.stats.domElement);
+    }
+
+    start = () => {
+        // if (!this.frameId) this.frameId = requestAnimationFrame(this.animate);
+        this.frameId = requestAnimationFrame(this.animate);
+    }
+
+    stop = () => {
+        cancelAnimationFrame(this.frameId);
+    }
+
+    animate = () => {
+        this.renderScene();
+        this.frameId = window.requestAnimationFrame(this.animate);
+    }
+
+    renderScene = () => {
+        this.stats.begin();
+        this.renderer.render(this.props.scene, this.props.camera);
+        this.stats.end();
     }
 
     render(){

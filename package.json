@@ -8,7 +8,8 @@
     "dev": "webpack --config webpack.dev.config.js --mode development --watch",
     "build": "webpack --config webpack.prod.config.js --mode production --optimize-minimize --watch",
     "start": "nodemon server.js --watch server.js",
-    "start:dev": "webpack-dev-server --config webpack.dev.config.js --mode development --hot"
+    "start:dev": "webpack-dev-server --config webpack.dev.config.js --mode development --hot",
+    "build-workers": "webpack --config webpack.workers.config.js"
   },
   "repository": {
     "type": "git",
