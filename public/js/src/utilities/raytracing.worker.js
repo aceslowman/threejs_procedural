@@ -176,10 +176,6 @@ THREE.RaytracingRendererWorker = function () {
             eyeVector.subVectors(ray.origin, point).normalize();
 
             // resolve pixel diffuse color
-            console.group();
-            console.log(material);
-            console.log(object)
-            console.groupEnd();
 
             if (material.isMeshLambertMaterial ||
                 material.isMeshPhongMaterial ||
@@ -188,7 +184,7 @@ THREE.RaytracingRendererWorker = function () {
                 diffuseColor.copyGammaToLinear(material.color);
 
             } else {
-
+                
                 diffuseColor.setRGB(1, 1, 1);
 
             }
@@ -196,10 +192,8 @@ THREE.RaytracingRendererWorker = function () {
             if (material.vertexColors === THREE.FaceColors) {
 
                 diffuseColor.multiply(face.color);
-
+                
             }
-
-            console.log(outputColor);
 
             // compute light shading
 
@@ -229,7 +223,6 @@ THREE.RaytracingRendererWorker = function () {
                 }
 
             } else if (material.isMeshLambertMaterial || material.isMeshPhongMaterial) {
-
                 var normalComputed = false;
 
                 for (var i = 0, l = lights.length; i < l; i++) {

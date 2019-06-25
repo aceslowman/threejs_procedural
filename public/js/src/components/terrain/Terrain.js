@@ -87,8 +87,17 @@ class Terrain extends React.Component {
 
   componentDidMount() {
     this.initializeMesh();
-    this.setupDebug();
+    // this.setupDebug();
+    this.mesh.updateMatrix();
     this.ready();
+  }
+
+  componentDidUpdate(prevProps){
+    if(prevProps.renderer != this.props.renderer){
+      console.log("RENDERER CHANGED!")
+
+      // re-render maps
+    }
   }
 
   ready() {
@@ -102,9 +111,9 @@ class Terrain extends React.Component {
     var mirrorMaterialSmooth = new THREE.MeshPhongMaterial({
       color: 0xffaa00,
       specular: 0x222222,
-      shininess: 10000,
-      vertexColors: THREE.NoColors,
-      flatShading: false
+      // shininess: 10000,
+      // vertexColors: THREE.NoColors,
+      // flatShading: true
     });
     mirrorMaterialSmooth.mirror = true;
     mirrorMaterialSmooth.reflectivity = 0.3;
@@ -123,6 +132,9 @@ class Terrain extends React.Component {
     const positions = this.geometry.getAttribute('position').array;
     const uvs = this.geometry.getAttribute('uv').array;
     const count = this.geometry.getAttribute('position').count;
+
+    // dynamic geometry?
+    this.geometry.getAttribute('position').dynamic = true;
     
     for (let i = 0; i < count; i++) {
       const u = uvs[i * 2];
@@ -135,13 +147,16 @@ class Terrain extends React.Component {
       positions[i * 3 + 2] = (r * this.amplitude);
     }
 
+    this.geometry.getAttribute('normal').needsUpdate = true;
     this.geometry.getAttribute('position').needsUpdate = true;
+    this.geometry.getAttribute('uv').needsUpdate = true;
+
     this.geometry.computeVertexNormals();
     this.geometry.computeFaceNormals();
     this.geometry.computeBoundingBox();
     this.geometry.computeBoundingSphere();
 
-    this.geometry.translate(0, 0, -this.geometry.boundingBox.min.z);
+    this.geometry.translate(50, 0, -this.geometry.boundingBox.min.z);
   }
 
   globalBoundsCheck(a) {

@@ -60,6 +60,7 @@ class Renderer extends React.Component {
 
         switch(type){
             case 'NORMAL':
+                this.renderer.clear();
                 this.renderer = new THREE.WebGLRenderer({ antialias: true });
                 this.props.setRenderer(this.renderer);
                 this.start();
@@ -78,6 +79,8 @@ class Renderer extends React.Component {
                 this.props.setRenderer(this.renderer);
                 
                 this.renderScene();
+
+                console.log("SCENE",this.props.scene);
                 
                 break;        
         }

@@ -29,6 +29,8 @@ export default class ProceduralMap extends React.Component {
         this.composer = new EffectComposer(this.renderer, this.target);
         this.composer.setSize(this.width, this.height);
 
+        console.log(this.composer);
+
         this.composer.swapBuffers(); // fixes issue where composer does not init
 
         this.state = {
@@ -85,6 +87,17 @@ export default class ProceduralMap extends React.Component {
         const buffer = new Float32Array(this.width * this.height * 4); // NOTE: can't use floats in Safari!
         this.renderer.readRenderTargetPixels(this.target, 0, 0, this.width, this.height, buffer);
         return buffer;
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.renderer != this.props.renderer) {
+            console.log("RENDERER CHANGED!")
+
+            // re-render maps
+            // this.composer.renderer = this.props.renderer
+            // this.updateComposer();
+            
+        }
     }
 
     render() {

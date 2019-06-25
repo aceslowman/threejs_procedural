@@ -51,6 +51,7 @@ class App extends React.Component {
       cameraReady: false,
       terrainReady: false,
       canvasReady: false,
+      rendererReady: false,
       width: '',
       height: '',
       startFlag: false,
@@ -93,7 +94,7 @@ class App extends React.Component {
       startFlag: true 
     });
 
-    var intensity = 0.5;
+    var intensity = 40000; // raytracer apparently needs HIGH intensity
 
     var light = new THREE.PointLight(0xffaa55, intensity);
     light.position.set(- 200, 100, 100);
@@ -122,6 +123,13 @@ class App extends React.Component {
     sphere2.position.set(175, - 250 + 5, - 150);
     this.state.scene.add(sphere2);
 
+  }
+
+  onMapRendered(ref){
+    console.log("map rendered! notify renderer");
+    this.setState({
+      rendererReady: true
+    })
   }
 
   componentDidUpdate(){
@@ -171,21 +179,20 @@ class App extends React.Component {
                   setRenderer={(r) => this.handleRendererChange(r)}
                   width={this.state.width}
                   height={this.state.height} 
-                  start={this.start}
-                  stop={this.stop}
-                  render={this.renderScene}
                   camera={this.state.camera}
                   scene={this.state.scene}
+                  ready={this.state.rendererReady}
                 />
                 {
                   this.state.canvasReady && <Terrain
                     renderer={this.state.renderer}
                     scene={this.state.scene}
-                    width={512}
-                    height={512}
+                    width={128}
+                    height={128}
                     detail={128}
                     amplitude={150}
                     terrainReady={(t) => this.handleTerrainReady(t)}
+                    mapRendered={(ref)=>this.onMapRendered(ref)}
                   />
                 }            
                 {
