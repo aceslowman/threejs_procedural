@@ -38,12 +38,15 @@ class Terrain extends React.Component {
 
     this.verbose   = false;
 
-    this.geometry  = new THREE.PlaneBufferGeometry(
+    let plane = new THREE.PlaneBufferGeometry(
       this.width,
       this.height,
       this.detail,
       this.detail
     );
+    // this.geometry.parameters = undefined;
+    this.geometry = new THREE.BufferGeometry();
+    this.geometry.copy(plane);
 
     this.state = {
       ready: false,
@@ -58,12 +61,15 @@ class Terrain extends React.Component {
 
     this.scene.remove(this.mesh)
 
-    this.geometry = new THREE.PlaneBufferGeometry(
+    let plane = new THREE.PlaneBufferGeometry(
       this.state.width,
       this.state.height,
       v,
       v    
     );
+    // this.geometry.parameters = undefined;
+    this.geometry = new THREE.BufferGeometry();
+    this.geometry.copy(plane);
 
     this.initializeMesh();
     this.displaceGeometry();
@@ -74,12 +80,15 @@ class Terrain extends React.Component {
 
     this.scene.remove(this.mesh)
 
-    this.geometry = new THREE.PlaneBufferGeometry(
+    let plane = new THREE.PlaneBufferGeometry(
       v,
       v,
       this.state.detail,
       this.state.detail
     );
+    // this.geometry.parameters = undefined;
+    this.geometry = new THREE.BufferGeometry();
+    this.geometry.copy(plane);
 
     this.initializeMesh();
     this.displaceGeometry();
@@ -111,9 +120,9 @@ class Terrain extends React.Component {
     var mirrorMaterialSmooth = new THREE.MeshPhongMaterial({
       color: 0xffaa00,
       specular: 0x222222,
-      // shininess: 10000,
-      // vertexColors: THREE.NoColors,
-      // flatShading: true
+      shininess: 10000,
+      vertexColors: THREE.NoColors,
+      flatShading: false
     });
     mirrorMaterialSmooth.mirror = true;
     mirrorMaterialSmooth.reflectivity = 0.3;
@@ -132,9 +141,6 @@ class Terrain extends React.Component {
     const positions = this.geometry.getAttribute('position').array;
     const uvs = this.geometry.getAttribute('uv').array;
     const count = this.geometry.getAttribute('position').count;
-
-    // dynamic geometry?
-    this.geometry.getAttribute('position').dynamic = true;
     
     for (let i = 0; i < count; i++) {
       const u = uvs[i * 2];
@@ -156,7 +162,20 @@ class Terrain extends React.Component {
     this.geometry.computeBoundingBox();
     this.geometry.computeBoundingSphere();
 
-    this.geometry.translate(50, 0, -this.geometry.boundingBox.min.z);
+    // this.geometry.translate(50, 0, -this.geometry.boundingBox.min.z);
+
+    // https://github.com/mrdoob/three.js/issues/9377
+    /*
+      when a standard buffergeometry is serialized using.toJSON, all 
+      attributes are omitted if geometry.parameters exists
+
+        this.geometry.parameters = undefined;
+
+      maybe this shouldn't be a PlaneBufferGeometry?
+    */
+    // this.geometry.scale(100,100,100);
+
+    console.log(this.geometry);
   }
 
   globalBoundsCheck(a) {

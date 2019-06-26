@@ -58,7 +58,8 @@ class App extends React.Component {
       renderer: null,
       scene: new THREE.Scene()
     }
-    
+
+    this.state.scene.autoUpdate = true;
     this.state.scene.background = new THREE.Color('blue');
   }
 
@@ -94,7 +95,7 @@ class App extends React.Component {
       startFlag: true 
     });
 
-    var intensity = 40000; // raytracer apparently needs HIGH intensity
+    var intensity = 70000; // raytracer apparently needs HIGH intensity
 
     var light = new THREE.PointLight(0xffaa55, intensity);
     light.position.set(- 200, 100, 100);
@@ -110,19 +111,6 @@ class App extends React.Component {
     light.position.set(0, 0, 300);
     light.physicalAttenuation = true;
     this.state.scene.add(light);
-
-    var sphereGeometry = new THREE.SphereBufferGeometry(100, 16, 8);
-
-    var sphere = new THREE.Mesh(sphereGeometry, new THREE.MeshLambertMaterial());
-    sphere.scale.multiplyScalar(0.5);
-    sphere.position.set(- 50, - 250 + 5, - 50);
-    this.state.scene.add(sphere);
-
-    var sphere2 = new THREE.Mesh(sphereGeometry, new THREE.MeshLambertMaterial());
-    sphere2.scale.multiplyScalar(0.5);
-    sphere2.position.set(175, - 250 + 5, - 150);
-    this.state.scene.add(sphere2);
-
   }
 
   onMapRendered(ref){

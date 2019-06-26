@@ -159,7 +159,8 @@ THREE.RaytracingRendererWorker = function () {
             if (intersections.length === 0) return;
 
             // ray hit
-
+            // console.log("INTERSECTIONS", intersections);
+            // console.log("OBJECTS", objects);
             var intersection = intersections[0];
 
             var point = intersection.point;
@@ -490,7 +491,6 @@ THREE.RaytracingRendererWorker = function () {
     this.render = function (scene, camera) {
 
         // update scene graph
-
         if (scene.autoUpdate === true) scene.updateMatrixWorld();
 
         // update camera matrices

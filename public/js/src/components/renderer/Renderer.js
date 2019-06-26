@@ -5,12 +5,7 @@ import * as THREE from 'three';
 
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import InputLabel from '@material-ui/core/InputLabel';
 import Typography from '@material-ui/core/Typography';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 
 import Stats from "stats-js";
@@ -64,31 +59,39 @@ class Renderer extends React.Component {
                 this.renderer = new THREE.WebGLRenderer({ antialias: true });
                 this.props.setRenderer(this.renderer);
                 this.start();
+
+                this.renderer.setSize(this.props.width, this.props.height);
+                
                 break;
             case 'RAYTRACING':            
                 this.stop(); 
 
                 this.renderer = new RaytracingRenderer({
                     workers: RAYTRACING_WORKERS,
-                    worker: Worker,
-                    // randomize: true,
-                    blockSize: 64
+                    worker: Worker,         // NOTE: to get around Worker/Webpack issues,
+                    randomize: false,       // I am passing in the entire bundled worker, 
+                    blockSize: 32           // instead of the workerPath. 
                 });
 
+                this.renderer.setClearColor(this.props.scene.background);
                 this.renderer.setSize(this.props.width, this.props.height);
                 this.props.setRenderer(this.renderer);
-                
-                this.renderScene();
 
-                console.log("SCENE",this.props.scene);
-                
+                // sending scene to renderer
+                this.renderer.render(this.props.scene, this.props.camera);
+
+                /* 
+                    NOTE: don't use the standard BufferGeometry variants
+                    when using RaytracingRenderer. The buffer attributes
+                    will not be copied over unless it is an actual
+                    BufferGeometry instance, not PlaneBufferGeometry or
+                    similar.
+                */
+
                 break;        
         }
 
-        this.renderer.setSize(this.props.width, this.props.height);
         document.getElementById('APP').appendChild(this.renderer.domElement);
-
-        this.props.setRenderer(this.renderer);
     }
 
     setupStats() {
@@ -103,7 +106,6 @@ class Renderer extends React.Component {
     }
 
     start = () => {
-        // if (!this.frameId) this.frameId = requestAnimationFrame(this.animate);
         this.frameId = requestAnimationFrame(this.animate);
     }
 
