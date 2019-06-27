@@ -1,6 +1,8 @@
 import React from 'react';
 import * as THREE from 'three';
 
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
+
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
@@ -35,7 +37,7 @@ const styles = theme => ({
 class FractalNoise extends React.Component{
   constructor(props){
     super(props);
-
+    
     this.state = {
       defines: {
         'NUM_OCTAVES': props.octaves,
@@ -52,8 +54,10 @@ class FractalNoise extends React.Component{
         map_max: props.map_max || 1.00,
       },
       params: {
-        enabled: props.enabled || true,
-        renderToScreen: props.renderToScreen || true
+        enabled: props.enabled,
+        renderToScreen: props.renderToScreen,
+        needsSwap: props.needsSwap,
+        clear: props.clear
       },
       name: "FractalNoise"
     }
@@ -77,7 +81,15 @@ class FractalNoise extends React.Component{
     });
 
     this.init();
-    props.addPass(this.shaderMaterial);
+
+    let shaderPass = new ShaderPass(this.shaderMaterial);
+
+    shaderPass.clear = this.state.params.clear;
+    shaderPass.needsSwap = this.state.params.needsSwap;
+    shaderPass.enabled = this.state.params.enabled;
+    shaderPass.renderToScreen = this.state.params.renderToScreen;
+    
+    props.addPass(shaderPass);
   }
 
   /*
@@ -225,7 +237,7 @@ class FractalNoise extends React.Component{
     const {classes} = this.props;
 
     return (
-      <ExpansionPanel defaultExpanded={false}>
+      <ExpansionPanel defaultExpanded={true}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
           <Typography variant="h5" className={classes.heading}>FractalNoise</Typography>
         </ExpansionPanelSummary>

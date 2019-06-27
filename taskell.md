@@ -17,8 +17,9 @@
 - [feature] Begin implementing RayTracing Renderer mode.
     > Currently, the obstacle is turning OFF the render cycle when switched over to raytracing, and then turning it back on when switched back to normal mode.
     * [ ] Need to kill all active workers when renderer changes.
-    * [ ] Terrain is not showing up displaced.
+    * [x] Terrain is not showing up displaced.
     * [ ] Light brightness has to be ludicrously high to show up in the raycasting renderer.
+- [bug] fix issue where second map is not displaying
 
 ## Done
 

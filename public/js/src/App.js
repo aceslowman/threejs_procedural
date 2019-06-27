@@ -95,7 +95,8 @@ class App extends React.Component {
       startFlag: true 
     });
 
-    var intensity = 70000; // raytracer apparently needs HIGH intensity
+    // var intensity = 70000; // raytracer apparently needs HIGH intensity
+    let intensity = 0.5;
 
     var light = new THREE.PointLight(0xffaa55, intensity);
     light.position.set(- 200, 100, 100);
@@ -175,9 +176,9 @@ class App extends React.Component {
                   this.state.canvasReady && <Terrain
                     renderer={this.state.renderer}
                     scene={this.state.scene}
-                    width={128}
-                    height={128}
-                    detail={128}
+                    width={512}
+                    height={512}
+                    detail={512}
                     amplitude={150}
                     terrainReady={(t) => this.handleTerrainReady(t)}
                     mapRendered={(ref)=>this.onMapRendered(ref)}

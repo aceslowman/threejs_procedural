@@ -29,10 +29,6 @@ export default class ProceduralMap extends React.Component {
         this.composer = new EffectComposer(this.renderer, this.target);
         this.composer.setSize(this.width, this.height);
 
-        console.log(this.composer);
-
-        this.composer.swapBuffers(); // fixes issue where composer does not init
-
         this.state = {
             passes: this.passes
         };
@@ -41,12 +37,14 @@ export default class ProceduralMap extends React.Component {
     }
 
     updateComposer(){
-        // when there is one buffer present, swapBuffers() is necessary
-        // when there are two, swap. I need to know how this works though.
-        if(this.composer.passes.length == 0) this.composer.swapBuffers();
         this.composer.render();
-
         this.props.displaceGeometry();
+    }
+
+    addPass(pass) {
+        this.composer.addPass(pass);
+        this.updateComposer();
+        console.log(this.composer);
     }
 
     updatePassParam(pass_id, name, value) {
@@ -65,17 +63,6 @@ export default class ProceduralMap extends React.Component {
         this.updateComposer();
     }
 
-    addPass(pass) {
-        console.log('hit');
-        let shaderPass = new ShaderPass(pass);
-        shaderPass.enabled = true;
-
-        this.composer.addPass(shaderPass);
-        this.composer.render();
-
-        this.props.displaceGeometry();
-    }
-
     getSample(x, y) {
         const buffer = new Float32Array(4); // NOTE: can't use floats in Safari!
         if (x > this.width || y > this.height || x < 0 || y < 0) console.warn("sampling out of bounds")
@@ -87,17 +74,6 @@ export default class ProceduralMap extends React.Component {
         const buffer = new Float32Array(this.width * this.height * 4); // NOTE: can't use floats in Safari!
         this.renderer.readRenderTargetPixels(this.target, 0, 0, this.width, this.height, buffer);
         return buffer;
-    }
-
-    componentDidUpdate(prevProps) {
-        if (prevProps.renderer != this.props.renderer) {
-            console.log("RENDERER CHANGED!")
-
-            // re-render maps
-            // this.composer.renderer = this.props.renderer
-            // this.updateComposer();
-            
-        }
     }
 
     render() {

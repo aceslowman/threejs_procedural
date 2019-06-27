@@ -1,6 +1,8 @@
 import React from 'react';
 import * as THREE from 'three';
 
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
+
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
@@ -36,14 +38,12 @@ class FractalWarp extends React.Component{
   constructor(props){
     super(props);
 
-    // TODO: this should be populated from props.
     this.state = {
       defines: {
         'NUM_OCTAVES': props.octaves,
         'SEED': props.seed
       },
       uniforms: {
-        tDiffuse: props.tDiffuse || '',
         map_min: props.map_min || -1.0,
         map_max: props.map_max || 1.0,
         s_x: props.s_x || 0.2 ,
@@ -51,8 +51,10 @@ class FractalWarp extends React.Component{
         s_z: props.s_z || 0.4 ,
       },
       params: {
-        enabled: props.enabled || true,
-        renderToScreen: props.renderToScreen || true
+        enabled: props.enabled,
+        renderToScreen: props.renderToScreen,
+        needsSwap: props.needsSwap,
+        clear: props.clear
       },
       name: "FractalWarp"
     }
@@ -74,7 +76,15 @@ class FractalWarp extends React.Component{
     });
 
     this.init();
-    props.addPass(this.shaderMaterial);
+
+    let shaderPass = new ShaderPass(this.shaderMaterial);
+
+    shaderPass.clear = this.state.params.clear;
+    shaderPass.needsSwap = this.state.params.needsSwap;
+    shaderPass.enabled = this.state.params.enabled;
+    shaderPass.renderToScreen = this.state.params.renderToScreen;
+
+    props.addPass(shaderPass);
   }
 
   /*
@@ -227,7 +237,7 @@ class FractalWarp extends React.Component{
     const { classes } = this.props;
 
     return (
-      <ExpansionPanel defaultExpanded={false}>
+      <ExpansionPanel defaultExpanded={true}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
           <Typography variant="h5" className={classes.heading}>FractalWarp</Typography>
         </ExpansionPanelSummary>

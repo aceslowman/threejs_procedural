@@ -96,7 +96,7 @@ class Terrain extends React.Component {
 
   componentDidMount() {
     this.initializeMesh();
-    // this.setupDebug();
+    this.setupDebug();
     this.mesh.updateMatrix();
     this.ready();
   }
@@ -124,8 +124,8 @@ class Terrain extends React.Component {
       vertexColors: THREE.NoColors,
       flatShading: false
     });
-    mirrorMaterialSmooth.mirror = true;
-    mirrorMaterialSmooth.reflectivity = 0.3;
+    // mirrorMaterialSmooth.mirror = true;
+    // mirrorMaterialSmooth.reflectivity = 0.3;
 
     this.mesh = new THREE.Mesh(this.geometry, mirrorMaterialSmooth);
     this.scene.add(this.mesh);
@@ -162,20 +162,11 @@ class Terrain extends React.Component {
     this.geometry.computeBoundingBox();
     this.geometry.computeBoundingSphere();
 
-    // this.geometry.translate(50, 0, -this.geometry.boundingBox.min.z);
-
     // https://github.com/mrdoob/three.js/issues/9377
     /*
       when a standard buffergeometry is serialized using.toJSON, all 
       attributes are omitted if geometry.parameters exists
-
-        this.geometry.parameters = undefined;
-
-      maybe this shouldn't be a PlaneBufferGeometry?
     */
-    // this.geometry.scale(100,100,100);
-
-    console.log(this.geometry);
   }
 
   globalBoundsCheck(a) {
@@ -247,8 +238,18 @@ class Terrain extends React.Component {
           seed={this.seed}
           onRef={ref => this.elevation = ref}
         >
-          <FractalNoise renderToScreen={false} enable={true} />
-          <FractalWarp renderToScreen={true} enable={true} />
+          <FractalNoise 
+            clear={false}
+            enabled={true} 
+            renderToScreen={false} 
+            needsSwap={false} // when false, map displays. warp does not.
+          />
+          <FractalWarp 
+            clear={false}
+            enabled={true} 
+            renderToScreen={false} 
+            needsSwap={true}
+          />
         </ProceduralMap>
       </React.Fragment>
     );

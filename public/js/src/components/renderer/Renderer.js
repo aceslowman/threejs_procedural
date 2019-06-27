@@ -69,8 +69,8 @@ class Renderer extends React.Component {
                 this.renderer = new RaytracingRenderer({
                     workers: RAYTRACING_WORKERS,
                     worker: Worker,         // NOTE: to get around Worker/Webpack issues,
-                    randomize: false,       // I am passing in the entire bundled worker, 
-                    blockSize: 32           // instead of the workerPath. 
+                    randomize: true,        // I am passing in the entire bundled worker, 
+                    blockSize: 64           // instead of the workerPath. 
                 });
 
                 this.renderer.setClearColor(this.props.scene.background);
