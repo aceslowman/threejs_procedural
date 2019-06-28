@@ -57,6 +57,20 @@ class Terrain extends React.Component {
     }
   }
 
+  //------------------------------------------------------------------------
+  componentDidMount() {
+    this.initializeMesh();
+    this.setupDebug();
+    this.mesh.updateMatrix();
+    this.ready();
+  }
+
+  ready() {
+    this.setState({ ready: true });
+    this.props.terrainReady(this);
+  }
+
+  //------------------------------------------------------------------------
   updateMeshDetail(v) {
     this.setState({detail: v});
 
@@ -97,18 +111,7 @@ class Terrain extends React.Component {
     this.displaceGeometry();
   }
 
-  componentDidMount() {
-    this.initializeMesh();
-    this.setupDebug();
-    this.mesh.updateMatrix();
-    this.ready();
-  }
-
-  ready() {
-    this.setState({ ready: true });
-    this.props.terrainReady(this);
-  }
-
+  //------------------------------------------------------------------------
   initializeMesh() {
     this.material = new THREE.MeshNormalMaterial();
 
@@ -126,17 +129,12 @@ class Terrain extends React.Component {
     this.scene.add(this.mesh);
   }
 
-  setupDebug() {
-    var helper = new THREE.Box3Helper(this.geometry.boundingBox, 0xffff00);
-    this.scene.add(helper);
-  }
-
   displaceGeometry() {
     const displacement_buffer = this.elevation.getBufferArray();
     const positions = this.geometry.getAttribute('position').array;
     const uvs = this.geometry.getAttribute('uv').array;
     const count = this.geometry.getAttribute('position').count;
-    
+
     for (let i = 0; i < count; i++) {
       const u = uvs[i * 2];
       const v = uvs[i * 2 + 1];
@@ -164,6 +162,12 @@ class Terrain extends React.Component {
     */
   }
 
+  setupDebug() {
+    var helper = new THREE.Box3Helper(this.geometry.boundingBox, 0xffff00);
+    this.scene.add(helper);
+  }
+
+  //------------------------------------------------------------------------
   globalBoundsCheck(a) {
     let h_w = (this.width / 2);
     let h_h = (this.height / 2);
@@ -176,6 +180,7 @@ class Terrain extends React.Component {
     return true;
   }
 
+  //------------------------------------------------------------------------
   render() {
     const {classes} = this.props;
     
@@ -227,24 +232,16 @@ class Terrain extends React.Component {
         <ProceduralMap
           name="Elevation"
           renderer={this.renderer}
+          scene={this.scene}
           width={this.width}
           height={this.height}
           displaceGeometry={() => this.displaceGeometry()}
           seed={this.seed}
-          onRef={ref => this.elevation = ref}
+          onRef={ref => this.elevation = ref} // assign ref so that displacement 
+                                              // can be done without props
         >
-          <FractalNoise 
-            clear={false}
-            enabled={true} 
-            renderToScreen={false} 
-            needsSwap={true} // when false, map displays. warp does not. when true, it's fully responsive to state change?
-          />                 
-          <FractalWarp 
-            clear={false}
-            enabled={true} 
-            renderToScreen={true} 
-            needsSwap={true}
-          />
+          <FractalNoise />                 
+          <FractalWarp />
         </ProceduralMap>
       </React.Fragment>
     );

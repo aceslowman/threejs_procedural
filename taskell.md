@@ -10,6 +10,7 @@
 - [enhancement] When changing camera type, duplicate / copy over any parent transform.
 - Research RayTracing Renderer
     > Raytracing Renderer (kept within renderers/RaytracingRenderer.js) would be a great option here, allowing me to do some high quality non-realtime renders. Perfect!
+- [enhancement] use defaultProps instead of the || default method.
 
 ## Doing
 

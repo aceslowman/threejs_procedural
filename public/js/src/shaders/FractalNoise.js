@@ -44,14 +44,14 @@ class FractalNoise extends React.Component{
         'SEED': props.seed
       },
       uniforms: {
-        o_x: props.o_x || 0.00,
-        o_y: props.o_y || 0.00,
-        o_z: props.o_z || 0.00,
-        s_x: props.s_x || 1.00,
-        s_y: props.s_y || 1.00,
-        s_z: props.s_z || 1.00,
-        map_min: props.map_min || -1.00,
-        map_max: props.map_max || 1.00,
+        o_x: props.o_x,
+        o_y: props.o_y,
+        o_z: props.o_z,
+        s_x: props.s_x,
+        s_y: props.s_y,
+        s_z: props.s_z,
+        map_min: props.map_min,
+        map_max: props.map_max,
       },
       params: {
         enabled: props.enabled,
@@ -88,7 +88,7 @@ class FractalNoise extends React.Component{
     shaderPass.needsSwap = this.state.params.needsSwap;
     shaderPass.enabled = this.state.params.enabled;
     shaderPass.renderToScreen = this.state.params.renderToScreen;
-    
+
     props.addPass(shaderPass);
   }
 
@@ -487,6 +487,21 @@ class FractalNoise extends React.Component{
       </ExpansionPanel>
     );
   }
+};
+
+FractalNoise.defaultProps = {
+  clear: false,
+  enabled: true,
+  renderToScreen: false,
+  needsSwap: true,
+  o_x: 0.00,
+  o_y: 0.00,
+  o_z: 0.00,
+  s_x: 1.00,
+  s_y: 1.00,
+  s_z: 1.00,
+  map_min: -1.00,
+  map_max: 1.00,
 };
 
 export default withStyles(styles)(FractalNoise);

@@ -55,12 +55,9 @@ class App extends React.Component {
       width: '',
       height: '',
       startFlag: false,
-      renderer: null,
+      renderer: new THREE.WebGLRenderer({ antialias: true }),
       scene: new THREE.Scene()
     }
-
-    this.state.scene.autoUpdate = true;
-    this.state.scene.background = new THREE.Color('blue');
   }
 
   handleCameraReady(cam) {

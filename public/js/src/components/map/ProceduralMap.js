@@ -11,13 +11,14 @@ export default class ProceduralMap extends React.Component {
 
         this.passes   = props.children;
         this.renderer = props.renderer;
+        this.scene    = props.scene;
         this.width    = props.width  || 256;
         this.height   = props.height || 256;
         this.seed     = props.seed || Math.random() * 10000;
         this.name     = props.name || "default map";
 
         this.target = new THREE.WebGLRenderTarget(this.width, this.height, {
-            minFilter: THREE.LinearMipMapLinearFilter,
+            minFilter: THREE.LinearFilter,
             magFilter: THREE.LinearFilter,
             format: THREE.RGBAFormat,       // important for readPixels()
             type: THREE.FloatType,          // important for readPixels()
@@ -27,21 +28,26 @@ export default class ProceduralMap extends React.Component {
         this.composer = new EffectComposer(this.renderer, this.target);
         this.composer.setSize(this.width, this.height);
 
+        console.log(JSON.stringify(this.renderer));
+
         props.onRef(this);
     }
 
-    updateComposer(){
-        this.composer.swapBuffers(); // TEMP
-        this.composer.render();
-        this.props.displaceGeometry();
+    //------------------------------------------------------------------------
+    componentDidMount() {
+        this.updateComposer();
     }
 
+    //------------------------------------------------------------------------
     addPass(pass) {
         this.composer.addPass(pass);
+        console.log('adding pass', pass.material.name);
     }
 
-    componentDidMount(){
-        this.updateComposer();
+    updateComposer(){
+        this.composer.render();
+        this.props.displaceGeometry();
+        console.log('rendering composer');
     }
 
     updatePassParam(pass_id, name, value) {
@@ -51,7 +57,7 @@ export default class ProceduralMap extends React.Component {
 
     updatePassDefine(pass_id, name, value) {
         this.composer.passes[pass_id].material.defines[name] = value;
-        this.composer.passes[pass_id].material.needsUpdate = true; // necessary when updating defines
+        this.composer.passes[pass_id].material.needsUpdate = true;
         this.updateComposer();
     }
 
@@ -60,6 +66,7 @@ export default class ProceduralMap extends React.Component {
         this.updateComposer();
     }
 
+    //------------------------------------------------------------------------
     getSample(x, y) {
         const buffer = new Float32Array(4); // NOTE: can't use floats in Safari!
         if (x > this.width || y > this.height || x < 0 || y < 0) console.warn("sampling out of bounds")
@@ -73,6 +80,7 @@ export default class ProceduralMap extends React.Component {
         return buffer;
     }
 
+    //------------------------------------------------------------------------
     render() {
         return(
             <React.Fragment>

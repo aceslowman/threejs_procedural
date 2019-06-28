@@ -44,11 +44,11 @@ class FractalWarp extends React.Component{
         'SEED': props.seed
       },
       uniforms: {
-        map_min: props.map_min || -1.0,
-        map_max: props.map_max || 1.0,
-        s_x: props.s_x || 0.2 ,
-        s_y: props.s_y || 0.2 ,
-        s_z: props.s_z || 0.4 ,
+        map_min: props.map_min,
+        map_max: props.map_max,
+        s_x: props.s_x,
+        s_y: props.s_y,
+        s_z: props.s_z,
       },
       params: {
         enabled: props.enabled,
@@ -76,8 +76,6 @@ class FractalWarp extends React.Component{
     });
 
     this.init();
-
-    this.shaderMaterial.needsUpdate - true;
 
     let shaderPass = new ShaderPass(this.shaderMaterial);
 
@@ -425,6 +423,18 @@ class FractalWarp extends React.Component{
       </ExpansionPanel>
     );
   }
+};
+
+FractalWarp.defaultProps = {
+  clear: false,
+  enabled: true,
+  renderToScreen: false,
+  needsSwap: true,
+  map_min: -0.0,
+  map_max: 1.0,
+  s_x: 0.2,
+  s_y: 0.9,
+  s_z: 0.4,
 };
 
 export default withStyles(styles)(FractalWarp);
