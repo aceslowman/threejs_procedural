@@ -38,6 +38,10 @@ export default class ProceduralMap extends React.Component {
         this.updateComposer();
     }
 
+    // componentDidUpdate() {
+    //     this.updateComposer();
+    // }
+
     //------------------------------------------------------------------------
     addPass(pass) {
         this.composer.addPass(pass);

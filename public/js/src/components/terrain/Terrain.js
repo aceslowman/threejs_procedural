@@ -50,7 +50,6 @@ class Terrain extends React.Component {
                                 // as it will not use position from a
                                 // PlaneBufferGeometry()
     this.state = {
-      ready: false,
       detail: props.detail,
       width: props.width,
       height: props.height
@@ -62,12 +61,6 @@ class Terrain extends React.Component {
     this.initializeMesh();
     this.setupDebug();
     this.mesh.updateMatrix();
-    this.ready();
-  }
-
-  ready() {
-    this.setState({ ready: true });
-    this.props.terrainReady(this);
   }
 
   //------------------------------------------------------------------------

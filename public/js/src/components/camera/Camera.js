@@ -50,13 +50,14 @@ class Camera extends React.Component {
     );
 
     this.state = { 
-      ready: false, 
       cameras: {
         ortho: ortho,
         perspective: persp
       }, 
       activeCamera: persp
     }
+
+    props.onRef(this.state.activeCamera);
   }
 
   componentDidMount(){
@@ -76,19 +77,12 @@ class Camera extends React.Component {
 
     this.setupOrbit();
     this.registerListeners();
-
-    this.ready();
   }
 
   componentDidUpdate(prevProps){
     if (prevProps.renderer != this.props.renderer) {
       this.setupOrbit();
     };
-  }
-
-  ready(){
-    this.setState({ready: true, activeCamera: this.state.cameras.perspective});
-    this.props.cameraReady(this.state.cameras.perspective);
   }
 
   setupOrbit() {
@@ -107,12 +101,12 @@ class Camera extends React.Component {
     switch(type){
       case "OrthographicCamera": 
         this.setState({activeCamera: this.state.cameras.ortho});
-        this.props.cameraChange(this.state.cameras.ortho);
+        this.props.onRef(this.state.cameras.ortho);
         this.orbitControls.object = this.state.cameras.ortho;
         break;
       case "PerspectiveCamera":
         this.setState({activeCamera: this.state.cameras.perspective});
-        this.props.cameraChange(this.state.cameras.perspective);
+        this.props.onRef(this.state.cameras.perspective);
         this.orbitControls.object = this.state.cameras.perspective;
         break;
     }

@@ -31,7 +31,7 @@ class Renderer extends React.Component {
         
         this.renderer.setSize(props.width, props.height);
 
-        props.setRenderer(this.renderer);
+        props.onRef(this.renderer);
     }
 
     componentDidMount(){

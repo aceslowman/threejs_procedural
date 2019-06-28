@@ -47,49 +47,24 @@ class App extends React.Component {
     this.entities = [];
 
     this.state = {
-      allReady: false,
-      cameraReady: false,
-      terrainReady: false,
-      canvasReady: false,
-      rendererReady: false,
       width: '',
       height: '',
-      startFlag: false,
-      renderer: new THREE.WebGLRenderer({ antialias: true }),
-      scene: new THREE.Scene()
+      scene: new THREE.Scene(),
+      camera: new THREE.PerspectiveCamera(),
+      renderer: '',
     }
   }
 
-  handleCameraReady(cam) {
-    this.setState({camera: cam, cameraReady: true});
-  }
-
-  handleCameraChange(cam) {
-    this.setState({camera: cam})
-  }
-
-  handleTerrainReady(terrain){
-    this.terrain = terrain;
-    this.setState({terrainReady: true});
-  }
-
-  handleRendererChange(renderer) {
-    this.setState({renderer: renderer});
-  }
-
-  handleSketchReady() {
-    this.setState({ sketchReady: true });
-  }
-
-  //LIFECYCLE-----------------------------------------------------
+  //------------------------------------------------------------------------
   componentDidMount() {
     this.registerListeners();
 
+    /*
+      set width and height, now that the canvas has been mounted
+    */
     this.setState({ 
       width: this.mount.clientWidth, 
-      height: this.mount.clientHeight,
-      canvasReady: true,
-      startFlag: true 
+      height: this.mount.clientHeight
     });
 
     // var intensity = 70000; // raytracer apparently needs HIGH intensity
@@ -111,29 +86,12 @@ class App extends React.Component {
     this.state.scene.add(light);
   }
 
-  onMapRendered(ref){
-    console.log("map rendered! notify renderer");
-    this.setState({
-      rendererReady: true
-    })
-  }
-
-  componentDidUpdate(){
-    if(this.state.cameraReady){
-      // console.log('CAMERA READY!');
-    }
-
-    if(this.state.terrainReady){
-      // console.log('TERRAIN READY!');
-    }
-  }
-
   componentWillUnmount() {
     this.removeListeners();
     this.mount.removeChild(this.renderer.domElement);
   }
 
-  //LISTENERS-----------------------------------------------------
+  //------------------------------------------------------------------------
   registerListeners(){
     window.addEventListener('resize', this.handleResize);
   }
@@ -154,6 +112,7 @@ class App extends React.Component {
     });
   }
 
+  //------------------------------------------------------------------------
   render() {
     return (
       <HashRouter>
@@ -168,33 +127,31 @@ class App extends React.Component {
                   camera={this.state.camera}
                   scene={this.state.scene}
                   ready={this.state.rendererReady}
-                />
+                  onRef={ref => this.setState({ renderer: ref })}
+                />    
                 {
-                  this.state.canvasReady && <Terrain
+                  this.state.renderer && <Camera 
+                  renderer={this.state.renderer} 
+                  scene={this.state.scene} 
+                  width={this.state.width} 
+                  height={this.state.height} 
+                  onRef={ref => this.setState({ camera: ref })}
+                />
+                }
+                {
+                  (this.state.renderer && this.state.camera) && <Terrain
                     renderer={this.state.renderer}
                     scene={this.state.scene}
                     width={512}
                     height={512}
                     detail={512}
                     amplitude={150}
-                    terrainReady={(t) => this.handleTerrainReady(t)}
-                    mapRendered={(ref)=>this.onMapRendered(ref)}
                   />
-                }            
-                {
-                  this.state.canvasReady && <Camera 
-                  renderer={this.state.renderer} 
-                  scene={this.state.scene} 
-                  width={this.state.width} 
-                  height={this.state.height} 
-                  cameraReady={(c) => this.handleCameraReady(c)} 
-                  cameraChange={(c) => this.handleCameraChange(c)}
-                />
-                }
+                }        
               </GUI>
               <div id="SKETCHCONTAINER">
                 <div id="APP" ref={mount => { this.mount = mount }} />
-                <Diagram ready={this.state.sketchReady} />
+                {/* <Diagram ready={this.state.sketchReady} /> */}
               </div>
             </div>
           </Provider>
