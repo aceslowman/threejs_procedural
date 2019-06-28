@@ -175,18 +175,15 @@ class FractalNoise extends React.Component{
     //------------------------------------------------------------------------------
 
     this.vert = `
-      varying vec2 vUv;
       varying vec3 vPosition;
 
       void main()	{
-          vUv = uv;
           vPosition = position;
           gl_Position = vec4( position, 1.0 );
       }
       `;
 
     this.frag = noise + `
-      varying vec2 vUv;
       varying vec3 vPosition;
 
       uniform float o_x;

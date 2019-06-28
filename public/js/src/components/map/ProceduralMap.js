@@ -1,9 +1,7 @@
 import React from 'react';
 import * as THREE from 'three';
 
-// import { EffectComposer } from '../../utilities/EffectComposer/EffectComposer.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 
 export default class ProceduralMap extends React.Component {
     constructor(props){
@@ -29,22 +27,21 @@ export default class ProceduralMap extends React.Component {
         this.composer = new EffectComposer(this.renderer, this.target);
         this.composer.setSize(this.width, this.height);
 
-        this.state = {
-            passes: this.passes
-        };
-
         props.onRef(this);
     }
 
     updateComposer(){
+        this.composer.swapBuffers(); // TEMP
         this.composer.render();
         this.props.displaceGeometry();
     }
 
     addPass(pass) {
         this.composer.addPass(pass);
+    }
+
+    componentDidMount(){
         this.updateComposer();
-        console.log(this.composer);
     }
 
     updatePassParam(pass_id, name, value) {

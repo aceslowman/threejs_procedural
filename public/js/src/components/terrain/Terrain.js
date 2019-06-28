@@ -44,10 +44,11 @@ class Terrain extends React.Component {
       this.detail,
       this.detail
     );
-    // this.geometry.parameters = undefined;
-    this.geometry = new THREE.BufferGeometry();
-    this.geometry.copy(plane);
 
+    this.geometry = new THREE.BufferGeometry();
+    this.geometry.copy(plane);  // this is important for RaytracingRenderer
+                                // as it will not use position from a
+                                // PlaneBufferGeometry()
     this.state = {
       ready: false,
       detail: props.detail,
@@ -67,10 +68,11 @@ class Terrain extends React.Component {
       v,
       v    
     );
-    // this.geometry.parameters = undefined;
-    this.geometry = new THREE.BufferGeometry();
-    this.geometry.copy(plane);
 
+    this.geometry = new THREE.BufferGeometry();
+    this.geometry.copy(plane);  // this is important for RaytracingRenderer
+                                // as it will not use position from a
+                                // PlaneBufferGeometry()
     this.initializeMesh();
     this.displaceGeometry();
   }
@@ -86,10 +88,11 @@ class Terrain extends React.Component {
       this.state.detail,
       this.state.detail
     );
-    // this.geometry.parameters = undefined;
-    this.geometry = new THREE.BufferGeometry();
-    this.geometry.copy(plane);
 
+    this.geometry = new THREE.BufferGeometry();
+    this.geometry.copy(plane);  // this is important for RaytracingRenderer
+                                // as it will not use position from a 
+                                // PlaneBufferGeometry()
     this.initializeMesh();
     this.displaceGeometry();
   }
@@ -99,14 +102,6 @@ class Terrain extends React.Component {
     this.setupDebug();
     this.mesh.updateMatrix();
     this.ready();
-  }
-
-  componentDidUpdate(prevProps){
-    if(prevProps.renderer != this.props.renderer){
-      console.log("RENDERER CHANGED!")
-
-      // re-render maps
-    }
   }
 
   ready() {
@@ -242,12 +237,12 @@ class Terrain extends React.Component {
             clear={false}
             enabled={true} 
             renderToScreen={false} 
-            needsSwap={false} // when false, map displays. warp does not.
-          />
+            needsSwap={true} // when false, map displays. warp does not. when true, it's fully responsive to state change?
+          />                 
           <FractalWarp 
             clear={false}
             enabled={true} 
-            renderToScreen={false} 
+            renderToScreen={true} 
             needsSwap={true}
           />
         </ProceduralMap>

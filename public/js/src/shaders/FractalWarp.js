@@ -72,10 +72,12 @@ class FractalWarp extends React.Component{
         s_y: { value: this.state.uniforms.s_y },
         s_z: { value: this.state.uniforms.s_z },
       },
-      name: "FractalWarp"
+      name: this.state.name
     });
 
     this.init();
+
+    this.shaderMaterial.needsUpdate - true;
 
     let shaderPass = new ShaderPass(this.shaderMaterial);
 
@@ -171,18 +173,15 @@ class FractalWarp extends React.Component{
 
     this.vert = `
       varying vec2 vUv;
-      varying vec3 vPosition;
 
       void main()	{
           vUv = uv;
-          vPosition = position;
           gl_Position = vec4( position, 1.0 );
       }
       `;
 
     this.frag = noise + `
       varying vec2 vUv;
-      varying vec3 vPosition;
 
       uniform sampler2D tDiffuse;
 
@@ -217,7 +216,6 @@ class FractalWarp extends React.Component{
         float c = map(n, -1.0, 1.0, map_min, map_max);
 
         gl_FragColor = vec4(c, c, c, 1.0);
-        // gl_FragColor = src;
       }
     `;
 

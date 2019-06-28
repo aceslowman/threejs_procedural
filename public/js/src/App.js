@@ -10,8 +10,8 @@ import Diagram from './components/diagram/DiagramContainer';
 
 import * as THREE from 'three';
 
-import Camera from './components/camera/CameraContainer';
-import Terrain from './components/terrain/TerrainContainer';
+import Camera from './components/camera/Camera';
+import Terrain from './components/terrain/Terrain';
 import Renderer from './components/renderer/Renderer';
 
 import store from './redux/store';
@@ -123,11 +123,11 @@ class App extends React.Component {
 
   componentDidUpdate(){
     if(this.state.cameraReady){
-      console.log('CAMERA READY!');
+      // console.log('CAMERA READY!');
     }
 
     if(this.state.terrainReady){
-      console.log('TERRAIN READY!');
+      // console.log('TERRAIN READY!');
     }
   }
 
