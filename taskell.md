@@ -14,13 +14,13 @@
 
 ## Doing
 
-- [improvement] each shader should actually contain an instance of ShaderPass.
 - [feature] Begin implementing RayTracing Renderer mode.
     > Currently, the obstacle is turning OFF the render cycle when switched over to raytracing, and then turning it back on when switched back to normal mode.
     * [ ] Need to kill all active workers when renderer changes.
     * [x] Terrain is not showing up displaced.
     * [ ] Light brightness has to be ludicrously high to show up in the raycasting renderer.
 - [bug] fix issue where second map is not displaying
+- [system]  random seed should be a member of the SketchContext 
 
 ## Done
 
@@ -86,6 +86,7 @@
 - [feature] Create new Renderer component & GUI, and pass it up to App.js using onRef().
 - [bug] orbitControls are not receiving the updated renderer domElement when changed in Renderer.
 - [bug] fix issue where composer passes are not being properly initialized
+- [improvement] each shader should actually contain an instance of ShaderPass.
 
 ## Backburner
 

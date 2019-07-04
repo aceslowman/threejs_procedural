@@ -51,7 +51,11 @@
     "webpack-dev-server": "^3.1.14"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
+    "@babel/core": "^7.0.0-0",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/preset-stage-2": "^7.0.0",
     "babel-loader": "^7.1.4",
     "compression-webpack-plugin": "^1.1.10",
     "css-loader": "^2.1.1",

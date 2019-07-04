@@ -34,21 +34,39 @@ const styles = theme => ({
   }
 });
 
-class FractalWarp extends React.Component{
+class FractalNoise extends React.Component{
+  static defaultProps = {
+    clear: false,
+    enabled: true,
+    renderToScreen: false,
+    needsSwap: true,
+    o_x: 0.00,
+    o_y: 0.00,
+    o_z: 0.00,
+    s_x: 1.00,
+    s_y: 1.00,
+    s_z: 1.00,
+    map_min: -1.00,
+    map_max: 1.00,
+  };
+
   constructor(props){
     super(props);
-
+    
     this.state = {
       defines: {
         'NUM_OCTAVES': props.octaves,
         'SEED': props.seed
       },
       uniforms: {
-        map_min: props.map_min,
-        map_max: props.map_max,
+        o_x: props.o_x,
+        o_y: props.o_y,
+        o_z: props.o_z,
         s_x: props.s_x,
         s_y: props.s_y,
         s_z: props.s_z,
+        map_min: props.map_min,
+        map_max: props.map_max,
       },
       params: {
         enabled: props.enabled,
@@ -56,21 +74,25 @@ class FractalWarp extends React.Component{
         needsSwap: props.needsSwap,
         clear: props.clear
       },
-      name: "FractalWarp"
+      name: "FractalNoise"
     }
+  }
 
+  componentDidMount(){
     this.shaderMaterial = new THREE.ShaderMaterial({
       defines: {
         'NUM_OCTAVES': this.state.defines.NUM_OCTAVES,
         'SEED': this.state.defines.SEED
       },
       uniforms: {
-        tDiffuse: { value: '' },
-        map_min: { value: this.state.uniforms.map_min },
-        map_max: { value: this.state.uniforms.map_max },
+        o_x: { value: this.state.uniforms.o_x },
+        o_y: { value: this.state.uniforms.o_y },
+        o_z: { value: this.state.uniforms.o_z },
         s_x: { value: this.state.uniforms.s_x },
         s_y: { value: this.state.uniforms.s_y },
         s_z: { value: this.state.uniforms.s_z },
+        map_min: { value: this.state.uniforms.map_min },
+        map_max: { value: this.state.uniforms.map_max },
       },
       name: this.state.name
     });
@@ -84,11 +106,11 @@ class FractalWarp extends React.Component{
     shaderPass.enabled = this.state.params.enabled;
     shaderPass.renderToScreen = this.state.params.renderToScreen;
 
-    props.addPass(shaderPass);
+    this.props.addPass(shaderPass);
   }
 
   /*
-    call init() if the shader constants needs to be reset.
+    call init() if the shader constants need to be reset.
   */
   init(){
     const noise = `
@@ -170,24 +192,31 @@ class FractalWarp extends React.Component{
     //------------------------------------------------------------------------------
 
     this.vert = `
-      varying vec2 vUv;
+      varying vec3 vPosition;
 
       void main()	{
-          vUv = uv;
+          vPosition = position;
           gl_Position = vec4( position, 1.0 );
       }
       `;
 
     this.frag = noise + `
-      varying vec2 vUv;
+      varying vec3 vPosition;
 
-      uniform sampler2D tDiffuse;
+      uniform float o_x;
+      uniform float o_y;
+      uniform float o_z;
 
       uniform float s_x;
       uniform float s_y;
       uniform float s_z;
+
       uniform float map_min;
       uniform float map_max;
+
+      float map(float value, float min1, float max1, float min2, float max2) {
+        return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
+      }
 
       float fbm(vec3 x) {
       	float v = 0.0;
@@ -201,79 +230,68 @@ class FractalWarp extends React.Component{
       	return v;
       }
 
-      float map(float value, float min1, float max1, float min2, float max2) {
-        return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
-      }
-
       void main() {
-        vec4 src = texture2D(tDiffuse, vUv);
+        vec3 offset = vec3(o_x,o_y,o_z);
+        vec3 scale = vec3(s_x,s_y,s_z);
 
-        vec3 scalar = vec3(s_x,s_y,s_z);
-        float n = fbm(src.rgb * scalar);
+        vec3 p = (vPosition * scale) + offset;
+
+        float n = fbm(p);
 
         float c = map(n, -1.0, 1.0, map_min, map_max);
-
         gl_FragColor = vec4(c, c, c, 1.0);
       }
     `;
-
-    /*
-      ARTIFACT ISSUE:
-
-      map is not the problem
-      scalar is unconfirmed but not likely
-      src is fine
-    */
 
     this.shaderMaterial.vertexShader   = this.vert;
     this.shaderMaterial.fragmentShader = this.frag;
   }
 
   render() {
-    const { classes } = this.props;
+    const {classes} = this.props;
 
     return (
       <ExpansionPanel defaultExpanded={true}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography variant="h5" className={classes.heading}>FractalWarp</Typography>
+          <Typography variant="h5" className={classes.heading}>FractalNoise</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <Grid container>
 
-
-
+            
+            
             {/* ENABLE */}
             <Grid item xs={12} align="right">
               <InputLabel margin="dense">Enabled</InputLabel>
               <Checkbox
                 checked={this.state.params.enabled}
                 onChange={(e) => {
-                  e.persist();
-                  this.setState(state => (state.params.enabled = e.target.checked));
-                  this.props.updatePassParam(this.props.index, "enabled", e.target.checked);
-                }
+                    e.persist();
+                    this.setState(state => (state.params.enabled = e.target.checked));
+                    this.props.updatePassParam(this.props.index, "enabled", e.target.checked);
+                  }
                 }
               />
             </Grid>
 
-
-
+            
+            
             {/* RENDER TO SCREEN */}
             <Grid item xs={12} align="right">
               <InputLabel margin="dense">Render to Screen</InputLabel>
               <Checkbox
                 checked={this.state.params.renderToScreen}
                 onChange={(e) => {
-                  e.persist();
-                  this.setState(state => (state.params.renderToScreen = e.target.checked));
-                  this.props.updatePassParam(this.props.index, "renderToScreen", e.target.checked);
-                }
+                    e.persist();
+                    this.setState(state => (state.params.renderToScreen = e.target.checked));
+                    this.props.updatePassParam(this.props.index, "renderToScreen", e.target.checked);
+                  }
                 }
               />
             </Grid>
 
-
-
+            
+            
             {/* OCTAVES */}
             <Grid item xs={6}>
               <TextField
@@ -283,16 +301,16 @@ class FractalWarp extends React.Component{
                 variant="filled"
                 margin="dense"
                 onChange={(e) => {
-                  e.persist();
-                  this.setState(state => (state.defines.NUM_OCTAVES = e.target.value));
-                  this.props.updatePassDefine(this.props.index, "NUM_OCTAVES", e.target.value);
-                }
+                    e.persist();
+                    this.setState(state => (state.defines.NUM_OCTAVES = e.target.value));
+                    this.props.updatePassDefine(this.props.index, "NUM_OCTAVES", e.target.value);
+                  }
                 }
               />
             </Grid>
 
-
-
+            
+            
             {/* SEED */}
             <Grid item xs={6}>
               <TextField
@@ -302,14 +320,77 @@ class FractalWarp extends React.Component{
                 variant="filled"
                 margin="dense"
                 onChange={(e) => {
-                  e.persist();
-                  this.setState(state => (state.defines.SEED = e.target.value));
-                  this.props.updatePassDefine(this.props.index, "SEED", e.target.value);
-                }
+                    e.persist();
+                    this.setState(state => (state.defines.SEED = e.target.value));
+                    this.props.updatePassDefine(this.props.index, "SEED", e.target.value);
+                  }
                 }
               />
             </Grid>
 
+            
+            
+            {/* OFFSET GROUP */}
+            <Grid container alignItems="center">
+
+              <Grid item xs={3} align="center">
+                <InputLabel margin="dense">Offset</InputLabel>
+              </Grid>
+
+              <Grid item xs={3}>
+                <TextField
+                  label="x"
+                  value={this.state.uniforms.o_x}
+                  inputProps={{ step: 0.1 }}
+                  type="number"
+                  variant="filled"
+                  margin="dense"
+                  onChange={(e) => {
+                    e.persist();
+                    this.setState(state => (state.uniforms.o_x = e.target.value));
+                    this.props.updatePassUniform(this.props.index, "o_x", e.target.value);
+                  }
+                }
+                />
+              </Grid>
+
+              <Grid item xs={3}>
+                <TextField
+                  label="y"
+                  value={this.state.uniforms.o_y}
+                  inputProps={{ step: 0.1 }}
+                  type="number"
+                  variant="filled"
+                  margin="dense"
+                  onChange={(e) => {
+                    e.persist();
+                    this.setState(state => (state.uniforms.o_y = e.target.value));
+                    this.props.updatePassUniform(this.props.index, "o_y", e.target.value);
+                  }
+                }
+                />
+              </Grid>
+
+              <Grid item xs={3}>
+                <TextField
+                  label="z"
+                  value={this.state.uniforms.o_z}
+                  inputProps={{ step: 0.1 }}
+                  type="number"
+                  variant="filled"
+                  margin="dense"
+                  onChange={(e) => {
+                    e.persist();
+                    this.setState(state => (state.uniforms.o_z = e.target.value));
+                    this.props.updatePassUniform(this.props.index, "o_z", e.target.value);
+                  }
+                }
+                />
+              </Grid>
+            </Grid>
+
+            
+            
             {/* SCALE GROUP */}
             <Grid container alignItems="center">
 
@@ -326,10 +407,10 @@ class FractalWarp extends React.Component{
                   variant="filled"
                   margin="dense"
                   onChange={(e) => {
-                    e.persist();
-                    this.setState(state => (state.uniforms.s_x = e.target.value));
-                    this.props.updatePassUniform(this.props.index, "s_x", e.target.value);
-                  }
+                      e.persist();
+                      this.setState(state => (state.uniforms.s_x = e.target.value));
+                      this.props.updatePassUniform(this.props.index, "s_x", e.target.value);
+                    }
                   }
                 />
               </Grid>
@@ -343,10 +424,10 @@ class FractalWarp extends React.Component{
                   variant="filled"
                   margin="dense"
                   onChange={(e) => {
-                    e.persist();
-                    this.setState(state => (state.uniforms.s_y = e.target.value));
-                    this.props.updatePassUniform(this.props.index, "s_y", e.target.value);
-                  }
+                      e.persist();
+                      this.setState(state => (state.uniforms.s_y = e.target.value));
+                      this.props.updatePassUniform(this.props.index, "s_y", e.target.value);
+                    }
                   }
                 />
               </Grid>
@@ -360,17 +441,17 @@ class FractalWarp extends React.Component{
                   variant="filled"
                   margin="dense"
                   onChange={(e) => {
-                    e.persist();
-                    this.setState(state => (state.uniforms.s_z = e.target.value));
-                    this.props.updatePassUniform(this.props.index, "s_z", e.target.value);
-                  }
+                      e.persist();
+                      this.setState(state => (state.uniforms.s_z = e.target.value));
+                      this.props.updatePassUniform(this.props.index, "s_z", e.target.value);
+                    }
                   }
                 />
               </Grid>
             </Grid>
 
-
-
+            
+            
             {/* MAP GROUP */}
             <Grid container alignItems="center">
 
@@ -387,10 +468,10 @@ class FractalWarp extends React.Component{
                   variant="filled"
                   margin="dense"
                   onChange={(e) => {
-                    e.persist();
-                    this.setState(state => (state.uniforms.map_min = e.target.value));
-                    this.props.updatePassUniform(this.props.index, "map_min", e.target.value);
-                  }
+                      e.persist();
+                      this.setState(state => (state.uniforms.map_min = e.target.value));
+                      this.props.updatePassUniform(this.props.index, "map_min", e.target.value);
+                    }
                   }
                 />
               </Grid>
@@ -404,10 +485,10 @@ class FractalWarp extends React.Component{
                   variant="filled"
                   margin="dense"
                   onChange={(e) => {
-                    e.persist();
-                    this.setState(state => (state.uniforms.map_max = e.target.value));
-                    this.props.updatePassUniform(this.props.index, "map_max", e.target.value);
-                  }
+                      e.persist();
+                      this.setState(state => (state.uniforms.map_max = e.target.value));
+                      this.props.updatePassUniform(this.props.index, "map_max", e.target.value);
+                    }
                   }
                 />
               </Grid>
@@ -425,16 +506,4 @@ class FractalWarp extends React.Component{
   }
 };
 
-FractalWarp.defaultProps = {
-  clear: false,
-  enabled: true,
-  renderToScreen: false,
-  needsSwap: true,
-  map_min: -0.0,
-  map_max: 1.0,
-  s_x: 0.2,
-  s_y: 0.9,
-  s_z: 0.4,
-};
-
-export default withStyles(styles)(FractalWarp);
+export default withStyles(styles)(FractalNoise);

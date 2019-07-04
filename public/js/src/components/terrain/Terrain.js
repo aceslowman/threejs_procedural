@@ -1,12 +1,13 @@
 import React from 'react';
+import SketchContext from '../../SketchContext';
 import { withStyles } from '@material-ui/core/styles';
 
 import * as THREE from 'three';
 
 import ProceduralMap from '../map/ProceduralMap';
 
-import FractalNoise from "../../shaders/FractalNoise.js";
-import FractalWarp from "../../shaders/FractalWarp.js";
+import FractalNoise from "../map/shaders/FractalNoise.js";
+import FractalWarp from "../map/shaders/FractalWarp.js";
 
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -25,10 +26,16 @@ const styles = theme => ({
 });
 
 class Terrain extends React.Component {
-  constructor(props) {
+  static contextType = SketchContext;
+
+  constructor(props) {  
     super(props);
 
-    this.renderer  = props.renderer;
+    // TODO: why is context still undefined?
+
+    console.log(this.context);
+
+    // this.renderer  = context.renderer;
     this.scene     = props.scene;
     this.width     = props.width;
     this.height    = props.height;
@@ -58,8 +65,9 @@ class Terrain extends React.Component {
 
   //------------------------------------------------------------------------
   componentDidMount() {
+    this.renderer = this.context.renderer;
     this.initializeMesh();
-    this.setupDebug();
+    this.setupDebug(); 
     this.mesh.updateMatrix();
   }
 
@@ -122,8 +130,8 @@ class Terrain extends React.Component {
     this.scene.add(this.mesh);
   }
 
-  displaceGeometry() {
-    const displacement_buffer = this.elevation.getBufferArray();
+  displaceGeometry(buffer) {
+    const displacement_buffer = buffer;
     const positions = this.geometry.getAttribute('position').array;
     const uvs = this.geometry.getAttribute('uv').array;
     const count = this.geometry.getAttribute('position').count;
@@ -176,7 +184,7 @@ class Terrain extends React.Component {
   //------------------------------------------------------------------------
   render() {
     const {classes} = this.props;
-    
+
     return (
       <React.Fragment>
         <Paper className={classes.root}>
@@ -224,17 +232,21 @@ class Terrain extends React.Component {
         </Paper>
         <ProceduralMap
           name="Elevation"
-          renderer={this.renderer}
-          scene={this.scene}
-          width={this.width}
-          height={this.height}
-          displaceGeometry={() => this.displaceGeometry()}
+          width={this.props.width}
+          height={this.props.height}
+          displaceGeometry={(b) => this.displaceGeometry(b)}
           seed={this.seed}
           onRef={ref => this.elevation = ref} // assign ref so that displacement 
                                               // can be done without props
         >
-          <FractalNoise />                 
-          <FractalWarp />
+          <FractalNoise 
+            needsSwap={true}
+            renderToScreen={true}
+          />                 
+          <FractalWarp 
+            needsSwap={true}
+            renderToScreen={true}
+          />
         </ProceduralMap>
       </React.Fragment>
     );

@@ -12,9 +12,11 @@ import * as THREE from 'three';
 
 import Camera from './components/camera/Camera';
 import Terrain from './components/terrain/Terrain';
-import Renderer from './components/renderer/Renderer';
+import Renderer from './components/renderer/RendererContainer';
 
 import store from './redux/store';
+
+import {SketchProvider} from './SketchContext'
 
 const theme = createMuiTheme({
   typography: {
@@ -42,15 +44,12 @@ class App extends React.Component {
   constructor(props){
     super(props);
 
-    this.clock    = new THREE.Clock();
-
-    this.entities = [];
-
     this.state = {
       width: '',
       height: '',
       scene: new THREE.Scene(),
       camera: new THREE.PerspectiveCamera(),
+      clock: new THREE.Clock(),
       renderer: '',
     }
   }
@@ -86,25 +85,16 @@ class App extends React.Component {
     this.state.scene.add(light);
   }
 
-  componentWillUnmount() {
-    this.removeListeners();
-    this.mount.removeChild(this.renderer.domElement);
-  }
-
   //------------------------------------------------------------------------
   registerListeners(){
     window.addEventListener('resize', this.handleResize);
-  }
-
-  removeListeners(){
-    window.removeEventListener('resize', this.handleResize);
   }
 
   handleResize = () => {
     let width = this.mount.clientWidth;
     let height = this.mount.clientHeight;
 
-    this.renderer.setSize(width, height);
+    this.state.renderer.setSize(width, height);
 
     this.setState({ 
       width: this.mount.clientWidth, 
@@ -114,47 +104,57 @@ class App extends React.Component {
 
   //------------------------------------------------------------------------
   render() {
+
+    /*
+      the SketchContext will share a few important webgl related objects
+      to all child components.
+    */
+    let sketchCtx = {
+      renderer: this.state.renderer,
+      clock: this.state.clock,
+      scene: this.state.scene
+    }
+
     return (
       <HashRouter>
         <MuiThemeProvider theme={theme}>
-          <Provider store={store}>
-            <div className="container">
-              <GUI ready={this.state.sketchReady}>
-                <Renderer
-                  setRenderer={(r) => this.handleRendererChange(r)}
-                  width={this.state.width}
-                  height={this.state.height} 
-                  camera={this.state.camera}
-                  scene={this.state.scene}
-                  ready={this.state.rendererReady}
-                  onRef={ref => this.setState({ renderer: ref })}
-                />    
-                {
-                  this.state.renderer && <Camera 
-                  renderer={this.state.renderer} 
-                  scene={this.state.scene} 
-                  width={this.state.width} 
-                  height={this.state.height} 
-                  onRef={ref => this.setState({ camera: ref })}
-                />
-                }
-                {
-                  (this.state.renderer && this.state.camera) && <Terrain
-                    renderer={this.state.renderer}
+          <SketchProvider value={sketchCtx}>
+            <Provider store={store}>
+              <div className="container">
+                <GUI ready={this.state.sketchReady}>
+                  <Renderer
+                    width={this.state.width}
+                    height={this.state.height}
+                    camera={this.state.camera}
                     scene={this.state.scene}
-                    width={512}
-                    height={512}
-                    detail={512}
-                    amplitude={150}
+                    onRef={ref => this.setState({ renderer: ref })}
                   />
-                }        
-              </GUI>
-              <div id="SKETCHCONTAINER">
-                <div id="APP" ref={mount => { this.mount = mount }} />
-                {/* <Diagram ready={this.state.sketchReady} /> */}
+                  {
+                    this.state.renderer && <Camera
+                      renderer={this.state.renderer}
+                      scene={this.state.scene}
+                      width={this.state.width}
+                      height={this.state.height}
+                      onRef={ref => this.setState({ camera: ref })}
+                    />
+                  }
+                  {
+                    this.state.renderer && <Terrain
+                      renderer={this.state.renderer}
+                      scene={this.state.scene}
+                      width={512}
+                      height={512}
+                      detail={512}
+                      amplitude={150}
+                    />
+                  }
+                </GUI>
+                <div id="SKETCHCONTAINER">
+                  <div id="APP" ref={mount => { this.mount = mount }} />
+                </div>
               </div>
-            </div>
-          </Provider>
+            </Provider>
+          </SketchProvider>
         </MuiThemeProvider>
       </HashRouter>
     )

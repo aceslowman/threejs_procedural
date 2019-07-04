@@ -1,4 +1,6 @@
 import React from 'react';
+import SketchContext from '../../SketchContext';
+
 import * as THREE from 'three';
 import OrbitControls from "../../utilities/OrbitControls.js";
 
@@ -26,10 +28,11 @@ const styles = theme => ({
 });
 
 class Camera extends React.Component {
+  static contextType = SketchContext;
+
   constructor(props){
     super(props);
 
-    this.scene    = props.scene;
     this.width    = props.width;
     this.height   = props.height;
 
@@ -49,31 +52,36 @@ class Camera extends React.Component {
       2000                        // far
     );
 
-    this.state = { 
+    this.state = {
       cameras: {
         ortho: ortho,
         perspective: persp
-      }, 
+      },
       activeCamera: persp
     }
-
-    props.onRef(this.state.activeCamera);
   }
 
   componentDidMount(){
-    this.state.cameras.ortho.name = "Default Orthographic";
-    this.state.cameras.ortho.zoom = 2;
-    this.state.cameras.ortho.position.z = 999;
-    this.state.cameras.ortho.up.set(0, 0, 1);
-    this.state.cameras.ortho.updateProjectionMatrix();
-    this.state.cameras.ortho.updateMatrixWorld();
+    this.scene = this.context.scene;
 
-    this.state.cameras.perspective.name = "Default Perspective";
-    this.state.cameras.perspective.zoom = 2;
-    this.state.cameras.perspective.position.z = 999;
-    this.state.cameras.perspective.up.set(0, 0, 1);
-    this.state.cameras.perspective.updateProjectionMatrix();
-    this.state.cameras.perspective.updateMatrixWorld();
+    this.props.onRef(this.state.activeCamera);
+
+    let orthoCam = this.state.cameras.ortho;
+    let perspCam = this.state.cameras.perspective;
+
+    orthoCam.name = "Default Orthographic";
+    orthoCam.zoom = 2;
+    orthoCam.position.z = 999;
+    orthoCam.up.set(0, 0, 1);
+    orthoCam.updateProjectionMatrix();
+    orthoCam.updateMatrixWorld();
+
+    perspCam.name = "Default Perspective";
+    perspCam.zoom = 2;
+    perspCam.position.z = 999;
+    perspCam.up.set(0, 0, 1);
+    perspCam.updateProjectionMatrix();
+    perspCam.updateMatrixWorld();
 
     this.setupOrbit();
     this.registerListeners();

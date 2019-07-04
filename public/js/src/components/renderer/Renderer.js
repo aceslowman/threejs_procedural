@@ -26,16 +26,17 @@ const styles = theme => ({
 class Renderer extends React.Component {
     constructor(props){
         super(props);
-
-        this.renderer = new THREE.WebGLRenderer({ antialias: true });
-        
-        this.renderer.setSize(props.width, props.height);
-
-        props.onRef(this.renderer);
     }
 
     componentDidMount(){
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+
+        this.renderer.autoClear = false;
+        this.renderer.autoClearColor = false;
+
         this.renderer.setSize(this.props.width, this.props.height);
+
+        this.props.onRef(this.renderer);
 
         this.setupStats();
 
@@ -55,9 +56,13 @@ class Renderer extends React.Component {
 
         switch(type){
             case 'NORMAL':
-                this.renderer.clear();
+                // this.renderer.clear();
                 this.renderer = new THREE.WebGLRenderer({ antialias: true });
-                this.props.setRenderer(this.renderer);
+                this.props.onRef(this.renderer);
+
+                // TODO:
+                this.props.changeRenderer(this.renderer);
+
                 this.start();
 
                 this.renderer.setSize(this.props.width, this.props.height);
@@ -75,7 +80,10 @@ class Renderer extends React.Component {
 
                 this.renderer.setClearColor(this.props.scene.background);
                 this.renderer.setSize(this.props.width, this.props.height);
-                this.props.setRenderer(this.renderer);
+                this.props.onRef(this.renderer);
+
+                // TODO:
+                this.props.changeRenderer(this.renderer);
 
                 // sending scene to renderer
                 this.renderer.render(this.props.scene, this.props.camera);
@@ -120,6 +128,8 @@ class Renderer extends React.Component {
 
     renderScene = () => {
         this.stats.begin();
+        this.renderer.autoClearColor = false;
+        this.renderer.clear();
         this.renderer.render(this.props.scene, this.props.camera);
         this.stats.end();
     }
