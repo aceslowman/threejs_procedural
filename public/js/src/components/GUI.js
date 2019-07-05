@@ -73,7 +73,9 @@ class GUI extends React.Component {
           <Navigation handleDrawerClose={() => this.handleDrawerClose()} handleDrawerOpen={() => this.handleDrawerOpen()} />
           <Divider />
 
-          {this.props.children}
+          {this.props.children && React.Children.map(this.props.children, (child, i) => child && React.cloneElement(child, {
+            display: true // currently, 'false' DISABLES child components, and will not work as-is
+          }))}
 
         </Drawer>
     );

@@ -20,10 +20,7 @@ export default class ProceduralMap extends React.Component {
         this.height   = props.height || 256;
         this.seed     = props.seed || Math.random() * 10000;
         this.name     = props.name || "default map";
-    }
 
-    //------------------------------------------------------------------------
-    componentWillMount() {
         this.target = new THREE.WebGLRenderTarget(this.width, this.height, {
             minFilter: THREE.LinearFilter,
             magFilter: THREE.LinearFilter,
@@ -33,50 +30,24 @@ export default class ProceduralMap extends React.Component {
         });
 
         this.composer = new EffectComposer(this.renderer, this.target);
-        this.composer.setSize(this.width, this.height);
-
-        /*
-            if I wait to render the composer until AFTER everything is ready,
-            I can actually see the effect of the FractalWarp. Is this some 
-            issue related to the order these components are being generated?
-
-            how can I test this?
-
-            - create an 'updateMap' ui element.
-                -- doesn't do anything. still outputs only the first pass.
-            
-            - how is the tDiffuse texture actually binding to FractalWarp? 
-                -- it isn't set after addPass(), what about in EffectComposer.render()?
-                    --- it's set in ShaderPass.render(), which assigns the readBuffer to
-                        the corresponding texture uniform (that matches the name of the
-                        shaderpass textureID, ie tDiffuse)
-            
-            - FractalWarp is WORKING, but I seem to be sending only the FractalNoise output. 
-                    
-            
-            - when I set the renderer.autoClear to false, I can see it flash one (correct)
-              frame from the EffectComposer. this makes me think that the renderToScreen 
-              quad is being displayed, but immediately drawn on top of. so it's rendering FIRST
-                -- could this mean that the rendering of the scene is happening before 
-                   the rendering of the effectcomposer?
-                -- it at least means that FractalNoise is working
-                -- THIS.ELEVATION is being set onRef()!!! is it not being updated?
-
-            - log when *all* components get mounted, and inspect.
-                -- verbose mode?
-        */
+        this.composer.setSize(this.width, this.height);        
     }
 
+    //------------------------------------------------------------------------
     componentDidMount(){
+        console.log('mounted!', this.composer);
         this.updateComposer();
     }
 
     //------------------------------------------------------------------------
     addPass(pass) {
+        console.log(pass.material.name, pass);
         this.composer.addPass(pass);
     }
 
     updateComposer(){
+        this.composer.renderToScreen = false;  /* required to render final pass */
+        this.composer.swapBuffers();                
         this.composer.render();
         this.props.onRef(this);
         this.props.displaceGeometry(this.getBufferArray());
@@ -116,10 +87,6 @@ export default class ProceduralMap extends React.Component {
     render() {
         return(
             <React.Fragment>
-                <button onClick={()=>this.updateComposer()}>UpdateComposer</button>
-                <button onClick={() => this.composer.swapBuffers()}>Swap Buffers</button>
-                <button onClick={()=>this.composer.reset()}>reset composer</button>
-
                 {React.Children.map(this.passes, (child, i) => React.cloneElement(child, {
                     index:i,
                     updatePassParam: (p,n,v) => this.updatePassParam(p,n,v),     // pass the update props on to the

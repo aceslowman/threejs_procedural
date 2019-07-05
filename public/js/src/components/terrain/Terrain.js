@@ -28,20 +28,17 @@ const styles = theme => ({
 class Terrain extends React.Component {
   static contextType = SketchContext;
 
-  constructor(props) {  
-    super(props);
+  constructor(props, context) {  
+    super(props, context);
 
-    // TODO: why is context still undefined?
-
-    console.log(this.context);
-
-    // this.renderer  = context.renderer;
-    this.scene     = props.scene;
+    this.renderer  = context.renderer;
+    this.scene     = context.scene;
+    this.seed      = context.seed;
+    
     this.width     = props.width;
     this.height    = props.height;
     this.detail    = props.detail;
     this.amplitude = props.amplitude;
-    this.seed      = Math.random() * 10000;
 
     this.verbose   = false;
 
@@ -56,6 +53,10 @@ class Terrain extends React.Component {
     this.geometry.copy(plane);  // this is important for RaytracingRenderer
                                 // as it will not use position from a
                                 // PlaneBufferGeometry()
+
+    this.geometry.rotateX(-Math.PI / 2.);
+    this.geometry.computeBoundingBox();
+
     this.state = {
       detail: props.detail,
       width: props.width,
@@ -65,10 +66,9 @@ class Terrain extends React.Component {
 
   //------------------------------------------------------------------------
   componentDidMount() {
-    this.renderer = this.context.renderer;
     this.initializeMesh();
+    // this.mesh.updateMatrix();
     this.setupDebug(); 
-    this.mesh.updateMatrix();
   }
 
   //------------------------------------------------------------------------
@@ -108,6 +108,7 @@ class Terrain extends React.Component {
     this.geometry.copy(plane);  // this is important for RaytracingRenderer
                                 // as it will not use position from a 
                                 // PlaneBufferGeometry()
+
     this.initializeMesh();
     this.displaceGeometry();
   }
@@ -141,10 +142,12 @@ class Terrain extends React.Component {
       const v = uvs[i * 2 + 1];
       const x = Math.floor(u * (this.width - 1.0));
       const y = Math.floor(v * (this.height - 1.0));
+      
       const d_index = (y * this.height + x) * 4;
       let r = displacement_buffer[d_index];
 
-      positions[i * 3 + 2] = (r * this.amplitude);
+      // change the Y position
+      positions[i * 3 + 1] = (r * this.amplitude);
     }
 
     this.geometry.getAttribute('normal').needsUpdate = true;
@@ -164,6 +167,7 @@ class Terrain extends React.Component {
   }
 
   setupDebug() {
+    console.log(this.mesh);
     var helper = new THREE.Box3Helper(this.geometry.boundingBox, 0xffff00);
     this.scene.add(helper);
   }
@@ -185,7 +189,7 @@ class Terrain extends React.Component {
   render() {
     const {classes} = this.props;
 
-    return (
+    return this.props.display ? (
       <React.Fragment>
         <Paper className={classes.root}>
           <Grid container justify={'center'} alignItems={'center'} alignContent='center' spacing={16}>
@@ -239,17 +243,11 @@ class Terrain extends React.Component {
           onRef={ref => this.elevation = ref} // assign ref so that displacement 
                                               // can be done without props
         >
-          <FractalNoise 
-            needsSwap={true}
-            renderToScreen={true}
-          />                 
-          <FractalWarp 
-            needsSwap={true}
-            renderToScreen={true}
-          />
+          <FractalNoise />                 
+          <FractalWarp />
         </ProceduralMap>
       </React.Fragment>
-    );
+    ) : null;
   }
 }
 

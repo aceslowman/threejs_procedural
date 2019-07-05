@@ -9,6 +9,7 @@ import GUI from './components/GUI';
 import Diagram from './components/diagram/DiagramContainer';
 
 import * as THREE from 'three';
+import { Sky } from 'three/examples/jsm/objects/Sky';
 
 import Camera from './components/camera/Camera';
 import Terrain from './components/terrain/Terrain';
@@ -51,6 +52,7 @@ class App extends React.Component {
       camera: new THREE.PerspectiveCamera(),
       clock: new THREE.Clock(),
       renderer: '',
+      seed: Math.random() * 10000
     }
   }
 
@@ -66,6 +68,40 @@ class App extends React.Component {
       height: this.mount.clientHeight
     });
 
+
+    var distance = 400000;
+    let sky = new Sky();
+    sky.scale.setScalar( 450000 );
+    sky.updateMatrixWorld();
+
+    var uniforms = sky.material.uniforms;
+    uniforms["turbidity"].value = 10;
+    uniforms["rayleigh"].value = 2;
+    uniforms["luminance"].value = 1;
+    uniforms["mieCoefficient"].value = 0.005;
+    uniforms["mieDirectionalG"].value = 0.8;
+
+    let sunSphere = new THREE.Mesh(
+      new THREE.SphereBufferGeometry(20000, 16, 8),
+      new THREE.MeshBasicMaterial({ color: 0xffffff })
+    );
+    sunSphere.position.x = - 700000;
+    sunSphere.updateWorldMatrix();
+    // sunSphere.visible = false;
+
+    var theta = Math.PI * (0.49 - 0.5);
+    var phi = 2 * Math.PI * (0.25 - 0.5);
+    sunSphere.position.x = distance * Math.cos(phi);
+    sunSphere.position.y = distance * Math.sin(phi) * Math.sin(theta);
+    sunSphere.position.z = distance * Math.sin(phi) * Math.cos(theta);
+    sunSphere.visible = true;
+    uniforms["sunPosition"].value.copy(sunSphere.position);
+  
+
+    this.state.scene.add(sky);
+    this.state.scene.add(sunSphere);
+
+    // TODO: move to lighting class
     // var intensity = 70000; // raytracer apparently needs HIGH intensity
     let intensity = 0.5;
 
@@ -74,15 +110,19 @@ class App extends React.Component {
     light.physicalAttenuation = true;
     this.state.scene.add(light);
 
-    var light = new THREE.PointLight(0x55aaff, intensity);
-    light.position.set(200, 100, 100);
-    light.physicalAttenuation = true;
-    this.state.scene.add(light);
+    // var light = new THREE.PointLight(0x55aaff, intensity);
+    // light.position.set(200, 100, 100);
+    // light.physicalAttenuation = true;
+    // this.state.scene.add(light);
 
-    var light = new THREE.PointLight(0xffffff, intensity * 1.5);
-    light.position.set(0, 0, 300);
-    light.physicalAttenuation = true;
-    this.state.scene.add(light);
+    // var light = new THREE.PointLight(0xffffff, intensity * 1.5);
+    // light.position.set(0, 0, 300);
+    // light.physicalAttenuation = true;
+    // this.state.scene.add(light);
+
+    // TODO: move to utilities class
+    let gridHelper = new THREE.GridHelper(2000, 200, new THREE.Color('yellow'));
+    this.state.scene.add(gridHelper);
   }
 
   //------------------------------------------------------------------------
@@ -112,7 +152,8 @@ class App extends React.Component {
     let sketchCtx = {
       renderer: this.state.renderer,
       clock: this.state.clock,
-      scene: this.state.scene
+      scene: this.state.scene,
+      seed: this.state.seed
     }
 
     return (
@@ -126,13 +167,10 @@ class App extends React.Component {
                     width={this.state.width}
                     height={this.state.height}
                     camera={this.state.camera}
-                    scene={this.state.scene}
                     onRef={ref => this.setState({ renderer: ref })}
                   />
                   {
                     this.state.renderer && <Camera
-                      renderer={this.state.renderer}
-                      scene={this.state.scene}
                       width={this.state.width}
                       height={this.state.height}
                       onRef={ref => this.setState({ camera: ref })}
@@ -140,8 +178,6 @@ class App extends React.Component {
                   }
                   {
                     this.state.renderer && <Terrain
-                      renderer={this.state.renderer}
-                      scene={this.state.scene}
                       width={512}
                       height={512}
                       detail={512}

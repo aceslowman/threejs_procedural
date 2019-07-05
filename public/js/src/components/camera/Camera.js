@@ -30,8 +30,11 @@ const styles = theme => ({
 class Camera extends React.Component {
   static contextType = SketchContext;
 
-  constructor(props){
-    super(props);
+  constructor(props, context){
+    super(props, context);
+
+    this.scene    = context.scene;
+    this.renderer = context.renderer;
 
     this.width    = props.width;
     this.height   = props.height;
@@ -62,8 +65,6 @@ class Camera extends React.Component {
   }
 
   componentDidMount(){
-    this.scene = this.context.scene;
-
     this.props.onRef(this.state.activeCamera);
 
     let orthoCam = this.state.cameras.ortho;
@@ -71,15 +72,15 @@ class Camera extends React.Component {
 
     orthoCam.name = "Default Orthographic";
     orthoCam.zoom = 2;
-    orthoCam.position.z = 999;
-    orthoCam.up.set(0, 0, 1);
+    orthoCam.position.y = 999;
+    // orthoCam.up.set(0, 0, 1); // make Z up
     orthoCam.updateProjectionMatrix();
     orthoCam.updateMatrixWorld();
 
     perspCam.name = "Default Perspective";
     perspCam.zoom = 2;
-    perspCam.position.z = 999;
-    perspCam.up.set(0, 0, 1);
+    perspCam.position.y = 999;
+    // perspCam.up.set(0, 0, 1); // make Z up
     perspCam.updateProjectionMatrix();
     perspCam.updateMatrixWorld();
 
@@ -88,7 +89,8 @@ class Camera extends React.Component {
   }
 
   componentDidUpdate(prevProps){
-    if (prevProps.renderer != this.props.renderer) {
+    // reset orbit controls after renderer change
+    if (this.context.renderer != this.renderer) {
       this.setupOrbit();
     };
   }
@@ -96,7 +98,7 @@ class Camera extends React.Component {
   setupOrbit() {
     this.orbitControls = new OrbitControls(
       this.state.activeCamera,
-      this.props.renderer.domElement
+      this.renderer.domElement
     );
 
     this.orbitControls.dampingFactor = 0.8;

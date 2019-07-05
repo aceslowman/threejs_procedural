@@ -1,6 +1,5 @@
 ## To Do
 
-- [feature] implement adjustable smoothing on Terrain mesh
 - [bug] Correct FBM artifact issue.
     > Currently small artifacts exist after a FractalWarp pass.
     * [ ] Check sampling functions
@@ -19,8 +18,8 @@
     * [ ] Need to kill all active workers when renderer changes.
     * [x] Terrain is not showing up displaced.
     * [ ] Light brightness has to be ludicrously high to show up in the raycasting renderer.
-- [bug] fix issue where second map is not displaying
-- [system]  random seed should be a member of the SketchContext 
+- [feature] implement adjustable smoothing on Terrain mesh
+    > This can be done using THREE.SubdivisionModifier on the Terrain mesh.
 
 ## Done
 
@@ -87,6 +86,10 @@
 - [bug] orbitControls are not receiving the updated renderer domElement when changed in Renderer.
 - [bug] fix issue where composer passes are not being properly initialized
 - [improvement] each shader should actually contain an instance of ShaderPass.
+- [bug] fix issue where second map is not displaying
+    > SOLUTION: disable renderToScreen on the COMPOSER
+- [system]  random seed should be a member of the SketchContext 
+- [system] remove all unnecessary rotation, y is now UP
 
 ## Backburner
 

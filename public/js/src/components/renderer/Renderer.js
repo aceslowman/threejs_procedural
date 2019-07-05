@@ -1,4 +1,6 @@
 import React from 'react';
+import SketchContext from '../../SketchContext';
+
 import { withStyles } from '@material-ui/core/styles';
 
 import * as THREE from 'three';
@@ -24,8 +26,12 @@ const styles = theme => ({
 });
 
 class Renderer extends React.Component {
-    constructor(props){
-        super(props);
+    static contextType = SketchContext;
+
+    constructor(props, context){
+        super(props, context);
+
+        this.scene = context.scene;
     }
 
     componentDidMount(){
@@ -56,12 +62,11 @@ class Renderer extends React.Component {
 
         switch(type){
             case 'NORMAL':
-                // this.renderer.clear();
+                // TODO: terminate workers
+
+                this.renderer.clear();
                 this.renderer = new THREE.WebGLRenderer({ antialias: true });
                 this.props.onRef(this.renderer);
-
-                // TODO:
-                this.props.changeRenderer(this.renderer);
 
                 this.start();
 
@@ -75,18 +80,15 @@ class Renderer extends React.Component {
                     workers: RAYTRACING_WORKERS,
                     worker: Worker,         // NOTE: to get around Worker/Webpack issues,
                     randomize: true,        // I am passing in the entire bundled worker, 
-                    blockSize: 64           // instead of the workerPath. 
+                    blockSize: 32           // instead of the workerPath. 
                 });
 
-                this.renderer.setClearColor(this.props.scene.background);
+                this.renderer.setClearColor(this.scene.background);
                 this.renderer.setSize(this.props.width, this.props.height);
                 this.props.onRef(this.renderer);
 
-                // TODO:
-                this.props.changeRenderer(this.renderer);
-
                 // sending scene to renderer
-                this.renderer.render(this.props.scene, this.props.camera);
+                this.renderer.render(this.scene, this.props.camera);
 
                 /* 
                     NOTE: don't use the standard BufferGeometry variants
@@ -128,9 +130,9 @@ class Renderer extends React.Component {
 
     renderScene = () => {
         this.stats.begin();
-        this.renderer.autoClearColor = false;
-        this.renderer.clear();
-        this.renderer.render(this.props.scene, this.props.camera);
+        // this.renderer.autoClearColor = false;
+        // this.renderer.clear();
+        this.renderer.render(this.scene, this.props.camera);
         this.stats.end();
     }
 

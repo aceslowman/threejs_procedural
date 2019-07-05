@@ -26,15 +26,13 @@ class CameraViews extends React.Component {
     }
 
     changeView(view){
-        this.props.camera.up.set(0, 0, 1);
-
         switch (view) {
             case 'SIDE':
                 this.props.camera.position.set(1100, 0, 0);
                 this.props.camera.lookAt(0, 0, 0);
                 break;
             case 'TOP':
-                this.props.camera.position.set(0, 0, 1000);
+                this.props.camera.position.set(0, 1000, 0);
                 this.props.camera.lookAt(0, 0, 0);
                 break;
             case 'ANGLE':
