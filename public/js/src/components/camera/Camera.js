@@ -62,13 +62,15 @@ class Camera extends React.Component {
       2000                        // far
     ); //TODO: 
 
+    first_person.position.y = 100;
+
     this.state = {
       cameras: {
         ortho: ortho,
         perspective: persp,
         first_person: first_person
       },
-      activeCamera: persp
+      activeCamera: first_person
     }
   }
 

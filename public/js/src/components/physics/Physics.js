@@ -5,8 +5,10 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import SketchContext from "../../SketchContext";
-import Ammo from 'ammo.js';
+import AMMO from 'ammo.js';
 import { Divider } from '@material-ui/core';
+
+import * as THREE from 'three';
 
 const styles = theme => ({
     root: {
@@ -15,122 +17,156 @@ const styles = theme => ({
     }
 });
 
-let AMMO = '';
-
+let Ammo = '';
 class Physics extends React.Component {
     static contextType = SketchContext;
 
     constructor(props, context) {
         super(props, context);
 
-        this.phys = {};
+        this.scene = context.scene;
 
-        Ammo().then((AmmoLib) => this.initPhysics(AmmoLib));
+        this.phys = {};
+        this.bodies = []; // array of rigid bodies
+        this.tmpTrans = '';
+
+        AMMO().then((A) => this.initPhysics(A));
     }
 
-    initPhysics(AmmoLib) {
-        AMMO = AmmoLib;
+    initPhysics(A) {
+        Ammo = A;
+        this.tmpTrans = new Ammo.btTransform();
 
-        // TODO: attempting to set up basic physics world, using ammo
-        // this will likely need to be moved to a new comp, and fed thru
-        // context, similar to the renderer
+        // default phys configuration, initialize collision detection stack allocator
+        this.phys.collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
 
-        // Physics configuration
-        this.phys.collisionConfiguration = new AMMO.btDefaultCollisionConfiguration();
-        this.phys.dispatcher = new AMMO.btCollisionDispatcher(
+        // dispatcher is responsible for collision calculations, with broadphase.
+        this.phys.dispatcher = new Ammo.btCollisionDispatcher(
             this.phys.collisionConfiguration
         );
 
-        this.phys.broadphase = new AMMO.btDbvtBroadphase();
-        this.phys.solver = new AMMO.btSequentialImpulseConstraintSolver();
+        // allows detection of aabb-overlapping object pairs
+        this.phys.broadphase = new Ammo.btDbvtBroadphase();
 
-        this.phys.physicsWorld = new AMMO.btDiscreteDynamicsWorld(
+        this.phys.solver = new Ammo.btSequentialImpulseConstraintSolver();
+
+        // allows for rigid body simulation
+        this.phys.physicsWorld = new Ammo.btDiscreteDynamicsWorld(
             this.phys.dispatcher,
             this.phys.broadphase,
             this.phys.solver,
             this.phys.collisionConfiguration
         );
 
-        this.phys.physicsWorld.setGravity(new AMMO.btVector3(0, - 6, 0));
+        this.phys.physicsWorld.setGravity(new Ammo.btVector3(0, - 6, 0));
 
-        console.log(this.phys.physicsWorld);
+        
 
-        // it is initializing
-
-        // can I just send this to the components using context?
-        // it appears I can.
-
-        var groundShape = new AMMO.btBoxShape(new AMMO.btVector3(50, 50, 50)),
-            bodies = [],
-            groundTransform = new AMMO.btTransform();
-
-        groundTransform.setIdentity();
-        groundTransform.setOrigin(new AMMO.btVector3(0, -56, 0));
+        this.createBox();
+        this.createSphere();
 
 
-        var mass = 0,
-            isDynamic = (mass !== 0),
-            localInertia = new AMMO.btVector3(0, 0, 0);
+        this.props.onRef(this);
+    }
 
-        if (isDynamic)
-            groundShape.calculateLocalInertia(mass, localInertia);
+    update(deltaTime) {
+        // console.log(deltaTime);
+        // Step world
+        this.phys.physicsWorld.stepSimulation(deltaTime, 10);
 
-        var myMotionState = new AMMO.btDefaultMotionState(groundTransform),
-            rbInfo = new AMMO.btRigidBodyConstructionInfo(mass, myMotionState, groundShape, localInertia),
-            body = new AMMO.btRigidBody(rbInfo);
+        // Update rigid bodies
+        for (let i = 0; i < this.bodies.length; i++) {
+            let objThree = this.bodies[i];
+            let objAmmo = objThree.userData.physicsBody;
+            let ms = objAmmo.getMotionState();
 
-        this.phys.physicsWorld.addRigidBody(body);
-        bodies.push(body);
-
-
-
-        var colShape = new AMMO.btSphereShape(1),
-            startTransform = new AMMO.btTransform();
-
-        startTransform.setIdentity();
-
-        var mass = 1,
-            isDynamic = (mass !== 0),
-            localInertia = new AMMO.btVector3(0, 0, 0);
-
-        if (isDynamic)
-            colShape.calculateLocalInertia(mass, localInertia);
-
-        startTransform.setOrigin(new AMMO.btVector3(2, 10, 0));
-
-        var myMotionState = new AMMO.btDefaultMotionState(startTransform),
-            rbInfo = new AMMO.btRigidBodyConstructionInfo(mass, myMotionState, colShape, localInertia),
-            body = new AMMO.btRigidBody(rbInfo);
-
-        this.phys.physicsWorld.addRigidBody(body);
-        bodies.push(body);
-
-
-
-
-        var trans = new AMMO.btTransform(); // taking this out of the loop below us reduces the leaking
-
-        for (var i = 0; i < 135; i++) {
-            this.phys.physicsWorld.stepSimulation(1 / 60, 10);
-
-            bodies.forEach(function (body) {
-                if (body.getMotionState()) {
-                    body.getMotionState().getWorldTransform(trans);
-                    console.log("world pos = " + [trans.getOrigin().x().toFixed(2), trans.getOrigin().y().toFixed(2), trans.getOrigin().z().toFixed(2)]);
-                }
-            });
+            if (ms) {
+                ms.getWorldTransform(this.tmpTrans);
+                let p = this.tmpTrans.getOrigin();
+                let q = this.tmpTrans.getRotation();
+                objThree.position.set(p.x(), p.y(), p.z());
+                objThree.quaternion.set(q.x(), q.y(), q.z(), q.w());
+            }
         }
+    }
 
-        // Delete objects we created through |new|. We just do a few of them here, but you should do them all if you are not shutting down ammo.js
-        // we'll free the objects in reversed order as they were created via 'new' to avoid the 'dead' object links
-        // AMMO.destroy(this.phys.physicsWorld);
-        // AMMO.destroy(solver);
-        // AMMO.destroy(overlappingPairCache);
-        // AMMO.destroy(dispatcher);
-        // AMMO.destroy(collisionConfiguration);
+    createBox(){
+        let pos = { x: 0, y: 0, z: 0 };
+        let scale = { x: 50, y: 2, z: 50 };
+        let quat = { x: 0, y: 0, z: 0, w: 1 };
+        let mass = 0;
 
-        // print('ok.')
-        console.log('ok.');
+        //threeJS Section
+        let blockPlane = new THREE.Mesh(new THREE.BoxBufferGeometry(), new THREE.MeshPhongMaterial({ color: 0xa0afa4 }));
+
+        blockPlane.position.set(pos.x, pos.y, pos.z);
+        blockPlane.scale.set(scale.x, scale.y, scale.z);
+
+        blockPlane.castShadow = true;
+        blockPlane.receiveShadow = true;
+
+        this.scene.add(blockPlane);
+
+
+        //Ammojs Section
+        let transform = new Ammo.btTransform();
+        transform.setIdentity();
+        transform.setOrigin(new Ammo.btVector3(pos.x, pos.y, pos.z));
+        transform.setRotation(new Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
+        let motionState = new Ammo.btDefaultMotionState(transform);
+
+        let colShape = new Ammo.btBoxShape(new Ammo.btVector3(scale.x * 0.5, scale.y * 0.5, scale.z * 0.5));
+        colShape.setMargin(0.05);
+
+        let localInertia = new Ammo.btVector3(0, 0, 0);
+        colShape.calculateLocalInertia(mass, localInertia);
+
+        let rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, motionState, colShape, localInertia);
+        let body = new Ammo.btRigidBody(rbInfo);
+
+        this.phys.physicsWorld.addRigidBody(body);
+
+        // blockPlane.userData.physicsBody = body;
+        // this.bodies.push(blockPlane);        
+    }
+
+    createSphere(){
+        let pos = { x: 0, y: 20, z: 0 };
+        let radius = 2;
+        let quat = { x: 0, y: 0, z: 0, w: 1 };
+        let mass = 1;
+
+        //threeJS Section
+        let ball = new THREE.Mesh(new THREE.SphereBufferGeometry(radius), new THREE.MeshPhongMaterial({ color: 0xff0505 }));
+
+        ball.position.set(pos.x, pos.y, pos.z);
+
+        ball.castShadow = true;
+        ball.receiveShadow = true;
+
+        this.scene.add(ball);
+
+
+        //Ammojs Section
+        let transform = new Ammo.btTransform();
+        transform.setIdentity();
+        transform.setOrigin(new Ammo.btVector3(pos.x, pos.y, pos.z));
+        transform.setRotation(new Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
+        let motionState = new Ammo.btDefaultMotionState(transform);
+
+        let colShape = new Ammo.btSphereShape(radius);
+        colShape.setMargin(0.05);
+
+        let localInertia = new Ammo.btVector3(0, 0, 0);
+        colShape.calculateLocalInertia(mass, localInertia);
+
+        let rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, motionState, colShape, localInertia);
+        let body = new Ammo.btRigidBody(rbInfo);
+
+        this.phys.physicsWorld.addRigidBody(body);
+
+        ball.userData.physicsBody = body;
+        this.bodies.push(ball);
     }
 
     render(){

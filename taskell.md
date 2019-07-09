@@ -7,12 +7,11 @@
     * [ ] Check for divide by zero
     * [ ] Clamp values?
 - [enhancement] When changing camera type, duplicate / copy over any parent transform.
-- Research RayTracing Renderer
-    > Raytracing Renderer (kept within renderers/RaytracingRenderer.js) would be a great option here, allowing me to do some high quality non-realtime renders. Perfect!
-- [enhancement] use defaultProps instead of the || default method.
 - [feature] implement adjustable smoothing on Terrain mesh
     > This can be done using THREE.SubdivisionModifier on the Terrain mesh.
-- [org] create Module template.
+- [enhancement] use defaultProps instead of the || default method.
+- [feature] create 'sun' light in sky that corresponds with Sky.sunSphere
+- [bug] correct 'every other change' issue with the ProceduralMap changes.
 
 ## Doing
 
@@ -25,6 +24,7 @@
     > this should be the beginning of my integration of ammo.js. size isn't a huge concern, and the possibility of threading using web-workers at least addresses my future performance concerns.
     * [ ] install ammo.js
     * [ ] 
+- [feature] incorporate Ammo.js
 
 ## Done
 
@@ -95,6 +95,9 @@
     > SOLUTION: disable renderToScreen on the COMPOSER
 - [system]  random seed should be a member of the SketchContext 
 - [system] remove all unnecessary rotation, y is now UP
+- [org] create Module template.
+- Research RayTracing Renderer
+    > Raytracing Renderer (kept within renderers/RaytracingRenderer.js) would be a great option here, allowing me to do some high quality non-realtime renders. Perfect!
 
 ## Backburner
 

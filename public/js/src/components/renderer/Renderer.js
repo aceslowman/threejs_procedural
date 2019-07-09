@@ -31,7 +31,9 @@ class Renderer extends React.Component {
     constructor(props, context){
         super(props, context);
 
-        this.scene = context.scene;
+        this.scene   = context.scene;
+        this.physics = context.physics;
+        this.clock   = context.clock;
     }
 
     componentDidMount(){
@@ -129,9 +131,11 @@ class Renderer extends React.Component {
     }
 
     renderScene = () => {
+        let deltaTime = this.context.clock.getDelta();
+
         this.stats.begin();
-        // this.renderer.autoClearColor = false;
-        // this.renderer.clear();
+        // if physics has been initialized, update it.
+        if(this.context.physics) this.context.physics.update(deltaTime);
         this.renderer.render(this.scene, this.props.camera);
         this.stats.end();
     }

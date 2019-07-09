@@ -20,6 +20,8 @@ class CameraViews extends React.Component {
     constructor(props) {
         super(props);
 
+        this.changeView(props.view)
+
         this.state = {
             view: props.view
         }
@@ -36,7 +38,7 @@ class CameraViews extends React.Component {
                 this.props.camera.lookAt(0, 0, 0);
                 break;
             case 'ANGLE':
-                this.props.camera.position.set(600, 600, 600);
+                this.props.camera.position.set(50, 50, 50);
                 this.props.camera.lookAt(0, 0, 0);
                 break;
         }

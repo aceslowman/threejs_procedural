@@ -53,6 +53,7 @@ class App extends React.Component {
       camera: new THREE.PerspectiveCamera(),
       clock: new THREE.Clock(),
       renderer: '',
+      physics: '',
       seed: Math.random() * 10000
     }
   }
@@ -122,7 +123,7 @@ class App extends React.Component {
       clock: this.state.clock,
       scene: this.state.scene,
       seed: this.state.seed,
-      // phys: this.phys, // IN PROGRESS
+      physics: this.state.physics, // IN PROGRESS
     }
 
     return (
@@ -132,7 +133,9 @@ class App extends React.Component {
             <Provider store={store}>
               <div className="container">
                 <GUI ready={this.state.sketchReady}>
-                  <Physics /> 
+                  <Physics 
+                    onRef={ref => this.setState({ physics: ref })}
+                  /> 
                   <Sky />
                   <Renderer
                     width={this.state.width}
