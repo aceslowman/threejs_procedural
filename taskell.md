@@ -10,6 +10,9 @@
 - Research RayTracing Renderer
     > Raytracing Renderer (kept within renderers/RaytracingRenderer.js) would be a great option here, allowing me to do some high quality non-realtime renders. Perfect!
 - [enhancement] use defaultProps instead of the || default method.
+- [feature] implement adjustable smoothing on Terrain mesh
+    > This can be done using THREE.SubdivisionModifier on the Terrain mesh.
+- [org] create Module template.
 
 ## Doing
 
@@ -18,8 +21,10 @@
     * [ ] Need to kill all active workers when renderer changes.
     * [x] Terrain is not showing up displaced.
     * [ ] Light brightness has to be ludicrously high to show up in the raycasting renderer.
-- [feature] implement adjustable smoothing on Terrain mesh
-    > This can be done using THREE.SubdivisionModifier on the Terrain mesh.
+- [feature] implement first person camera mode
+    > this should be the beginning of my integration of ammo.js. size isn't a huge concern, and the possibility of threading using web-workers at least addresses my future performance concerns.
+    * [ ] install ammo.js
+    * [ ] 
 
 ## Done
 

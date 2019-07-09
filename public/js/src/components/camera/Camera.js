@@ -55,10 +55,18 @@ class Camera extends React.Component {
       2000                        // far
     );
 
+    let first_person = new THREE.PerspectiveCamera(
+      75,                         // fov
+      this.width / this.height,   // aspect
+      0.01,                       // near
+      2000                        // far
+    ); //TODO: 
+
     this.state = {
       cameras: {
         ortho: ortho,
-        perspective: persp
+        perspective: persp,
+        first_person: first_person
       },
       activeCamera: persp
     }
@@ -73,19 +81,20 @@ class Camera extends React.Component {
     orthoCam.name = "Default Orthographic";
     orthoCam.zoom = 2;
     orthoCam.position.y = 999;
-    // orthoCam.up.set(0, 0, 1); // make Z up
     orthoCam.updateProjectionMatrix();
     orthoCam.updateMatrixWorld();
 
     perspCam.name = "Default Perspective";
     perspCam.zoom = 2;
     perspCam.position.y = 999;
-    // perspCam.up.set(0, 0, 1); // make Z up
     perspCam.updateProjectionMatrix();
     perspCam.updateMatrixWorld();
 
     this.setupOrbit();
     this.registerListeners();
+
+    // TODO: 
+    this.initializeFirstPersonCamera();
   }
 
   componentDidUpdate(prevProps){
@@ -120,6 +129,21 @@ class Camera extends React.Component {
         this.orbitControls.object = this.state.cameras.perspective;
         break;
     }
+  }
+
+  initializeFirstPersonCamera(){
+    // 
+    let geometry = new THREE.SphereBufferGeometry(10,16,16);
+    let material = new THREE.MeshNormalMaterial();
+    this.fp_obj = new THREE.Mesh(geometry, material);
+
+    this.fp_obj.position.y = 300;
+
+    this.scene.add(this.fp_obj);
+  }
+
+  update(){
+
   }
 
   //LISTENERS-----------------------------------------------------
