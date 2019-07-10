@@ -17,7 +17,6 @@ const styles = theme => ({
     }
 });
 
-let Ammo = '';
 class Physics extends React.Component {
     static contextType = SketchContext;
 
@@ -26,53 +25,117 @@ class Physics extends React.Component {
 
         this.scene = context.scene;
 
-        this.phys = {};
         this.bodies = []; // array of rigid bodies
+        this.testObjects = []; // array of meshes
         this.tmpTrans = '';
+        this.Ammo = '';
 
         AMMO().then((A) => this.initPhysics(A));
     }
 
     initPhysics(A) {
-        Ammo = A;
-        this.tmpTrans = new Ammo.btTransform();
+        this.Ammo = A;
+        this.tmpTrans = new this.Ammo.btTransform();
 
-        // default phys configuration, initialize collision detection stack allocator
-        this.phys.collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
+        // default configuration, initialize collision detection stack allocator
+        this.collisionConfiguration = new this.Ammo.btDefaultCollisionConfiguration();
 
         // dispatcher is responsible for collision calculations, with broadphase.
-        this.phys.dispatcher = new Ammo.btCollisionDispatcher(
-            this.phys.collisionConfiguration
+        this.dispatcher = new this.Ammo.btCollisionDispatcher(
+            this.collisionConfiguration
         );
 
         // allows detection of aabb-overlapping object pairs
-        this.phys.broadphase = new Ammo.btDbvtBroadphase();
+        this.broadphase = new this.Ammo.btDbvtBroadphase();
 
-        this.phys.solver = new Ammo.btSequentialImpulseConstraintSolver();
+        this.solver = new this.Ammo.btSequentialImpulseConstraintSolver();
 
         // allows for rigid body simulation
-        this.phys.physicsWorld = new Ammo.btDiscreteDynamicsWorld(
-            this.phys.dispatcher,
-            this.phys.broadphase,
-            this.phys.solver,
-            this.phys.collisionConfiguration
+        this.physicsWorld = new this.Ammo.btDiscreteDynamicsWorld(
+            this.dispatcher,
+            this.broadphase,
+            this.solver,
+            this.collisionConfiguration
         );
 
-        this.phys.physicsWorld.setGravity(new Ammo.btVector3(0, - 6, 0));
-
-        
-
-        this.createBox();
-        this.createSphere();
-
+        this.physicsWorld.setGravity(new this.Ammo.btVector3(0, -20, 0));
 
         this.props.onRef(this);
+
+        this.triggerTestPhysics();
+    }
+
+    triggerTestPhysics(){
+        // clear all bodies
+        for (let body of this.bodies){
+            this.Ammo.destroy(body.userData.physicsBody);
+            // this.context.scene.remove(body);
+        }
+
+        this.bodies = []; // TODO: probably a memory leak
+
+        let num_obj = 10;
+        for (let x = 0; x <= num_obj; x++) {
+            for (let z = 0; z <= num_obj; z++) {
+                let width = 512;
+                let height = 80;
+
+                let radius = 2;
+
+                let padding = width / num_obj;
+                // let padding = ;
+                let offset = -width / 2;
+                this.initializeTestPhysics(x * (padding) + offset, height, z * (padding) + offset, radius);
+            }
+        }
+    }
+
+    initializeTestPhysics(x,y,z,rad) {
+        let pos = { x: x, y: y, z: z };
+        let radius = rad;
+        let quat = { x: 0, y: 0, z: 0, w: 1 };
+        let mass = 1;
+
+        //threeJS Section
+        let ball = new THREE.Mesh(
+            new THREE.SphereBufferGeometry(radius, 4, 4),
+            new THREE.MeshNormalMaterial()
+        );
+
+        ball.position.set(pos.x, pos.y, pos.z);
+
+        ball.castShadow = true;
+        ball.receiveShadow = true;
+
+        this.context.scene.add(ball);
+
+
+        //Ammojs Section
+        let transform = new this.Ammo.btTransform();
+        transform.setIdentity();
+        transform.setOrigin(new this.Ammo.btVector3(pos.x, pos.y, pos.z));
+        transform.setRotation(new this.Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
+        let motionState = new this.Ammo.btDefaultMotionState(transform);
+
+        let colShape = new this.Ammo.btSphereShape(radius);
+        colShape.setMargin(0.05);
+
+        let localInertia = new this.Ammo.btVector3(0, 0, 0);
+        colShape.calculateLocalInertia(mass, localInertia);
+
+        let rbInfo = new this.Ammo.btRigidBodyConstructionInfo(mass, motionState, colShape, localInertia);
+        let body = new this.Ammo.btRigidBody(rbInfo);
+
+        this.physicsWorld.addRigidBody(body);
+
+        ball.userData.physicsBody = body;
+        this.bodies.push(ball);
     }
 
     update(deltaTime) {
         // console.log(deltaTime);
         // Step world
-        this.phys.physicsWorld.stepSimulation(deltaTime, 10);
+        this.physicsWorld.stepSimulation(deltaTime, 10);
 
         // Update rigid bodies
         for (let i = 0; i < this.bodies.length; i++) {
@@ -109,64 +172,25 @@ class Physics extends React.Component {
 
 
         //Ammojs Section
-        let transform = new Ammo.btTransform();
+        let transform = new this.Ammo.btTransform();
         transform.setIdentity();
-        transform.setOrigin(new Ammo.btVector3(pos.x, pos.y, pos.z));
-        transform.setRotation(new Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
-        let motionState = new Ammo.btDefaultMotionState(transform);
+        transform.setOrigin(new this.Ammo.btVector3(pos.x, pos.y, pos.z));
+        transform.setRotation(new this.Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
+        let motionState = new this.Ammo.btDefaultMotionState(transform);
 
-        let colShape = new Ammo.btBoxShape(new Ammo.btVector3(scale.x * 0.5, scale.y * 0.5, scale.z * 0.5));
+        let colShape = new this.Ammo.btBoxShape(new this.Ammo.btVector3(scale.x * 0.5, scale.y * 0.5, scale.z * 0.5));
         colShape.setMargin(0.05);
 
-        let localInertia = new Ammo.btVector3(0, 0, 0);
+        let localInertia = new this.Ammo.btVector3(0, 0, 0);
         colShape.calculateLocalInertia(mass, localInertia);
 
-        let rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, motionState, colShape, localInertia);
-        let body = new Ammo.btRigidBody(rbInfo);
+        let rbInfo = new this.Ammo.btRigidBodyConstructionInfo(mass, motionState, colShape, localInertia);
+        let body = new this.Ammo.btRigidBody(rbInfo);
 
-        this.phys.physicsWorld.addRigidBody(body);
+        this.physicsWorld.addRigidBody(body);
 
         // blockPlane.userData.physicsBody = body;
         // this.bodies.push(blockPlane);        
-    }
-
-    createSphere(){
-        let pos = { x: 0, y: 20, z: 0 };
-        let radius = 2;
-        let quat = { x: 0, y: 0, z: 0, w: 1 };
-        let mass = 1;
-
-        //threeJS Section
-        let ball = new THREE.Mesh(new THREE.SphereBufferGeometry(radius), new THREE.MeshPhongMaterial({ color: 0xff0505 }));
-
-        ball.position.set(pos.x, pos.y, pos.z);
-
-        ball.castShadow = true;
-        ball.receiveShadow = true;
-
-        this.scene.add(ball);
-
-
-        //Ammojs Section
-        let transform = new Ammo.btTransform();
-        transform.setIdentity();
-        transform.setOrigin(new Ammo.btVector3(pos.x, pos.y, pos.z));
-        transform.setRotation(new Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
-        let motionState = new Ammo.btDefaultMotionState(transform);
-
-        let colShape = new Ammo.btSphereShape(radius);
-        colShape.setMargin(0.05);
-
-        let localInertia = new Ammo.btVector3(0, 0, 0);
-        colShape.calculateLocalInertia(mass, localInertia);
-
-        let rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, motionState, colShape, localInertia);
-        let body = new Ammo.btRigidBody(rbInfo);
-
-        this.phys.physicsWorld.addRigidBody(body);
-
-        ball.userData.physicsBody = body;
-        this.bodies.push(ball);
     }
 
     render(){
@@ -183,6 +207,9 @@ class Physics extends React.Component {
                     <Typography variant="h5" gutterBottom>Physics</Typography>
                 </Grid>
                 <Divider />
+                <Grid item>
+                    <button onClick={()=>this.triggerTestPhysics()} >Trigger Physics Test</button>
+                </Grid>
             </Paper>
         );
     }

@@ -42,9 +42,10 @@ class FractalWarp extends React.Component{
     needsSwap: true,
     map_min: -1.0,
     map_max: 1.0,
-    s_x: 0.5,
-    s_y: -0.8,
-    s_z: -0.1,
+    octaves: 8,
+    s_x: 0.1,
+    s_y: 0.1,
+    s_z: -0.2,
   };
 
   constructor(props){
@@ -52,8 +53,8 @@ class FractalWarp extends React.Component{
 
     this.state = {
       defines: {
-        'NUM_OCTAVES': props.octaves,
-        'SEED': props.seed
+        NUM_OCTAVES: props.octaves,
+        SEED: props.seed
       },
       uniforms: {
         map_min: props.map_min,
@@ -337,7 +338,7 @@ class FractalWarp extends React.Component{
                 <TextField
                   label="x"
                   value={this.state.uniforms.s_x}
-                  inputProps={{ step: 0.1 }}
+                  inputProps={{ step: 0.01 }}
                   type="number"
                   variant="filled"
                   margin="dense"
@@ -354,7 +355,7 @@ class FractalWarp extends React.Component{
                 <TextField
                   label="y"
                   value={this.state.uniforms.s_y}
-                  inputProps={{ step: 0.1 }}
+                  inputProps={{ step: 0.01 }}
                   type="number"
                   variant="filled"
                   margin="dense"
@@ -371,7 +372,7 @@ class FractalWarp extends React.Component{
                 <TextField
                   label="z"
                   value={this.state.uniforms.s_z}
-                  inputProps={{ step: 0.1 }}
+                  inputProps={{ step: 0.01 }}
                   type="number"
                   variant="filled"
                   margin="dense"
@@ -398,7 +399,7 @@ class FractalWarp extends React.Component{
                 <TextField
                   label="min"
                   value={this.state.uniforms.map_min}
-                  inputProps={{ step: 0.1 }}
+                  inputProps={{ step: 0.01 }}
                   type="number"
                   variant="filled"
                   margin="dense"
@@ -415,7 +416,7 @@ class FractalWarp extends React.Component{
                 <TextField
                   label="max"
                   value={this.state.uniforms.map_max}
-                  inputProps={{ step: 0.1 }}
+                  inputProps={{ step: 0.01 }}
                   type="number"
                   variant="filled"
                   margin="dense"

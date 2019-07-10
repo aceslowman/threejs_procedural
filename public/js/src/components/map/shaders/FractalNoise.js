@@ -43,11 +43,11 @@ class FractalNoise extends React.Component{
     o_x: 0.00,
     o_y: 0.00,
     o_z: 0.00,
-    s_x: 1.00,
-    s_y: 1.00,
-    s_z: 1.00,
+    s_x: 1.50,
+    s_y: 1.20,
+    s_z: 1.30,
     map_min: -1.00,
-    map_max: 1.00,
+    map_max: 0.2,
   };
 
   constructor(props){
@@ -341,7 +341,7 @@ class FractalNoise extends React.Component{
                 <TextField
                   label="x"
                   value={this.state.uniforms.o_x}
-                  inputProps={{ step: 0.1 }}
+                  inputProps={{ step: 0.01 }}
                   type="number"
                   variant="filled"
                   margin="dense"
@@ -358,7 +358,7 @@ class FractalNoise extends React.Component{
                 <TextField
                   label="y"
                   value={this.state.uniforms.o_y}
-                  inputProps={{ step: 0.1 }}
+                  inputProps={{ step: 0.01 }}
                   type="number"
                   variant="filled"
                   margin="dense"
@@ -375,7 +375,7 @@ class FractalNoise extends React.Component{
                 <TextField
                   label="z"
                   value={this.state.uniforms.o_z}
-                  inputProps={{ step: 0.1 }}
+                  inputProps={{ step: 0.01 }}
                   type="number"
                   variant="filled"
                   margin="dense"
@@ -402,7 +402,7 @@ class FractalNoise extends React.Component{
                 <TextField
                   label="x"
                   value={this.state.uniforms.s_x}
-                  inputProps={{ step: 0.1 }}
+                  inputProps={{ step: 0.01 }}
                   type="number"
                   variant="filled"
                   margin="dense"
@@ -419,7 +419,7 @@ class FractalNoise extends React.Component{
                 <TextField
                   label="y"
                   value={this.state.uniforms.s_y}
-                  inputProps={{ step: 0.1 }}
+                  inputProps={{ step: 0.01 }}
                   type="number"
                   variant="filled"
                   margin="dense"
@@ -436,7 +436,7 @@ class FractalNoise extends React.Component{
                 <TextField
                   label="z"
                   value={this.state.uniforms.s_z}
-                  inputProps={{ step: 0.1 }}
+                  inputProps={{ step: 0.01 }}
                   type="number"
                   variant="filled"
                   margin="dense"
@@ -463,7 +463,7 @@ class FractalNoise extends React.Component{
                 <TextField
                   label="min"
                   value={this.state.uniforms.map_min}
-                  inputProps={{ step: 0.1 }}
+                  inputProps={{ step: 0.01 }}
                   type="number"
                   variant="filled"
                   margin="dense"
@@ -480,7 +480,7 @@ class FractalNoise extends React.Component{
                 <TextField
                   label="max"
                   value={this.state.uniforms.map_max}
-                  inputProps={{ step: 0.1 }}
+                  inputProps={{ step: 0.01 }}
                   type="number"
                   variant="filled"
                   margin="dense"

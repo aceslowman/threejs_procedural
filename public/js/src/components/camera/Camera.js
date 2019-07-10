@@ -4,7 +4,6 @@ import SketchContext from '../../SketchContext';
 import * as THREE from 'three';
 import OrbitControls from "../../utilities/OrbitControls.js";
 
-import { withRouter, Route } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 
 import Grid from '@material-ui/core/Grid';
@@ -29,6 +28,10 @@ const styles = theme => ({
 
 class Camera extends React.Component {
   static contextType = SketchContext;
+
+  static defaultProps = {
+    
+  };
 
   constructor(props, context){
     super(props, context);
@@ -94,9 +97,6 @@ class Camera extends React.Component {
 
     this.setupOrbit();
     this.registerListeners();
-
-    // TODO: 
-    this.initializeFirstPersonCamera();
   }
 
   componentDidUpdate(prevProps){
@@ -131,17 +131,6 @@ class Camera extends React.Component {
         this.orbitControls.object = this.state.cameras.perspective;
         break;
     }
-  }
-
-  initializeFirstPersonCamera(){
-    // 
-    let geometry = new THREE.SphereBufferGeometry(10,16,16);
-    let material = new THREE.MeshNormalMaterial();
-    this.fp_obj = new THREE.Mesh(geometry, material);
-
-    this.fp_obj.position.y = 300;
-
-    this.scene.add(this.fp_obj);
   }
 
   update(){

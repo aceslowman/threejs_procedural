@@ -38,7 +38,7 @@ class CameraViews extends React.Component {
                 this.props.camera.lookAt(0, 0, 0);
                 break;
             case 'ANGLE':
-                this.props.camera.position.set(50, 50, 50);
+                this.props.camera.position.set(50, 50, 50); //TODO: these should be dependent on a 'distance' variable.
                 this.props.camera.lookAt(0, 0, 0);
                 break;
         }

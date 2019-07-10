@@ -15,16 +15,19 @@
 
 ## Doing
 
+- [feature] implement first person camera mode
+    > this should be the beginning of my integration of ammo.js. size isn't a huge concern, and the possibility of threading using web-workers at least addresses my future performance concerns.
+    * [x] install ammo.js
+    * [x] allow rigidbody to fall from the Camera component
+    * [ ] generate heightmap from Terrain
+    * [ ] test rigidbody should collide with Terrain
+    * [ ] swap out test rigidbody with Object3D, and parent it to the first person camera.
+- [feature] incorporate Ammo.js
 - [feature] Begin implementing RayTracing Renderer mode.
     > Currently, the obstacle is turning OFF the render cycle when switched over to raytracing, and then turning it back on when switched back to normal mode.
     * [ ] Need to kill all active workers when renderer changes.
     * [x] Terrain is not showing up displaced.
     * [ ] Light brightness has to be ludicrously high to show up in the raycasting renderer.
-- [feature] implement first person camera mode
-    > this should be the beginning of my integration of ammo.js. size isn't a huge concern, and the possibility of threading using web-workers at least addresses my future performance concerns.
-    * [ ] install ammo.js
-    * [ ] 
-- [feature] incorporate Ammo.js
 
 ## Done
 

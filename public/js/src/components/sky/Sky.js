@@ -23,19 +23,29 @@ const styles = theme => ({
 class Sky extends React.Component {
     static contextType = SketchContext;
 
+    static defaultProps = {
+        turbidity: 10,
+        rayleigh: 0.8,
+        luminance: 1,
+        mieCoefficient: 0.005,
+        mieDirectionalG: 0.8,
+        inclination: -0.19,
+        azimuth: 0.25
+    };
+
     constructor(props, context) {
         super(props, context);
 
         this.scene = context.scene;
 
         this.state = {
-            turbidity: 10,
-            rayleigh: 2,
-            luminance: 1,
-            mieCoefficient: 0.005,
-            mieDirectionalG: 0.8,
-            inclination: 0.49,
-            azimuth: 0.25
+            turbidity: props.turbidity,
+            rayleigh: props.rayleigh,
+            luminance: props.luminance,
+            mieCoefficient: props.mieCoefficient,
+            mieDirectionalG: props.mieDirectionalG,
+            inclination: props.inclination,
+            azimuth: props.azimuth
         };
     }
 
@@ -131,7 +141,7 @@ class Sky extends React.Component {
                             fullWidth
                             id="turbidity-number"
                             label="turbidity"
-                            step="0.1"
+                            step="0.01"
                             type="number"
                             variant="filled"
                             margin="dense"
@@ -141,8 +151,8 @@ class Sky extends React.Component {
                         />
                         <Slider
                             id="turbidity"
-                            min={0}
-                            max={10}
+                            min={-1}
+                            max={1}
                             value={Number(this.state.turbidity)}
                             onChange={(e, v) => this.setParam('turbidity', v)}
                         />
@@ -152,7 +162,7 @@ class Sky extends React.Component {
                             fullWidth
                             id="rayleigh-number"
                             label="rayleigh"
-                            step="0.1"
+                            step="0.01"
                             type="number"
                             variant="filled"
                             margin="dense"
@@ -162,8 +172,8 @@ class Sky extends React.Component {
                         />
                         <Slider
                             id="rayleigh"
-                            min={0}
-                            max={10}
+                            min={-1}
+                            max={1}
                             value={Number(this.state.rayleigh)}
                             onChange={(e, v) => this.setParam('rayleigh', v)}
                         />
@@ -173,7 +183,7 @@ class Sky extends React.Component {
                             fullWidth
                             id="luminance-number"
                             label="luminance"
-                            step="0.1"
+                            step="0.01"
                             type="number"
                             variant="filled"
                             margin="dense"
@@ -183,8 +193,8 @@ class Sky extends React.Component {
                         />
                         <Slider
                             id="luminance"
-                            min={0}
-                            max={10}
+                            min={-1}
+                            max={1}
                             value={Number(this.state.luminance)}
                             onChange={(e, v) => this.setParam('luminance', v)}
                         />
@@ -194,7 +204,7 @@ class Sky extends React.Component {
                             fullWidth
                             id="mieCoefficient-number"
                             label="mieCoefficient"
-                            step="0.1"
+                            step="0.01"
                             type="number"
                             variant="filled"
                             margin="dense"
@@ -204,8 +214,8 @@ class Sky extends React.Component {
                         />
                         <Slider
                             id="mieCoefficient"
-                            min={0}
-                            max={10}
+                            min={-1}
+                            max={1}
                             value={Number(this.state.mieCoefficient)}
                             onChange={(e, v) => this.setParam('mieCoefficient', v)}
                         />
@@ -215,7 +225,7 @@ class Sky extends React.Component {
                             fullWidth
                             id="mieDirectionalG-number"
                             label="mieDirectionalG"
-                            step="0.1"
+                            step="0.01"
                             type="number"
                             variant="filled"
                             margin="dense"
@@ -225,8 +235,8 @@ class Sky extends React.Component {
                         />
                         <Slider
                             id="mieDirectionalG"
-                            min={0}
-                            max={10}
+                            min={-1}
+                            max={1}
                             value={Number(this.state.mieDirectionalG)}
                             onChange={(e, v) => this.setParam('mieDirectionalG', v)}
                         />
