@@ -35,7 +35,8 @@ export default class ProceduralMap extends React.Component {
 
     //------------------------------------------------------------------------
     componentDidMount(){
-        console.log('mounted!', this.composer);
+        this.composer.renderToScreen = false; /* required to render final pass */
+        this.composer.swapBuffers();
         this.updateComposer();
     }
 
@@ -46,10 +47,7 @@ export default class ProceduralMap extends React.Component {
     }
 
     updateComposer(){
-        this.composer.renderToScreen = false;  /* required to render final pass */
-        this.composer.swapBuffers();                
         this.composer.render();
-        this.props.onRef(this);
         this.props.displaceGeometry(this.getBufferArray());
     }
 

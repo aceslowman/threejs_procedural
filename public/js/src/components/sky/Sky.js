@@ -52,13 +52,24 @@ class Sky extends React.Component {
         this.uniforms["mieCoefficient"].value = this.state.mieCoefficient;
         this.uniforms["mieDirectionalG"].value = this.state.mieDirectionalG;
 
+        this.context.scene.add(sky);
+
+        this.initSun();        
+    }
+
+    componentDidUpdate(){
+        this.updateSun();
+    }
+
+    initSun(){
         this.sunSphere = new THREE.Mesh(
             new THREE.SphereBufferGeometry(20000, 16, 8),
-            new THREE.MeshBasicMaterial({ color: 0xffffff })
+            new THREE.MeshBasicMaterial({
+                color: 0xffffff
+            })
         );
-        this.sunSphere.position.x = - 700000;
+        this.sunSphere.position.x = -700000;
         this.sunSphere.updateWorldMatrix();
-        // sunSphere.visible = false;
 
         var theta = Math.PI * (this.state.inclination - 0.5);
         var phi = 2 * Math.PI * (this.state.azimuth - 0.5);
@@ -68,13 +79,15 @@ class Sky extends React.Component {
         this.sunSphere.visible = true;
         this.uniforms["sunPosition"].value.copy(this.sunSphere.position);
 
+        this.context.scene.add(this.sunSphere);
 
-        this.scene.add(sky);
-        this.scene.add(this.sunSphere);
-    }
+        // var intensity = 70000; // raytracer apparently needs HIGH intensity
+        let intensity = 1.0;
 
-    componentDidUpdate(){
-        this.updateSun();
+        this.sunlight = new THREE.PointLight(0xffaa55, intensity);
+        this.sunlight.position.copy(this.sunSphere.position);
+        this.sunlight.physicalAttenuation = true;
+        this.context.scene.add(this.sunlight);
     }
 
     setParam(id, value){
@@ -93,6 +106,8 @@ class Sky extends React.Component {
         this.sunSphere.position.z = this.distance * Math.sin(phi) * Math.cos(theta);
         this.sunSphere.visible = true;
         this.uniforms["sunPosition"].value.copy(this.sunSphere.position);
+
+        this.sunlight.position.copy(this.sunSphere.position);
     }
 
     render() {

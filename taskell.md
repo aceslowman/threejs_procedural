@@ -10,8 +10,8 @@
 - [feature] implement adjustable smoothing on Terrain mesh
     > This can be done using THREE.SubdivisionModifier on the Terrain mesh.
 - [enhancement] use defaultProps instead of the || default method.
-- [feature] create 'sun' light in sky that corresponds with Sky.sunSphere
-- [bug] correct 'every other change' issue with the ProceduralMap changes.
+- [feature] add randomization feature to all ProcMap passes
+- [org] create Pass template, which should include new randomization of parameters.
 
 ## Doing
 
@@ -98,6 +98,8 @@
 - [org] create Module template.
 - Research RayTracing Renderer
     > Raytracing Renderer (kept within renderers/RaytracingRenderer.js) would be a great option here, allowing me to do some high quality non-realtime renders. Perfect!
+- [bug] correct 'every other change' issue with the ProceduralMap changes.
+- [feature] create 'sun' light in sky that corresponds with Sky.sunSphere
 
 ## Backburner
 

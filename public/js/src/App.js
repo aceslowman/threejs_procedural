@@ -70,25 +70,6 @@ class App extends React.Component {
       height: this.mount.clientHeight
     });
 
-    // TODO: move to lighting class
-    // var intensity = 70000; // raytracer apparently needs HIGH intensity
-    let intensity = 0.5;
-
-    var light = new THREE.PointLight(0xffaa55, intensity);
-    light.position.set(- 200, 100, 100);
-    light.physicalAttenuation = true;
-    this.state.scene.add(light);
-
-    // var light = new THREE.PointLight(0x55aaff, intensity);
-    // light.position.set(200, 100, 100);
-    // light.physicalAttenuation = true;
-    // this.state.scene.add(light);
-
-    // var light = new THREE.PointLight(0xffffff, intensity * 1.5);
-    // light.position.set(0, 0, 300);
-    // light.physicalAttenuation = true;
-    // this.state.scene.add(light);
-
     // TODO: move to utilities class
     let gridHelper = new THREE.GridHelper(2000, 200, new THREE.Color('yellow'));
     this.state.scene.add(gridHelper);

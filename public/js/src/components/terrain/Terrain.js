@@ -317,8 +317,12 @@ class Terrain extends React.Component {
           onRef={ref => this.elevation = ref} // assign ref so that displacement 
                                               // can be done without props
         >
-          <FractalNoise />                 
-          <FractalWarp />
+          <FractalNoise
+            needsSwap={true} 
+          />                 
+          <FractalWarp
+            needsSwap={true} 
+          />
         </ProceduralMap>
       </React.Fragment>
     ) : null;

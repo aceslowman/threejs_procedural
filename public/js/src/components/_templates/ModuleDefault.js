@@ -16,6 +16,10 @@ const styles = theme => ({
 class MODULE extends React.Component {
     static contextType = SketchContext;
 
+    static defaultProps = {
+
+    };
+
     constructor(props, context) {
         super(props, context);
     }

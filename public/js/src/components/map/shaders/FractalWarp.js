@@ -40,11 +40,11 @@ class FractalWarp extends React.Component{
     enabled: true,
     renderToScreen: false,
     needsSwap: true,
-    map_min: -0.0,
+    map_min: -1.0,
     map_max: 1.0,
-    s_x: 0.2,
-    s_y: 0.9,
-    s_z: 0.4,
+    s_x: 0.5,
+    s_y: -0.8,
+    s_z: -0.1,
   };
 
   constructor(props){
