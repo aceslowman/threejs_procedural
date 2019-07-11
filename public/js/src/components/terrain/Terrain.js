@@ -125,15 +125,14 @@ class Terrain extends React.Component {
       specular: 0x222222,
       shininess: 10000,
       vertexColors: THREE.NoColors,
-      flatShading: false
+      flatShading: false,
+      // wireframe: true
     });
-    // mirrorMaterialSmooth.mirror = true;
-    // mirrorMaterialSmooth.reflectivity = 0.3;
+    mirrorMaterialSmooth.mirror = true;
+    mirrorMaterialSmooth.reflectivity = 0.3;
 
     this.mesh = new THREE.Mesh(this.geometry, mirrorMaterialSmooth);
     this.scene.add(this.mesh);
-
-    // create the terrain shape for Ammo
   }
 
   displaceGeometry(buffer) {
@@ -165,30 +164,37 @@ class Terrain extends React.Component {
     this.geometry.computeBoundingBox();
     this.geometry.computeBoundingSphere();
 
+    /*
+      translate the geometry so that the bottom of the boundingBox
+      sits nicely ON TOP of the 0 plane. this seems to be necessary
+      for the proper functioning of the physics.
+    */
+    this.geometry.translate(0,-this.geometry.boundingBox.min.y,0);
+
     // https://github.com/mrdoob/three.js/issues/9377
     /*
       when a standard buffergeometry is serialized using.toJSON, all 
       attributes are omitted if geometry.parameters exists
     */
-    this.heightData = buffer;
 
-    // this.generateHeightmap(); // TODO:!
+    this.heightData = positions;
+    console.log('mesh', this.mesh);
+    console.log('min y',this.mesh.geometry.boundingBox.min.y);
+    console.log('max y',this.mesh.geometry.boundingBox.max.y);
+    this.generateHeightmap(); // TODO:!
   }
 
   generateHeightmap(){ // corresponds with 'createTerrainShape()'
     // --------------------------------_GENERATE GROUNDSHAPE------------------------------------------
-    var terrainWidth = this.state.width;      // width of terrain plane
-    var terrainDepth = this.state.width;      // total height
-    var terrainMinHeight = this.mesh.geometry.boundingBox.min.y;
-    var terrainMaxHeight = this.mesh.geometry.boundingBox.max.y;
-    var terrainWidthExtents = this.state.width;
-    var terrainDepthExtents = this.state.width;
-
-
-
+    var terrainWidth        = this.state.detail;                     // width of terrain plane
+    var terrainDepth        = this.state.detail;                     // height of terrain plane
+    var terrainMinHeight    = this.mesh.geometry.boundingBox.min.y;
+    var terrainMaxHeight    = this.mesh.geometry.boundingBox.max.y;
+    var terrainWidthExtents = this.state.width;                      // still unsure about this!
+    var terrainDepthExtents = this.state.height;                     // still unsure about this!
 
     // This parameter is not really used, since we are using PHY_FLOAT height data type and hence it is ignored
-    var heightScale = this.state.amplitude;
+    var heightScale = 1;
     // Up axis = 0 for X, 1 for Y, 2 for Z. Normally 1 = Y is used.
     var upAxis = 1;
     // hdt, height data type. "PHY_FLOAT" is used. Possible values are "PHY_FLOAT", "PHY_UCHAR", "PHY_SHORT"
@@ -198,56 +204,62 @@ class Terrain extends React.Component {
     // Creates height data buffer in Ammo heap
     var ammoHeightData = this.context.physics.Ammo._malloc(4 * terrainWidth * terrainDepth);
     // Copy the javascript height data array to the Ammo one.
-    var p = 0;
+    var p = 1;
     var p2 = 0;
     for (var j = 0; j < terrainDepth; j++) {
       for (var i = 0; i < terrainWidth; i++) {
         // write 32-bit float data to memory
-
-        // NOTE!!!!!!!!!!: I need to skip every 4 (rgba) elements in this.heightData!
         this.context.physics.Ammo.HEAPF32[ammoHeightData + p2 >> 2] = this.heightData[p];
-        p++;
+
+        // 3, to jump through x,y,z groups
+        p += 3;
         // 4 bytes/float
         p2 += 4;
       }
     }
+
     // Creates the heightfield physics shape
     var heightFieldShape = new Ammo.btHeightfieldTerrainShape(
       terrainWidth,
       terrainDepth,
+
       ammoHeightData,
+
       heightScale,
       terrainMinHeight,
       terrainMaxHeight,
+
       upAxis,
       hdt,
       flipQuadEdges
     );
-    // Set horizontal scale
-    var scaleX = terrainWidthExtents / (terrainWidth - 1);
-    var scaleZ = terrainDepthExtents / (terrainDepth - 1);
+
+    /*  
+      
+    */
+    // var scaleX = terrainWidthExtents / (terrainWidth - 1);
+    // var scaleZ = terrainDepthExtents / (terrainDepth - 1);
+    var scaleX = terrainWidthExtents / terrainWidth;
+    var scaleZ = terrainDepthExtents / terrainDepth;
+    console.log([scaleX, scaleZ]);
     heightFieldShape.setLocalScaling(new Ammo.btVector3(scaleX, 1, scaleZ));
     heightFieldShape.setMargin(0.05);
 
-
-    this.groundShape = heightFieldShape;
-
-    //-0---------------------------GENERATE RIGIDBODY-----------------------------------------------------------------
-    // update rigidbody?
-    // TODO: groundShape should be set within displaceGeometry
-    // groundShape = createTerrainShape(heightData);
-    // this.groundShape = '';
+    //---------------------------GENERATE RIGIDBODY-----------------------------------------------------------------
     var groundTransform = new Ammo.btTransform();
     groundTransform.setIdentity();
     // Shifts the terrain, since bullet re-centers it on its bounding box.
-    console.log(this.mesh);
-    groundTransform.setOrigin(new Ammo.btVector3(0, (terrainMaxHeight + terrainMinHeight) + 1, 0));
+    groundTransform.setOrigin(new Ammo.btVector3(0, (terrainMaxHeight + terrainMinHeight) /2, 0));
     var groundMass = 0;
     var groundLocalInertia = new Ammo.btVector3(0, 0, 0);
     var groundMotionState = new Ammo.btDefaultMotionState(groundTransform);
-    this.groundBody = new Ammo.btRigidBody(new Ammo.btRigidBodyConstructionInfo(groundMass, groundMotionState, this.groundShape, groundLocalInertia));
+    this.groundBody = new Ammo.btRigidBody(new Ammo.btRigidBodyConstructionInfo(
+      groundMass, 
+      groundMotionState, 
+      heightFieldShape, 
+      groundLocalInertia
+    ));
     this.context.physics.physicsWorld.addRigidBody(this.groundBody);
-    console.log(this.groundBody);
   }
 
   setupDebug() {

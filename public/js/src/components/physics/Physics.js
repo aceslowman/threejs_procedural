@@ -58,14 +58,14 @@ class Physics extends React.Component {
             this.collisionConfiguration
         );
 
-        this.physicsWorld.setGravity(new this.Ammo.btVector3(0, -20, 0));
+        this.physicsWorld.setGravity(new this.Ammo.btVector3(0, -6, 0));
 
         this.props.onRef(this);
 
-        this.triggerTestPhysics();
+        this.triggerTestPhysics(30,128,80,1);
     }
 
-    triggerTestPhysics(){
+    triggerTestPhysics(num_obj, width, height, radius){
         // clear all bodies
         for (let body of this.bodies){
             this.Ammo.destroy(body.userData.physicsBody);
@@ -74,17 +74,11 @@ class Physics extends React.Component {
 
         this.bodies = []; // TODO: probably a memory leak
 
-        let num_obj = 10;
+        let padding = width / num_obj;
+        let offset  = -width / 2;
+
         for (let x = 0; x <= num_obj; x++) {
             for (let z = 0; z <= num_obj; z++) {
-                let width = 512;
-                let height = 80;
-
-                let radius = 2;
-
-                let padding = width / num_obj;
-                // let padding = ;
-                let offset = -width / 2;
                 this.initializeTestPhysics(x * (padding) + offset, height, z * (padding) + offset, radius);
             }
         }
@@ -208,7 +202,7 @@ class Physics extends React.Component {
                 </Grid>
                 <Divider />
                 <Grid item>
-                    <button onClick={()=>this.triggerTestPhysics()} >Trigger Physics Test</button>
+                    <button onClick={() => this.triggerTestPhysics(20, 128, 80, 1)} >Trigger Physics Test</button>
                 </Grid>
             </Paper>
         );

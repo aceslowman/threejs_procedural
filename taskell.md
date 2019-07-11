@@ -16,7 +16,7 @@
 ## Doing
 
 - [feature] implement first person camera mode
-    > this should be the beginning of my integration of ammo.js. size isn't a huge concern, and the possibility of threading using web-workers at least addresses my future performance concerns.
+    > this should be the beginning of my integration of ammo.js. size isn't a huge concern, and the possibility of threading using web-workers at least addresses my future performance concerns. CURRENTLY, the heightfield is being generated, but it is slightly out of alignment. check anything related to a +1 or an offset.
     * [x] install ammo.js
     * [x] allow rigidbody to fall from the Camera component
     * [ ] generate heightmap from Terrain

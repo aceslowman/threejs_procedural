@@ -104,7 +104,7 @@ class App extends React.Component {
       clock: this.state.clock,
       scene: this.state.scene,
       seed: this.state.seed,
-      physics: this.state.physics, // IN PROGRESS
+      physics: this.state.physics,
     }
 
     return (
@@ -133,9 +133,9 @@ class App extends React.Component {
                   }
                   {
                     this.state.renderer && <Terrain
-                      width={512}
-                      height={512}
-                      detail={512}
+                      width={128}
+                      height={128}
+                      detail={32}
                       amplitude={150}
                     />
                   }
