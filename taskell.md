@@ -28,6 +28,9 @@
     * [ ] Need to kill all active workers when renderer changes.
     * [x] Terrain is not showing up displaced.
     * [ ] Light brightness has to be ludicrously high to show up in the raycasting renderer.
+- [improvement] add euler widget
+- [feature] create keybinding system (json representation of all keybindings, mapped to params)
+- 
 
 ## Done
 

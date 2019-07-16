@@ -58,11 +58,12 @@ class Physics extends React.Component {
             this.collisionConfiguration
         );
 
-        this.physicsWorld.setGravity(new this.Ammo.btVector3(0, -6, 0));
+        // temporarily set to -3 to debug
+        this.physicsWorld.setGravity(new this.Ammo.btVector3(0, -3, 0));
 
         this.props.onRef(this);
 
-        this.triggerTestPhysics(30,128,80,1);
+        this.triggerTestPhysics(30,256,80,1);
     }
 
     triggerTestPhysics(num_obj, width, height, radius){
@@ -93,7 +94,10 @@ class Physics extends React.Component {
         //threeJS Section
         let ball = new THREE.Mesh(
             new THREE.SphereBufferGeometry(radius, 4, 4),
-            new THREE.MeshNormalMaterial()
+            new THREE.MeshBasicMaterial({
+                color: 'red',
+                depthTest: false
+            })
         );
 
         ball.position.set(pos.x, pos.y, pos.z);

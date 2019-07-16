@@ -115,7 +115,7 @@ class Camera extends React.Component {
     this.orbitControls.dampingFactor = 0.8;
     this.orbitControls.minDistance = 0.1;
     this.orbitControls.maxDistance = 1000;
-    this.orbitControls.maxPolarAngle = Math.PI / 2;
+    // this.orbitControls.maxPolarAngle = Math.PI / 2;
   }
 
   changeActiveCamera(type){

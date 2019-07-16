@@ -29,10 +29,14 @@ class CameraViews extends React.Component {
 
     changeView(view){
         switch (view) {
-            case 'SIDE':
+            case 'xSIDE':
                 this.props.camera.position.set(1100, 0, 0);
                 this.props.camera.lookAt(0, 0, 0);
                 break;
+            case 'zSIDE':
+                this.props.camera.position.set(0, 0, 1100);
+                this.props.camera.lookAt(0, 0, 0);
+                break;                
             case 'TOP':
                 this.props.camera.position.set(0, 1000, 0);
                 this.props.camera.lookAt(0, 0, 0);
@@ -61,13 +65,16 @@ class CameraViews extends React.Component {
                     <Grid item xs={12}>
                         <Typography variant="h6" align="center">Camera Views</Typography>
                     </Grid>
-                    <Grid item xs={4}>
-                        <Button onClick={()=>this.changeView("SIDE")} fullWidth variant="outlined">Side</Button>
+                    <Grid item xs={3}>
+                        <Button onClick={()=>this.changeView("xSIDE")} fullWidth variant="outlined">xSide</Button>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={3}>
+                        <Button onClick={() => this.changeView("zSIDE")} fullWidth variant="outlined">zSide</Button>
+                    </Grid>                    
+                    <Grid item xs={3}>
                         <Button onClick={()=>this.changeView("TOP")} fullWidth variant="outlined">Top</Button>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={3}>
                         <Button onClick={()=>this.changeView("ANGLE")} fullWidth variant="outlined">Angle</Button>
                     </Grid>
                 </Grid>  

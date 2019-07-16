@@ -118,7 +118,7 @@ class Terrain extends React.Component {
 
   //------------------------------------------------------------------------
   initializeMesh() {
-    this.material = new THREE.MeshNormalMaterial();
+    this.material = new THREE.MeshNormalMaterial({side: THREE.DoubleSide, wireframe: true});
 
     var mirrorMaterialSmooth = new THREE.MeshPhongMaterial({
       color: 0xffaa00,
@@ -126,12 +126,13 @@ class Terrain extends React.Component {
       shininess: 10000,
       vertexColors: THREE.NoColors,
       flatShading: false,
-      // wireframe: true
+      wireframe: true,
+      // side: THREE.DoubleSide
     });
     mirrorMaterialSmooth.mirror = true;
     mirrorMaterialSmooth.reflectivity = 0.3;
 
-    this.mesh = new THREE.Mesh(this.geometry, mirrorMaterialSmooth);
+    this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.scene.add(this.mesh);
   }
 
@@ -178,16 +179,13 @@ class Terrain extends React.Component {
     */
 
     this.heightData = positions;
-    console.log('mesh', this.mesh);
-    console.log('min y',this.mesh.geometry.boundingBox.min.y);
-    console.log('max y',this.mesh.geometry.boundingBox.max.y);
-    this.generateHeightmap(); // TODO:!
+    this.generateHeightfield();
   }
 
-  generateHeightmap(){ // corresponds with 'createTerrainShape()'
+  generateHeightfield(){ // corresponds with 'createTerrainShape()'
     // --------------------------------_GENERATE GROUNDSHAPE------------------------------------------
     var terrainWidth        = this.state.detail;                     // width of terrain plane
-    var terrainDepth        = this.state.detail;                     // height of terrain plane
+    var terrainDepth        = this.state.detail;
     var terrainMinHeight    = this.mesh.geometry.boundingBox.min.y;
     var terrainMaxHeight    = this.mesh.geometry.boundingBox.max.y;
     var terrainWidthExtents = this.state.width;                      // still unsure about this!
@@ -204,15 +202,15 @@ class Terrain extends React.Component {
     // Creates height data buffer in Ammo heap
     var ammoHeightData = this.context.physics.Ammo._malloc(4 * terrainWidth * terrainDepth);
     // Copy the javascript height data array to the Ammo one.
-    var p = 1;
+    var p = 0;
     var p2 = 0;
-    for (var j = 0; j < terrainDepth; j++) {
-      for (var i = 0; i < terrainWidth; i++) {
+    for (var x = 0; x < terrainDepth; x++) {
+      for (var y = 0; y < terrainWidth; y++) {
         // write 32-bit float data to memory
-        this.context.physics.Ammo.HEAPF32[ammoHeightData + p2 >> 2] = this.heightData[p];
+        this.context.physics.Ammo.HEAPF32[ammoHeightData + p2 >> 2] = this.heightData[p + 1];
 
         // 3, to jump through x,y,z groups
-        p += 3;
+        p += 3; 
         // 4 bytes/float
         p2 += 4;
       }
@@ -234,14 +232,11 @@ class Terrain extends React.Component {
       flipQuadEdges
     );
 
-    /*  
-      
-    */
     // var scaleX = terrainWidthExtents / (terrainWidth - 1);
     // var scaleZ = terrainDepthExtents / (terrainDepth - 1);
     var scaleX = terrainWidthExtents / terrainWidth;
     var scaleZ = terrainDepthExtents / terrainDepth;
-    console.log([scaleX, scaleZ]);
+    console.log([scaleX,scaleZ]);
     heightFieldShape.setLocalScaling(new Ammo.btVector3(scaleX, 1, scaleZ));
     heightFieldShape.setMargin(0.05);
 
@@ -250,6 +245,7 @@ class Terrain extends React.Component {
     groundTransform.setIdentity();
     // Shifts the terrain, since bullet re-centers it on its bounding box.
     groundTransform.setOrigin(new Ammo.btVector3(0, (terrainMaxHeight + terrainMinHeight) /2, 0));
+    // groundTransform.setOrigin(new Ammo.btVector3(terrainWidthExtents / 2, (terrainMaxHeight + terrainMinHeight) /2, terrainDepthExtents / 2));
     var groundMass = 0;
     var groundLocalInertia = new Ammo.btVector3(0, 0, 0);
     var groundMotionState = new Ammo.btDefaultMotionState(groundTransform);
@@ -340,9 +336,11 @@ class Terrain extends React.Component {
         >
           <FractalNoise
             needsSwap={true} 
+            octaves={3}
           />                 
           <FractalWarp
             needsSwap={true} 
+            octaves={3}
           />
         </ProceduralMap>
       </React.Fragment>

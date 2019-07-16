@@ -48,6 +48,7 @@ class FractalNoise extends React.Component{
     s_z: 1.30,
     map_min: -1.00,
     map_max: 0.2,
+    octaves: 2,
   };
 
   constructor(props){

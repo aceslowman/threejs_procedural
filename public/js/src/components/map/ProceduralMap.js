@@ -91,8 +91,7 @@ export default class ProceduralMap extends React.Component {
                     updatePassDefine: (p,n,v) => this.updatePassDefine(p,n,v),   // props.children
                     updatePassUniform: (p,n,v) => this.updatePassUniform(p,n,v), 
                     addPass: (p) => this.addPass(p),
-                    composer: this.composer, 
-                    octaves: 8, 
+                    composer: this.composer,  
                     seed: this.seed
                 }))}
             </React.Fragment>
