@@ -42,59 +42,22 @@ class Camera extends React.Component {
     this.width    = props.width;
     this.height   = props.height;
 
-    let ortho = new THREE.OrthographicCamera(
-      this.width / - 2,
-      this.width / 2,
-      this.height / 2,
-      this.height / - 2,
-      0,
-      2000
-    );
-
-    let persp = new THREE.PerspectiveCamera(
-      75,                         // fov
-      this.width / this.height,   // aspect
-      0.01,                       // near
-      2000                        // far
-    );
-
-    let first_person = new THREE.PerspectiveCamera(
-      75,                         // fov
-      this.width / this.height,   // aspect
-      0.01,                       // near
-      2000                        // far
-    ); //TODO: 
-
-    first_person.position.y = 100;
+    this.setupOrthographicCamera();
+    this.setupPerspectiveCamera();
+    this.setupFirstPersonCamera();
 
     this.state = {
       cameras: {
-        ortho: ortho,
-        perspective: persp,
-        first_person: first_person
+        ortho: this.ortho,
+        perspective: this.persp,
+        first_person: this.first_person
       },
-      activeCamera: first_person
+      activeCamera: this.first_person
     }
   }
 
   componentDidMount(){
     this.props.onRef(this.state.activeCamera);
-
-    let orthoCam = this.state.cameras.ortho;
-    let perspCam = this.state.cameras.perspective;
-
-    orthoCam.name = "Default Orthographic";
-    orthoCam.zoom = 2;
-    orthoCam.position.y = 999;
-    orthoCam.updateProjectionMatrix();
-    orthoCam.updateMatrixWorld();
-
-    perspCam.name = "Default Perspective";
-    perspCam.zoom = 2;
-    perspCam.position.y = 999;
-    perspCam.updateProjectionMatrix();
-    perspCam.updateMatrixWorld();
-
     this.setupOrbit();
     this.registerListeners();
   }
@@ -104,6 +67,88 @@ class Camera extends React.Component {
     if (this.context.renderer != this.renderer) {
       this.setupOrbit();
     };
+  }
+
+  setupOrthographicCamera(){
+    this.ortho = new THREE.OrthographicCamera(
+      this.width / - 2,
+      this.width / 2,
+      this.height / 2,
+      this.height / - 2,
+      0,
+      2000
+    );
+
+    this.ortho.name = "Default Orthographic";
+    this.ortho.zoom = 2;
+    this.ortho.position.y = 999;
+    this.ortho.updateProjectionMatrix();
+    this.ortho.updateMatrixWorld();
+  }
+
+  setupPerspectiveCamera() {
+    this.persp = new THREE.PerspectiveCamera(
+      75,                         // fov
+      this.width / this.height,   // aspect
+      0.01,                       // near
+      2000                        // far
+    );
+
+    this.persp.name = "Default Perspective";
+    this.persp.zoom = 2;
+    this.persp.position.y = 999;
+    this.persp.updateProjectionMatrix();
+    this.persp.updateMatrixWorld();
+  }
+
+  setupFirstPersonCamera() {
+    let pos = { x: 0, y: 100, z: 0 };
+    let radius = 5;
+    let quat = { x: 0, y: 0, z: 0, w: 1 };
+    let mass = 1;
+
+    //create mesh ----------------------------
+    let ball = new THREE.Mesh(
+      new THREE.SphereBufferGeometry(radius, 16, 16),
+      new THREE.MeshNormalMaterial()
+    );
+
+    ball.position.set(pos.x, pos.y, pos.z);
+    ball.castShadow = true;
+    ball.receiveShadow = true;
+
+    this.context.scene.add(ball);
+
+    //create rigidbody ----------------------------
+    let transform = new this.context.physics.Ammo.btTransform();
+    transform.setIdentity();
+    transform.setOrigin(new this.context.physics.Ammo.btVector3(pos.x, pos.y, pos.z));
+    transform.setRotation(new this.context.physics.Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
+    let motionState = new this.context.physics.Ammo.btDefaultMotionState(transform);
+
+    let colShape = new this.context.physics.Ammo.btSphereShape(radius);
+    colShape.setMargin(0.05);
+
+    let localInertia = new this.context.physics.Ammo.btVector3(0, 0, 0);
+    colShape.calculateLocalInertia(mass, localInertia);
+
+    let rbInfo = new this.context.physics.Ammo.btRigidBodyConstructionInfo(mass, motionState, colShape, localInertia);
+    let body = new this.context.physics.Ammo.btRigidBody(rbInfo);
+
+    this.context.physics.physicsWorld.addRigidBody(body);
+
+    ball.userData.physicsBody = body;
+    this.context.physics.bodies.push(ball);
+
+    //create camera ----------------------------
+    this.first_person = new THREE.PerspectiveCamera(
+      75,                         // fov
+      this.width / this.height,   // aspect
+      0.01,                       // near
+      2000                        // far
+    );
+
+    ball.add(this.first_person);
   }
 
   setupOrbit() {

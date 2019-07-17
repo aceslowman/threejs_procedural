@@ -118,7 +118,7 @@ class Terrain extends React.Component {
 
   //------------------------------------------------------------------------
   initializeMesh() {
-    this.material = new THREE.MeshNormalMaterial({side: THREE.DoubleSide, wireframe: true});
+    this.material = new THREE.MeshNormalMaterial({side: THREE.DoubleSide, wireframe: false});
 
     var mirrorMaterialSmooth = new THREE.MeshPhongMaterial({
       color: 0xffaa00,
@@ -126,7 +126,7 @@ class Terrain extends React.Component {
       shininess: 10000,
       vertexColors: THREE.NoColors,
       flatShading: false,
-      wireframe: true,
+      // wireframe: true,
       // side: THREE.DoubleSide
     });
     mirrorMaterialSmooth.mirror = true;

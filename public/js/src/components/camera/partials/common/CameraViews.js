@@ -20,7 +20,7 @@ class CameraViews extends React.Component {
     constructor(props) {
         super(props);
 
-        this.changeView(props.view)
+        // this.changeView(props.view)
 
         this.state = {
             view: props.view

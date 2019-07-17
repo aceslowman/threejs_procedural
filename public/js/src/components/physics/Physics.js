@@ -58,8 +58,7 @@ class Physics extends React.Component {
             this.collisionConfiguration
         );
 
-        // temporarily set to -3 to debug
-        this.physicsWorld.setGravity(new this.Ammo.btVector3(0, -3, 0));
+        this.physicsWorld.setGravity(new this.Ammo.btVector3(0, -6, 0));
 
         this.props.onRef(this);
 
@@ -151,6 +150,9 @@ class Physics extends React.Component {
         }
     }
 
+    /*
+        TODO: turn this into a boundary box that removes rigidbodies
+    */
     createBox(){
         let pos = { x: 0, y: 0, z: 0 };
         let scale = { x: 50, y: 2, z: 50 };

@@ -19,9 +19,11 @@
     > this should be the beginning of my integration of ammo.js. size isn't a huge concern, and the possibility of threading using web-workers at least addresses my future performance concerns. CURRENTLY, the heightfield is being generated, but it is slightly out of alignment. check anything related to a +1 or an offset.
     * [x] install ammo.js
     * [x] allow rigidbody to fall from the Camera component
-    * [ ] generate heightmap from Terrain
-    * [ ] test rigidbody should collide with Terrain
-    * [ ] swap out test rigidbody with Object3D, and parent it to the first person camera.
+    * [x] generate heightmap from Terrain
+    * [x] create rigidBody in Camera
+    * [x] swap out test rigidbody with Object3D, and parent it to the first person camera.
+    * [ ] Fix structure in Camera component
+    * [ ] Create a toggle that allows for enabling/disabling of axis locking.
 - [feature] incorporate Ammo.js
 - [feature] Begin implementing RayTracing Renderer mode.
     > Currently, the obstacle is turning OFF the render cycle when switched over to raytracing, and then turning it back on when switched back to normal mode.
@@ -30,7 +32,7 @@
     * [ ] Light brightness has to be ludicrously high to show up in the raycasting renderer.
 - [improvement] add euler widget
 - [feature] create keybinding system (json representation of all keybindings, mapped to params)
-- 
+- [improvement] create boundaryBox that will destroy rigidbodies and meshes
 
 ## Done
 
