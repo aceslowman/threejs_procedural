@@ -184,8 +184,14 @@ class Terrain extends React.Component {
 
   generateHeightfield(){ // corresponds with 'createTerrainShape()'
     // --------------------------------_GENERATE GROUNDSHAPE------------------------------------------
-    var terrainWidth        = this.state.detail;                     // width of terrain plane
-    var terrainDepth        = this.state.detail;
+
+
+  /*
+      + 1 FIX!!!!!!!!!
+  */
+
+    var terrainWidth        = this.state.detail + 1;                     // width of terrain plane
+    var terrainDepth        = this.state.detail + 1;
     var terrainMinHeight    = this.mesh.geometry.boundingBox.min.y;
     var terrainMaxHeight    = this.mesh.geometry.boundingBox.max.y;
     var terrainWidthExtents = this.state.width;                      // still unsure about this!
