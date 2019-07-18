@@ -58,7 +58,7 @@ class Physics extends React.Component {
             this.collisionConfiguration
         );
 
-        this.physicsWorld.setGravity(new this.Ammo.btVector3(0, -6, 0));
+        this.physicsWorld.setGravity(new this.Ammo.btVector3(0, -9.82, 0));
 
         this.props.onRef(this);
 
@@ -68,9 +68,14 @@ class Physics extends React.Component {
     triggerTestPhysics(num_obj, width, height, radius){
         // clear all bodies
         for (let body of this.bodies){
-            this.Ammo.destroy(body.userData.physicsBody);
-            // this.context.scene.remove(body);
+            console.log(body);
+            console.log(body.userData.physicsBody);
+            // body.userData.physicsBody.destroy();
+            // this.Ammo.destroy(body.userData.physicsBody);
+            this.context.scene.remove(body);
         }
+
+        // store these separately in a 'test bodies' array.
 
         this.bodies = []; // TODO: probably a memory leak
 
@@ -92,10 +97,11 @@ class Physics extends React.Component {
 
         //threeJS Section
         let ball = new THREE.Mesh(
-            new THREE.SphereBufferGeometry(radius, 4, 4),
+            new THREE.SphereBufferGeometry(radius, 8, 8),
             new THREE.MeshBasicMaterial({
                 color: 'red',
-                depthTest: false
+                depthTest: true,
+                wireframe: true
             })
         );
 
@@ -138,16 +144,21 @@ class Physics extends React.Component {
         for (let i = 0; i < this.bodies.length; i++) {
             let objThree = this.bodies[i];
             let objAmmo = objThree.userData.physicsBody;
+
             let ms = objAmmo.getMotionState();
 
+            // objAmmo.setLinearVelocity(this.Ammo.btVector3(0, 0, 0));
+            // objAmmo.setLinearVelocity(this.Ammo.btVector3(100, 0, 0));
+            
             if (ms) {
+                // console.log(ms);
                 ms.getWorldTransform(this.tmpTrans);
                 let p = this.tmpTrans.getOrigin();
                 let q = this.tmpTrans.getRotation();
                 objThree.position.set(p.x(), p.y(), p.z());
                 objThree.quaternion.set(q.x(), q.y(), q.z(), q.w());
             }
-        }
+        }   
     }
 
     /*

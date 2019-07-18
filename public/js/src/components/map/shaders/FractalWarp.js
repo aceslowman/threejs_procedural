@@ -42,7 +42,7 @@ class FractalWarp extends React.Component{
     needsSwap: true,
     map_min: -1.0,
     map_max: 1.0,
-    octaves: 3,
+    octaves: 8,
     s_x: 0.1,
     s_y: 0.1,
     s_z: -0.2,

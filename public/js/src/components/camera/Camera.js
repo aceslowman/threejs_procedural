@@ -105,27 +105,30 @@ class Camera extends React.Component {
     let pos = { x: 0, y: 100, z: 0 };
     let radius = 5;
     let quat = { x: 0, y: 0, z: 0, w: 1 };
-    let mass = 1;
+    let mass =  15;
 
     //create mesh ----------------------------
-    let ball = new THREE.Mesh(
+    this.fpTransform = new THREE.Mesh(
       new THREE.SphereBufferGeometry(radius, 16, 16),
       new THREE.MeshNormalMaterial()
     );
 
-    ball.position.set(pos.x, pos.y, pos.z);
-    ball.castShadow = true;
-    ball.receiveShadow = true;
+    this.fpTransform.position.set(pos.x, pos.y, pos.z);
+    this.fpTransform.castShadow = true;
+    this.fpTransform.receiveShadow = true;
 
-    this.context.scene.add(ball);
+    this.context.scene.add(this.fpTransform);
 
     //create rigidbody ----------------------------
     let transform = new this.context.physics.Ammo.btTransform();
     transform.setIdentity();
+
+    // set default position
     transform.setOrigin(new this.context.physics.Ammo.btVector3(pos.x, pos.y, pos.z));
+    // set default rotation
     transform.setRotation(new this.context.physics.Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
     let motionState = new this.context.physics.Ammo.btDefaultMotionState(transform);
-
+      console.log(motionState);
     let colShape = new this.context.physics.Ammo.btSphereShape(radius);
     colShape.setMargin(0.05);
 
@@ -133,12 +136,19 @@ class Camera extends React.Component {
     colShape.calculateLocalInertia(mass, localInertia);
 
     let rbInfo = new this.context.physics.Ammo.btRigidBodyConstructionInfo(mass, motionState, colShape, localInertia);
-    let body = new this.context.physics.Ammo.btRigidBody(rbInfo);
+    this.fp_body = new this.context.physics.Ammo.btRigidBody(rbInfo);
 
-    this.context.physics.physicsWorld.addRigidBody(body);
+    // lock axis to keep camera upright. TODO: make toggleable
+    this.fp_body.setAngularFactor(this.context.physics.Ammo.btVector3(1,0,1));
 
-    ball.userData.physicsBody = body;
-    this.context.physics.bodies.push(ball);
+    // this.fp_body.setCollisionFlags(2);
+    this.fp_body.setActivationState(4);
+    this.fp_body.setFriction(0);
+
+    this.context.physics.physicsWorld.addRigidBody(this.fp_body);
+
+    this.fpTransform.userData.physicsBody = this.fp_body;
+    this.context.physics.bodies.push(this.fpTransform);
 
     //create camera ----------------------------
     this.first_person = new THREE.PerspectiveCamera(
@@ -148,12 +158,44 @@ class Camera extends React.Component {
       2000                        // far
     );
 
-    ball.add(this.first_person);
+
+      console.log(this.fp_body);
+    // this.first_person.rotateX(- Math.PI / 2);
+
+    this.fpTransform.add(this.first_person);
+    // this.moveFirstPersonCamera({code: "ArrowLeft"})
+  }
+
+  moveFirstPersonCamera(e){
+    // e.preventDefault();
+    let s = 1000;
+
+    let body = this.fp_body;
+    let motionState = body.getMotionState();
+
+    /*
+      OH MY GOD I WAS FORGETTING TO USE new FOR btVECTOR!
+    */
+
+    switch(e.code){
+      case "ArrowLeft":
+        body.applyForce(new this.context.physics.Ammo.btVector3(-s, 0, 0));
+        break;
+      case "ArrowRight":
+        body.applyForce(new this.context.physics.Ammo.btVector3(s, 0, 0));
+        break;
+      case "ArrowUp":
+        body.applyForce(new this.context.physics.Ammo.btVector3(0, 0, -s));
+        break;
+      case "ArrowDown":
+        body.applyForce(new this.context.physics.Ammo.btVector3(0, 0, s));
+        break;
+    }
   }
 
   setupOrbit() {
     this.orbitControls = new OrbitControls(
-      this.state.activeCamera,
+      this.persp,
       this.renderer.domElement
     );
 
@@ -175,6 +217,10 @@ class Camera extends React.Component {
         this.props.onRef(this.state.cameras.perspective);
         this.orbitControls.object = this.state.cameras.perspective;
         break;
+      case "FirstPerson":
+        this.setState({activeCamera: this.first_person});
+        this.props.onRef(this.first_person);
+        break;
     }
   }
 
@@ -185,6 +231,11 @@ class Camera extends React.Component {
   //LISTENERS-----------------------------------------------------
   registerListeners() {
     window.addEventListener('resize', this.handleResize);
+
+    /*
+      FPC
+    */
+    document.addEventListener('keydown', (e) => this.moveFirstPersonCamera(e))
   }
 
   removeListeners() {
@@ -214,7 +265,7 @@ class Camera extends React.Component {
             <Grid item xs={12}>
               <Typography variant="h6" align="center">Camera Type</Typography>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={4}>
               <Button 
                 color={this.state.activeCamera.type == "OrthographicCamera" ? 'primary' : 'default'} 
                 onClick={() => this.changeActiveCamera("OrthographicCamera")} 
@@ -224,7 +275,7 @@ class Camera extends React.Component {
                 Orthographic
               </Button>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={4}>
               <Button 
                 color={this.state.activeCamera.type == "PerspectiveCamera" ? 'primary' : 'default'} 
                 onClick={() => this.changeActiveCamera("PerspectiveCamera")} 
@@ -234,6 +285,16 @@ class Camera extends React.Component {
                 Perspective
               </Button>
             </Grid>
+            <Grid item xs={4}>
+              <Button
+                // color={this.state.activeCamera.type == "PerspectiveCamera" ? 'primary' : 'default'}
+                onClick={() => this.changeActiveCamera("FirstPerson")}
+                fullWidth
+                variant="outlined"
+              >
+                First Person
+              </Button>
+            </Grid>            
           </Grid>
         </Paper>
 

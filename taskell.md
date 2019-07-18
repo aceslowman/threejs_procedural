@@ -24,6 +24,7 @@
     * [x] swap out test rigidbody with Object3D, and parent it to the first person camera.
     * [ ] Fix structure in Camera component
     * [ ] Create a toggle that allows for enabling/disabling of axis locking.
+    * [ ] Get basic keybindings working to allow for directional movement.
 - [feature] incorporate Ammo.js
 - [feature] Begin implementing RayTracing Renderer mode.
     > Currently, the obstacle is turning OFF the render cycle when switched over to raytracing, and then turning it back on when switched back to normal mode.
@@ -32,6 +33,7 @@
     * [ ] Light brightness has to be ludicrously high to show up in the raycasting renderer.
 - [improvement] add euler widget
 - [feature] create keybinding system (json representation of all keybindings, mapped to params)
+    * [ ] Add listeners to move first person camera.
 - [improvement] create boundaryBox that will destroy rigidbodies and meshes
 
 ## Done

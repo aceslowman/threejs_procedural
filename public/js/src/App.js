@@ -133,9 +133,9 @@ class App extends React.Component {
                   }
                   {
                     this.state.renderer && <Terrain
-                      width={256}
-                      height={256}
-                      detail={256}
+                      width={512}
+                      height={512}
+                      detail={512}
                       amplitude={150}
                     />
                   }

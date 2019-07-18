@@ -342,11 +342,11 @@ class Terrain extends React.Component {
         >
           <FractalNoise
             needsSwap={true} 
-            octaves={3}
+            octaves={8}
           />                 
           <FractalWarp
             needsSwap={true} 
-            octaves={3}
+            octaves={8}
           />
         </ProceduralMap>
       </React.Fragment>
