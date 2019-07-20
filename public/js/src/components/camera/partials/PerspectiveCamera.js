@@ -1,4 +1,6 @@
 import React from 'react';
+import * as THREE from 'three';
+import SketchContext from '../../../SketchContext';
 
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
@@ -12,13 +14,36 @@ const styles = theme => ({
     }
 });
 
-class PerspectiveCameraTools extends React.Component {
+class PerspectiveCamera extends React.Component {
+    static contextType = SketchContext;
+
+    static defaultProps = {
+
+    };
+
     constructor(props) {
         super(props);
 
         this.state = {
-            focalLength: props.camera.getFocalLength()
+            focalLength: 0
         };
+    }
+
+    componentDidMount(){
+        this.camera = new THREE.PerspectiveCamera(
+            75,                         // fov
+            this.width / this.height,   // aspect
+            0.01,                       // near
+            2000                        // far
+        );
+
+        this.camera.name = "PerspectiveCamera";
+        this.camera.zoom = 2;
+        this.camera.position.y = 999;
+        this.camera.updateProjectionMatrix();
+        this.camera.updateMatrixWorld();
+
+        this.setState({focalLength: this.camera.getFocalLength()})
     }
 
     setFocalLength(v) {
@@ -54,4 +79,4 @@ class PerspectiveCameraTools extends React.Component {
     }
 };
 
-export default withStyles(styles)(PerspectiveCameraTools);
+export default withStyles(styles)(PerspectiveCamera);

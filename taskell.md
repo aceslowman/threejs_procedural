@@ -12,6 +12,15 @@
 - [enhancement] use defaultProps instead of the || default method.
 - [feature] add randomization feature to all ProcMap passes
 - [org] create Pass template, which should include new randomization of parameters.
+- [feature] Begin implementing RayTracing Renderer mode.
+    > Currently, the obstacle is turning OFF the render cycle when switched over to raytracing, and then turning it back on when switched back to normal mode.
+    * [ ] Need to kill all active workers when renderer changes.
+    * [x] Terrain is not showing up displaced.
+    * [ ] Light brightness has to be ludicrously high to show up in the raycasting renderer.
+- [improvement] add euler widget
+- [feature] create keybinding system (json representation of all keybindings, mapped to params)
+    * [ ] Add listeners to move first person camera.
+- [improvement] create boundaryBox that will destroy rigidbodies and meshes
 
 ## Doing
 
@@ -24,17 +33,9 @@
     * [x] swap out test rigidbody with Object3D, and parent it to the first person camera.
     * [ ] Fix structure in Camera component
     * [ ] Create a toggle that allows for enabling/disabling of axis locking.
-    * [ ] Get basic keybindings working to allow for directional movement.
-- [feature] incorporate Ammo.js
-- [feature] Begin implementing RayTracing Renderer mode.
-    > Currently, the obstacle is turning OFF the render cycle when switched over to raytracing, and then turning it back on when switched back to normal mode.
-    * [ ] Need to kill all active workers when renderer changes.
-    * [x] Terrain is not showing up displaced.
-    * [ ] Light brightness has to be ludicrously high to show up in the raycasting renderer.
-- [improvement] add euler widget
-- [feature] create keybinding system (json representation of all keybindings, mapped to params)
-    * [ ] Add listeners to move first person camera.
-- [improvement] create boundaryBox that will destroy rigidbodies and meshes
+    * [x] Get basic keybindings working to allow for directional movement.
+    * [ ] Allow for looking around.
+- [feature] seperate out menu items.
 
 ## Done
 
@@ -110,6 +111,7 @@
     > Raytracing Renderer (kept within renderers/RaytracingRenderer.js) would be a great option here, allowing me to do some high quality non-realtime renders. Perfect!
 - [bug] correct 'every other change' issue with the ProceduralMap changes.
 - [feature] create 'sun' light in sky that corresponds with Sky.sunSphere
+- [feature] incorporate Ammo.js
 
 ## Backburner
 

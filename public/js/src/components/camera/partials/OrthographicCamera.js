@@ -1,4 +1,7 @@
 import React from 'react';
+import * as THREE from 'three';
+import SketchContext from '../../../SketchContext';
+
 import CameraCommons from './common/CameraCommons'
 import CameraViews from './common/CameraViews';
 
@@ -18,9 +21,32 @@ const styles = theme => ({
     }
 });
 
-class OrthoGraphicCameraTools extends React.Component {
+class OrthographicCamera extends React.Component {
+    static contextType = SketchContext;
+
+    static defaultProps = {
+
+    };
+    
     constructor(props) {
         super(props);
+    }
+
+    componentDidMount(){
+        this.ortho = new THREE.OrthographicCamera(
+            this.width / - 2,
+            this.width / 2,
+            this.height / 2,
+            this.height / - 2,
+            0,
+            2000
+        );
+
+        this.ortho.name = "Default Orthographic";
+        this.ortho.zoom = 2;
+        this.ortho.position.y = 999;
+        this.ortho.updateProjectionMatrix();
+        this.ortho.updateMatrixWorld();
     }
 
     render() {
@@ -33,4 +59,4 @@ class OrthoGraphicCameraTools extends React.Component {
     }
 };
 
-export default withStyles(styles)(OrthoGraphicCameraTools);
+export default withStyles(styles)(OrthographicCamera);

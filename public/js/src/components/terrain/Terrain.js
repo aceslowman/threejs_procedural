@@ -9,6 +9,7 @@ import ProceduralMap from '../map/ProceduralMap';
 import FractalNoise from "../map/shaders/FractalNoise.js";
 import FractalWarp from "../map/shaders/FractalWarp.js";
 
+import { Divider } from '@material-ui/core'; 
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -287,69 +288,80 @@ class Terrain extends React.Component {
     const {classes} = this.props;
 
     return this.props.display ? (
-      <React.Fragment>
-        <Paper className={classes.root}>
-          <Grid container justify={'center'} alignItems={'center'} alignContent='center' spacing={16}>
-            <Grid item xs={12}>
-              <Typography variant="h6" align="center">Mesh Settings</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <FormControl fullWidth>
-                <InputLabel htmlFor="detail-helper">size</InputLabel>
-                <Select
-                  fullWidth
-                  value={this.state.width}
-                  onChange={(e) => this.updateMeshSize(e.target.value)}
-                >
-                  <MenuItem value={32}>32</MenuItem>
-                  <MenuItem value={64}>64</MenuItem>
-                  <MenuItem value={128}>128</MenuItem>
-                  <MenuItem value={256}>256</MenuItem>
-                  <MenuItem value={512}>512</MenuItem>
-                  <MenuItem value={1024}>1024</MenuItem>
-                </Select>
-                <FormHelperText>dimensions of mesh</FormHelperText>
-              </FormControl>
-            </Grid>
-            <Grid item xs={6}>
-              <FormControl fullWidth>
-                <InputLabel htmlFor="detail-helper">detail</InputLabel>
-                <Select
-                  fullWidth
-                  value={this.state.detail}
-                  onChange={(e)=>this.updateMeshDetail(e.target.value)}
-                >
-                  <MenuItem value={32}>32</MenuItem>
-                  <MenuItem value={64}>64</MenuItem>
-                  <MenuItem value={128}>128</MenuItem>
-                  <MenuItem value={256}>256</MenuItem>
-                  <MenuItem value={512}>512</MenuItem>
-                  <MenuItem value={1024}>1024</MenuItem>
-                </Select>
-                <FormHelperText>resolution of displacement</FormHelperText>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </Paper>
-        <ProceduralMap
-          name="Elevation"
-          width={this.props.width}
-          height={this.props.height}
-          displaceGeometry={(b) => this.displaceGeometry(b)}
-          seed={this.seed}
-          onRef={ref => this.elevation = ref} // assign ref so that displacement 
-                                              // can be done without props
+      <Paper className={classes.root}>
+        <Grid
+          container
+          justify={'space-around'}
+          alignItems={'center'}
+          spacing={16}
         >
-          <FractalNoise
-            needsSwap={true} 
-            octaves={8}
-          />                 
-          <FractalWarp
-            needsSwap={true} 
-            octaves={8}
-          />
-        </ProceduralMap>
-      </React.Fragment>
+          <Grid item xs={12}>
+            <Typography variant="h5" gutterBottom>Terrain</Typography>
+            <Divider />
+          </Grid>
+          <Paper className={classes.root}>
+            <Grid container justify={'center'} alignItems={'center'} alignContent='center' spacing={16}>
+              <Grid item xs={12}>
+                <Typography variant="h6" align="center">Mesh Settings</Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <FormControl fullWidth>
+                  <InputLabel htmlFor="detail-helper">size</InputLabel>
+                  <Select
+                    fullWidth
+                    value={this.state.width}
+                    onChange={(e) => this.updateMeshSize(e.target.value)}
+                  >
+                    <MenuItem value={32}>32</MenuItem>
+                    <MenuItem value={64}>64</MenuItem>
+                    <MenuItem value={128}>128</MenuItem>
+                    <MenuItem value={256}>256</MenuItem>
+                    <MenuItem value={512}>512</MenuItem>
+                    <MenuItem value={1024}>1024</MenuItem>
+                  </Select>
+                  <FormHelperText>dimensions of mesh</FormHelperText>
+                </FormControl>
+              </Grid>
+              <Grid item xs={6}>
+                <FormControl fullWidth>
+                  <InputLabel htmlFor="detail-helper">detail</InputLabel>
+                  <Select
+                    fullWidth
+                    value={this.state.detail}
+                    onChange={(e)=>this.updateMeshDetail(e.target.value)}
+                  >
+                    <MenuItem value={32}>32</MenuItem>
+                    <MenuItem value={64}>64</MenuItem>
+                    <MenuItem value={128}>128</MenuItem>
+                    <MenuItem value={256}>256</MenuItem>
+                    <MenuItem value={512}>512</MenuItem>
+                    <MenuItem value={1024}>1024</MenuItem>
+                  </Select>
+                  <FormHelperText>resolution of displacement</FormHelperText>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </Paper>
+          <ProceduralMap
+            name="Elevation"
+            width={this.props.width}
+            height={this.props.height}
+            displaceGeometry={(b) => this.displaceGeometry(b)}
+            seed={this.seed}
+            onRef={ref => this.elevation = ref} // assign ref so that displacement 
+                                                // can be done without props
+          >
+            <FractalNoise
+              needsSwap={true} 
+              octaves={8}
+            />                 
+            <FractalWarp
+              needsSwap={true} 
+              octaves={8}
+            />
+          </ProceduralMap>
+          </Grid>
+      </Paper>
     ) : null;
   }
 }
