@@ -98,7 +98,8 @@ class FirstPersonCamera extends React.Component {
 
     move(e) {
         // if (!this.state.locked) {
-        let s = 20;
+        const sensitivity = 20;
+        const mode = 0;
 
         let body = this.fp_body;
 
@@ -110,36 +111,53 @@ class FirstPersonCamera extends React.Component {
         this.camera.getWorldDirection(direction);
 
         direction.normalize();
-        console.log(e.code)
         switch (e.code) {
             case "KeyW":
-                d = direction.multiplyScalar(s);
-                // body.applyForce(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
-                body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0, 0, 0));
-                body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
+                d = direction.multiplyScalar(sensitivity);
+                if(mode){
+                    body.applyForce(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
+                }else{
+                    body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0, 0, 0));
+                    body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
+                }
+                
                 break;
             case "KeyA":
                 axis = new THREE.Vector3(0, 1, 0);
-                d = direction.applyAxisAngle(axis, Math.PI/2).multiplyScalar(s);
-                // body.applyForce(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
-                body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0,0,0));
-                body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
+                d = direction.applyAxisAngle(axis, Math.PI/2).multiplyScalar(sensitivity);
+                if(mode){
+                    body.applyForce(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
+                }else{
+                    body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0,0,0));
+                    body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
+                }
+                
                 break;
             case "KeyS":
                 axis = new THREE.Vector3(0, 1, 0);
-                d = direction.applyAxisAngle(axis, Math.PI).multiplyScalar(s);
-                // body.applyForce(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
-                body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0, 0, 0));
-                body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
+                d = direction.applyAxisAngle(axis, Math.PI).multiplyScalar(sensitivity);
+                if(mode){
+                    body.applyForce(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
+                }else{
+                    body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0, 0, 0));
+                    body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
+                }
+                
                 break;
             case "KeyD":
                 axis = new THREE.Vector3(0, -1, 0);
-                d = direction.applyAxisAngle(axis, Math.PI/2).multiplyScalar(s);
-                // body.applyForce(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
-                body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0,0,0));
-                body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
+                d = direction.applyAxisAngle(axis, Math.PI/2).multiplyScalar(sensitivity);
+                if(mode){
+                    body.applyForce(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
+                }else{
+                    body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0,0,0));
+                    body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
+                }
+                
                 break;
         }
+
+        // TODO: break this into two different modes. impulse/velocity
         
         // }
     }
@@ -184,12 +202,33 @@ class FirstPersonCamera extends React.Component {
         this.removeListeners();
     }
 
+    onPointerlockChange() {
+        if (document.pointerLockElement === scope.domElement) {
+            scope.dispatchEvent(lockEvent);
+            scope.isLocked = true;
+
+        } else {
+            scope.dispatchEvent(unlockEvent);
+            scope.isLocked = false;
+        }
+    }
+
+    onPointerlockError() {
+        console.error('Unable to use Pointer Lock API');
+    }
+
+
     registerListeners() {
         let canvas = this.context.renderer.domElement;
 
         document.addEventListener('keydown', (e) => this.move(e));
         document.addEventListener('keyup', (e) => this.move(e));
         canvas.addEventListener('mousemove', (e)=> this.look(e))
+
+        document.addEventListener('pointerlockchange', ()=>this.onPointerlockChange(), false);
+        document.addEventListener('pointerlockerror', ()=>this.onPointerlockError(), false);
+
+        canvas.requestPointerLock();
     }
 
     removeListeners() {
