@@ -115,10 +115,14 @@ class App extends React.Component {
               <div className="container">
                 <GUI ready={this.state.sketchReady}>
                   <Physics 
+                    key='Physics'
                     onRef={ref => this.setState({ physics: ref })}
                   /> 
-                  <Sky />
+                  <Sky 
+                    key='Sky'
+                  />
                   <Renderer
+                    key='Renderer'
                     width={this.state.width}
                     height={this.state.height}
                     camera={this.state.camera}
@@ -126,6 +130,7 @@ class App extends React.Component {
                   />
                   {
                     this.state.renderer && <Camera
+                      key='Camera'
                       width={this.state.width}
                       height={this.state.height}
                       onRef={ref => this.setState({ camera: ref })}
@@ -133,9 +138,10 @@ class App extends React.Component {
                   }
                   {
                     this.state.renderer && <Terrain
-                      width={512}
-                      height={512}
-                      detail={512}
+                      key='Terrain'
+                      width={256}
+                      height={256}
+                      detail={256}
                       amplitude={150}
                     />
                   }

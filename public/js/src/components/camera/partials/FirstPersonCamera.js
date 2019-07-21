@@ -32,7 +32,9 @@ class FirstPersonCamera extends React.Component {
 
         this.state = {
             focalLength: 0,
-            axisLock: false
+            axisLock: false,
+            noGravity: false,
+            pointerLock: false
         };
     }
 
@@ -76,6 +78,9 @@ class FirstPersonCamera extends React.Component {
         // lock axis to keep camera upright. TODO: make toggleable
         this.fp_body.setAngularFactor(this.context.physics.Ammo.btVector3(this.state.axisLock, 0, this.state.axisLock));
 
+        // toggle gravity TODO: make toggleable
+        this.fp_body.setGravity(this.context.physics.Ammo.btVector3(0,0,0));
+
         this.fp_body.setActivationState(4);
         this.fp_body.setFriction(0);
 
@@ -97,69 +102,68 @@ class FirstPersonCamera extends React.Component {
     }
 
     move(e) {
-        // if (!this.state.locked) {
-        const sensitivity = 20;
-        const mode = 0;
+        if(this.state.pointerLock){
+            // if (!this.state.locked) {
+            const sensitivity = 20;
+            const mode = 0;
 
-        let body = this.fp_body;
+            let body = this.fp_body;
 
-        // apply force in DIRECTION
-        let direction = new THREE.Vector3(); 
-        let axis = '';
-        let d = '';
+            // apply force in DIRECTION
+            let direction = new THREE.Vector3();
+            let axis = '';
+            let d = '';
 
-        this.camera.getWorldDirection(direction);
+            this.camera.getWorldDirection(direction);
 
-        direction.normalize();
-        switch (e.code) {
-            case "KeyW":
-                d = direction.multiplyScalar(sensitivity);
-                if(mode){
-                    body.applyForce(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
-                }else{
-                    body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0, 0, 0));
-                    body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
-                }
-                
-                break;
-            case "KeyA":
-                axis = new THREE.Vector3(0, 1, 0);
-                d = direction.applyAxisAngle(axis, Math.PI/2).multiplyScalar(sensitivity);
-                if(mode){
-                    body.applyForce(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
-                }else{
-                    body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0,0,0));
-                    body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
-                }
-                
-                break;
-            case "KeyS":
-                axis = new THREE.Vector3(0, 1, 0);
-                d = direction.applyAxisAngle(axis, Math.PI).multiplyScalar(sensitivity);
-                if(mode){
-                    body.applyForce(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
-                }else{
-                    body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0, 0, 0));
-                    body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
-                }
-                
-                break;
-            case "KeyD":
-                axis = new THREE.Vector3(0, -1, 0);
-                d = direction.applyAxisAngle(axis, Math.PI/2).multiplyScalar(sensitivity);
-                if(mode){
-                    body.applyForce(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
-                }else{
-                    body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0,0,0));
-                    body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x,d.y,d.z));
-                }
-                
-                break;
+            direction.normalize();
+            switch (e.code) {
+                case "KeyW":
+                    d = direction.multiplyScalar(sensitivity);
+                    if (mode) {
+                        body.applyForce(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
+                    } else {
+                        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0, 0, 0));
+                        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
+                    }
+
+                    break;
+                case "KeyA":
+                    axis = new THREE.Vector3(0, 1, 0);
+                    d = direction.applyAxisAngle(axis, Math.PI / 2).multiplyScalar(sensitivity);
+                    if (mode) {
+                        body.applyForce(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
+                    } else {
+                        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0, 0, 0));
+                        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
+                    }
+
+                    break;
+                case "KeyS":
+                    axis = new THREE.Vector3(0, 1, 0);
+                    d = direction.applyAxisAngle(axis, Math.PI).multiplyScalar(sensitivity);
+                    if (mode) {
+                        body.applyForce(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
+                    } else {
+                        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0, 0, 0));
+                        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
+                    }
+
+                    break;
+                case "KeyD":
+                    axis = new THREE.Vector3(0, -1, 0);
+                    d = direction.applyAxisAngle(axis, Math.PI / 2).multiplyScalar(sensitivity);
+                    if (mode) {
+                        body.applyForce(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
+                    } else {
+                        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0, 0, 0));
+                        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
+                    }
+
+                    break;
+            }
+            // TODO: break this into two different modes. impulse/velocity
         }
-
-        // TODO: break this into two different modes. impulse/velocity
-        
-        // }
     }
 
     stop(e){
@@ -168,28 +172,23 @@ class FirstPersonCamera extends React.Component {
     }
 
     look(e){
-        // let center = new THREE.Vector2(0.5,0.5)
-        // let norm = new THREE.Vector2(e.offsetX / this.width, e.offsetY / this.height);
-        
-        // let direction = norm.sub(center).multiply(new THREE.Vector2(2,2));
-        // console.log(direction)
+        if(this.state.pointerLock){
+            let euler = new THREE.Euler(0, 0, 0, 'YXZ');
 
-        let euler = new THREE.Euler(0, 0, 0, 'YXZ');
+            var PI_2 = Math.PI / 2;
 
-        var PI_2 = Math.PI / 2;
+            var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+            var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-        var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-        var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+            euler.setFromQuaternion(this.camera.quaternion);
 
-        euler.setFromQuaternion(this.camera.quaternion);
+            euler.y -= movementX * 0.006;
+            euler.x -= movementY * 0.006;
 
-        euler.y -= movementX * 0.006;
-        euler.x -= movementY * 0.006;
+            euler.x = Math.max(-PI_2, Math.min(PI_2, euler.x));
 
-        euler.x = Math.max(- PI_2, Math.min(PI_2, euler.x));
-
-        this.camera.quaternion.setFromEuler(euler);
-        
+            this.camera.quaternion.setFromEuler(euler);
+        }
     }
 
     componentDidMount(){
@@ -202,33 +201,39 @@ class FirstPersonCamera extends React.Component {
         this.removeListeners();
     }
 
-    onPointerlockChange() {
-        if (document.pointerLockElement === scope.domElement) {
-            scope.dispatchEvent(lockEvent);
-            scope.isLocked = true;
-
-        } else {
-            scope.dispatchEvent(unlockEvent);
-            scope.isLocked = false;
-        }
-    }
-
     onPointerlockError() {
         console.error('Unable to use Pointer Lock API');
     }
 
+    onPointerlockChange() {
+        let canvas = this.context.renderer.domElement;
+
+        if (document.pointerLockElement !== canvas){
+            this.setState({pointerLock: false})
+            console.log('lock off!')
+        }
+    }
+
+    onClick(){
+        let canvas = this.context.renderer.domElement;
+        let lock = !this.state.pointerLock;
+
+        !this.state.pointerLock ? canvas.requestPointerLock() : document.exitPointerLock()
+        
+        this.setState({pointerLock: !this.state.pointerLock})
+    }
 
     registerListeners() {
         let canvas = this.context.renderer.domElement;
 
         document.addEventListener('keydown', (e) => this.move(e));
         document.addEventListener('keyup', (e) => this.move(e));
+        document.addEventListener('pointerlockchange', () => this.onPointerlockChange(), false);
+        document.addEventListener('pointerlockerror', () => this.onPointerlockError(), false);
+        canvas.addEventListener('dblclick', (e) => this.onClick(e));
         canvas.addEventListener('mousemove', (e)=> this.look(e))
 
-        document.addEventListener('pointerlockchange', ()=>this.onPointerlockChange(), false);
-        document.addEventListener('pointerlockerror', ()=>this.onPointerlockError(), false);
-
-        canvas.requestPointerLock();
+        // canvas.requestPointerLock();
     }
 
     removeListeners() {
@@ -236,7 +241,10 @@ class FirstPersonCamera extends React.Component {
 
         document.removeEventListener('keydown', (e) => this.move(e));
         document.removeEventListener('keyup', (e) => this.move(e));
-        canvas.removeEventListener('mousemove', (e)=> this.look(e))
+        document.removeEventListener('pointerlockchange', () => this.onPointerlockChange(), false);
+        document.removeEventListener('pointerlockerror', () => this.onPointerlockError(), false);
+        canvas.removeEventListener('mousemove', (e)=> this.look(e));
+        canvas.removeEventListener('dblclick', (e) => this.onClick(e));
     }
 
     render() {

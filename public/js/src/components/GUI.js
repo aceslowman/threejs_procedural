@@ -15,11 +15,14 @@ import Typography from '@material-ui/core/Typography';
 import Navigation from './Navigation';
 
 class GUI extends React.Component {
+  static displayName = 'GUI';
+
   constructor(props) {
     super(props);
 
     this.state = {
-      open: true
+      open: true,
+      currentGroup: 'Terrain'
     };
   }
 
@@ -31,7 +34,15 @@ class GUI extends React.Component {
     this.setState({ open: false });
   };
 
+  selectGroup(group){
+    this.setState({currentGroup: group});
+    this.handleDrawerOpen()
+  }
+
   render() {
+    console.log(this.state.currentGroup);
+    console.log(this.props.children[0]);
+
     return (
         <Drawer 
           id="GUI"
@@ -70,11 +81,16 @@ class GUI extends React.Component {
           </Grid>
 
           <Divider />
-          <Navigation handleDrawerClose={() => this.handleDrawerClose()} handleDrawerOpen={() => this.handleDrawerOpen()} />
+          <Navigation 
+            handleDrawerClose={() => this.handleDrawerClose()} 
+            handleDrawerOpen={() => this.handleDrawerOpen()} 
+            selectGroup={(g) => this.selectGroup(g)}
+            currentGroup={this.state.currentGroup}
+          />
           <Divider />
 
           {this.props.children && React.Children.map(this.props.children, (child, i) => child && React.cloneElement(child, {
-            display: true // currently, 'false' DISABLES child components, and will not work as-is
+            display: this.state.currentGroup == child.key ? true : false
           }))}
 
         </Drawer>

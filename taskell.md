@@ -34,8 +34,17 @@
     * [ ] Fix structure in Camera component
     * [ ] Create a toggle that allows for enabling/disabling of axis locking.
     * [x] Get basic keybindings working to allow for directional movement.
-    * [ ] Allow for looking around.
+    * [x] Allow for looking around.
+    * [ ] Achieve backwards velocity
+    * [ ] Toggle on/off gravity
+    * [x] Lock pointer when canvas is clicked
+    * [ ] Throttle necessary listeners
 - [feature] seperate out menu items.
+    > I will be using display:block or display:none to hide and show relevant items. Some non-essential components can mount / unmount, possibly.
+    * [x] Allow for top level toggling of components
+    * [ ] Allow for intermediate toggling of components.
+    * [x] Tie  toggle params to a variable in GUI.
+    * [x] Create new Navigation elements for topmost items
 
 ## Done
 

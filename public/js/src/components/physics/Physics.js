@@ -25,7 +25,7 @@ class Physics extends React.Component {
 
         this.scene = context.scene;
 
-        this.bodies = []; // array of rigid bodies
+        this.bodies = [];      // array of rigid bodies
         this.testObjects = []; // array of meshes
         this.tmpTrans = '';
         this.Ammo = '';
@@ -62,11 +62,11 @@ class Physics extends React.Component {
 
         this.props.onRef(this);
 
-        this.triggerTestPhysics(30,256,80,1);
+        this.triggerTestPhysics(15,256,80,1);
     }
 
     triggerTestPhysics(num_obj, width, height, radius){
-        // clear all bodies
+        // TODO: clear all bodies
         for (let body of this.bodies){
             console.log(body);
             console.log(body.userData.physicsBody);
@@ -136,8 +136,6 @@ class Physics extends React.Component {
     }
 
     update(deltaTime) {
-        // console.log(deltaTime);
-        // Step world
         this.physicsWorld.stepSimulation(deltaTime, 10);
 
         // Update rigid bodies
@@ -147,11 +145,7 @@ class Physics extends React.Component {
 
             let ms = objAmmo.getMotionState();
 
-            // objAmmo.setLinearVelocity(this.Ammo.btVector3(0, 0, 0));
-            // objAmmo.setLinearVelocity(this.Ammo.btVector3(100, 0, 0));
-            
             if (ms) {
-                // console.log(ms);
                 ms.getWorldTransform(this.tmpTrans);
                 let p = this.tmpTrans.getOrigin();
                 let q = this.tmpTrans.getRotation();
@@ -208,7 +202,7 @@ class Physics extends React.Component {
         const { classes } = this.props;
 
         return (
-            <Paper className={classes.root}>
+            <Paper className={classes.root} style={{display: this.props.display ? 'block' : 'none'}}>
                 <Grid
                     container
                     justify={'space-around'}

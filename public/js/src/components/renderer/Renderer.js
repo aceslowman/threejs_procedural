@@ -26,6 +26,7 @@ const styles = theme => ({
 });
 
 class Renderer extends React.Component {
+    static displayName = 'Renderer';
     static contextType = SketchContext;
 
     constructor(props, context){
@@ -144,36 +145,34 @@ class Renderer extends React.Component {
         const { classes } = this.props;
 
         return (
-            <React.Fragment>
-                <Paper className={classes.root}>
-                    <Grid
-                        container
-                        justify={'space-around'}
-                        alignItems={'center'}
-                        spacing={16}
-                    >
-                        <Grid item xs={12}>
-                            <Typography variant="h6" align="center">Rendering</Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <Button 
-                            onClick={() => this.changeRenderer("NORMAL")} 
-                            fullWidth 
-                            variant="outlined">
-                                Normal
-                            </Button>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <Button 
-                            onClick={() => this.changeRenderer("RAYTRACING")} 
-                            fullWidth 
-                            variant="outlined">
-                                Raytracing
-                            </Button>
-                        </Grid>
+            <Paper className={classes.root} style={{display: this.props.display ? 'block' : 'none'}}>
+                <Grid
+                    container
+                    justify={'space-around'}
+                    alignItems={'center'}
+                    spacing={16}
+                >
+                    <Grid item xs={12}>
+                        <Typography variant="h6" align="center">Rendering</Typography>
                     </Grid>
-                </Paper>
-            </React.Fragment>
+                    <Grid item xs={6}>
+                        <Button 
+                        onClick={() => this.changeRenderer("NORMAL")} 
+                        fullWidth 
+                        variant="outlined">
+                            Normal
+                        </Button>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Button 
+                        onClick={() => this.changeRenderer("RAYTRACING")} 
+                        fullWidth 
+                        variant="outlined">
+                            Raytracing
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Paper>
         );
     }
 }

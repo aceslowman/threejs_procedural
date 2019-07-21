@@ -105,7 +105,7 @@ class Camera extends React.Component {
                                               // they aren't sent to children
 
     return (
-        <Paper className={classes.root}>
+        <Paper className={classes.root} style={{display: this.props.display ? 'block' : 'none'}}>
           <Grid
             container
             justify={'space-around'}

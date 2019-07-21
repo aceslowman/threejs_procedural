@@ -21,6 +21,7 @@ const styles = theme => ({
 });
 
 class Sky extends React.Component {
+    static displayName = 'Sky';
     static contextType = SketchContext;
 
     static defaultProps = {
@@ -124,8 +125,8 @@ class Sky extends React.Component {
         const { classes } = this.props;
 
         return (
-            <Paper className={classes.root}>
-                <Grid
+            <Paper className={classes.root} style={{display: this.props.display ? 'block' : 'none'}}>
+            <Grid
                     container
                     justify={'space-around'}
                     alignItems={'center'}
