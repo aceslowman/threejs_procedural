@@ -161,8 +161,13 @@ class FirstPersonCamera extends React.Component {
                     }
 
                     break;
+                case "Space":
+                    body.applyImpulse(new this.context.physics.Ammo.btVector3(0,sensitivity*10,0));
+                    break;
             }
             // TODO: break this into two different modes. impulse/velocity
+
+            console.log(e.code);
         }
     }
 
@@ -210,7 +215,11 @@ class FirstPersonCamera extends React.Component {
 
         if (document.pointerLockElement !== canvas){
             this.setState({pointerLock: false})
-            console.log('lock off!')
+            canvas.style.boxSizing = "border-box";
+            canvas.style.border = "";
+        }else{
+            canvas.style.boxSizing = "border-box";
+            canvas.style.border = "2px solid pink";
         }
     }
 
@@ -230,7 +239,7 @@ class FirstPersonCamera extends React.Component {
         document.addEventListener('keyup', (e) => this.move(e));
         document.addEventListener('pointerlockchange', () => this.onPointerlockChange(), false);
         document.addEventListener('pointerlockerror', () => this.onPointerlockError(), false);
-        canvas.addEventListener('dblclick', (e) => this.onClick(e));
+        canvas.addEventListener('click', (e) => this.onClick(e));
         canvas.addEventListener('mousemove', (e)=> this.look(e))
 
         // canvas.requestPointerLock();
@@ -244,7 +253,7 @@ class FirstPersonCamera extends React.Component {
         document.removeEventListener('pointerlockchange', () => this.onPointerlockChange(), false);
         document.removeEventListener('pointerlockerror', () => this.onPointerlockError(), false);
         canvas.removeEventListener('mousemove', (e)=> this.look(e));
-        canvas.removeEventListener('dblclick', (e) => this.onClick(e));
+        canvas.removeEventListener('click', (e) => this.onClick(e));
     }
 
     render() {

@@ -45,7 +45,7 @@ class Camera extends React.Component {
     this.height   = props.height;
 
     this.state = {
-      activeCamera: this.first_person
+      activeCamera: ''
     }
   }
 
@@ -125,7 +125,7 @@ class Camera extends React.Component {
               </Grid>
               <Grid item xs={4}>
                 <Button 
-                  // color={this.state.activeCamera.type == "OrthographicCamera" ? 'primary' : 'default'} 
+                  color = {this.state.activeCamera && this.state.activeCamera.name == "OrthographicCamera" ? 'primary' : 'default'}
                   onClick={() => this.changeActiveCamera("OrthographicCamera")} 
                   fullWidth 
                   variant="outlined"
@@ -135,7 +135,7 @@ class Camera extends React.Component {
               </Grid>
               <Grid item xs={4}>
                 <Button 
-                  // color={this.state.activeCamera.type == "PerspectiveCamera" ? 'primary' : 'default'} 
+                  color={this.state.activeCamera && this.state.activeCamera.name == "PerspectiveCamera" ? 'primary' : 'default'} 
                   onClick={() => this.changeActiveCamera("PerspectiveCamera")} 
                   fullWidth 
                   variant="outlined"
@@ -145,8 +145,9 @@ class Camera extends React.Component {
               </Grid>
               <Grid item xs={4}>
                 <Button
-                  // color={this.state.activeCamera.type == "PerspectiveCamera" ? 'primary' : 'default'}
-                  onClick={() => this.changeActiveCamera("FirstPerson")}
+                  color = {
+                    this.state.activeCamera && this.state.activeCamera.name == "FirstPersonCamera" ? 'primary' : 'default'}
+                  onClick={() => this.changeActiveCamera("FirstPersonCamera")}
                   fullWidth
                   variant="outlined"
                 >
@@ -164,14 +165,14 @@ class Camera extends React.Component {
               active={this.state.activeCamera && this.state.activeCamera.name == "FirstPersonCamera"}
               setActive={(r)=>this.changeActiveCamera(r)}
             />
-            {/* <PerspectiveCamera 
+            <PerspectiveCamera 
               active={this.state.activeCamera && this.state.activeCamera.name == "PerspectiveCamera"}
               setActive={(r)=>this.changeActiveCamera(r)}
             />
             <OrthographicCamera 
               active={this.state.activeCamera && this.state.activeCamera.name == "OrthographicCamera"}
               setActive={(r)=>this.changeActiveCamera(r)}
-            /> */}
+            />
           </Paper>
         </Grid>
       </Paper>

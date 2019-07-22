@@ -39,6 +39,8 @@
     * [ ] Toggle on/off gravity
     * [x] Lock pointer when canvas is clicked
     * [ ] Throttle necessary listeners
+    * [x] Implement simple jump
+    * [ ] Implement simple sprint
 - [feature] seperate out menu items.
     > I will be using display:block or display:none to hide and show relevant items. Some non-essential components can mount / unmount, possibly.
     * [x] Allow for top level toggling of components
