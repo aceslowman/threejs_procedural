@@ -1,13 +1,13 @@
 import React from 'react';
-import SketchContext from '../../SketchContext';
+import SketchContext from '../../../SketchContext';
 import { withStyles } from '@material-ui/core/styles';
 
 import * as THREE from 'three';
 
-import ProceduralMap from '../map/ProceduralMap';
+import ProceduralMap from '../../map/ProceduralMap';
 
-import FractalNoise from "../map/shaders/FractalNoise.js";
-import FractalWarp from "../map/shaders/FractalWarp.js";
+import FractalNoise from "../../map/shaders/FractalNoise.js";
+import FractalWarp from "../../map/shaders/FractalWarp.js";
 
 import { Divider } from '@material-ui/core'; 
 import Grid from '@material-ui/core/Grid';

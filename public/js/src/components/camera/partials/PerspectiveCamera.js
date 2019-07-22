@@ -24,6 +24,9 @@ class PerspectiveCamera extends React.Component {
     constructor(props) {
         super(props);
 
+        this.width = props.width;
+        this.height = props.height;
+
         this.state = {
             focalLength: 0
         };
@@ -38,17 +41,15 @@ class PerspectiveCamera extends React.Component {
         );
 
         this.camera.name = "PerspectiveCamera";
-        this.camera.zoom = 2;
-        this.camera.position.y = 999;
-        this.camera.updateProjectionMatrix();
-        this.camera.updateMatrixWorld();
 
         this.setState({focalLength: this.camera.getFocalLength()})
+
+        if (this.props.default) this.props.setActive(this.camera)
     }
 
     setFocalLength(v) {
-        this.props.camera.setFocalLength(v);
-        this.setState({focalLength: this.props.camera.getFocalLength()})
+        this.camera.setFocalLength(v);
+        this.setState({focalLength: this.camera.getFocalLength()})
     }
 
     render() {

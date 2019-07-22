@@ -11,10 +11,9 @@ import Diagram from './components/diagram/DiagramContainer';
 import * as THREE from 'three';
 
 import Camera from './components/camera/Camera';
-import Terrain from './components/terrain/Terrain';
 import Renderer from './components/renderer/RendererContainer';
 import Physics from './components/physics/Physics';
-import Sky from './components/sky/Sky';
+import World from './components/world/World';
 
 import store from './redux/store';
 
@@ -118,9 +117,7 @@ class App extends React.Component {
                     key='Physics'
                     onRef={ref => this.setState({ physics: ref })}
                   /> 
-                  <Sky 
-                    key='Sky'
-                  />
+
                   <Renderer
                     key='Renderer'
                     width={this.state.width}
@@ -137,12 +134,10 @@ class App extends React.Component {
                     />
                   }
                   {
-                    this.state.renderer && <Terrain
-                      key='Terrain'
-                      width={256}
-                      height={256}
-                      detail={256}
-                      amplitude={150}
+                    this.state.renderer && <World
+                      key='World'
+                      width={512}
+                      height={512}
                     />
                   }
                 </GUI>

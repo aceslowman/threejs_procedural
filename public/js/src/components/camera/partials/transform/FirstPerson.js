@@ -2,8 +2,7 @@ import React from 'react';
 import * as THREE from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
 
-
-import SketchContext from '../../../SketchContext';
+import SketchContext from '../../../../SketchContext';
 
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
@@ -29,6 +28,7 @@ class FirstPersonCamera extends React.Component {
 
         this.width = props.width;
         this.height = props.height;
+        this.camera = props.camera;
 
         this.state = {
             focalLength: 0,
@@ -65,7 +65,6 @@ class FirstPersonCamera extends React.Component {
         // set default rotation
         transform.setRotation(new this.context.physics.Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
         let motionState = new this.context.physics.Ammo.btDefaultMotionState(transform);
-        console.log(motionState);
         let colShape = new this.context.physics.Ammo.btSphereShape(radius);
         colShape.setMargin(0.05);
 
@@ -89,16 +88,10 @@ class FirstPersonCamera extends React.Component {
         this.fpTransform.userData.physicsBody = this.fp_body;
         this.context.physics.bodies.push(this.fpTransform);
 
-        //create camera ----------------------------
-        this.camera = new THREE.PerspectiveCamera(
-            75,                         // fov
-            this.width / this.height,   // aspect
-            0.01,                       // near
-            2000                        // far
-        );
-        this.camera.name = "FirstPersonCamera";
-
+        // bind to camera prop
         this.fpTransform.add(this.camera);
+        this.camera.updateProjectionMatrix();
+        this.camera.updateMatrixWorld();
     }
 
     move(e) {
@@ -166,8 +159,6 @@ class FirstPersonCamera extends React.Component {
                     break;
             }
             // TODO: break this into two different modes. impulse/velocity
-
-            console.log(e.code);
         }
     }
 
@@ -198,7 +189,7 @@ class FirstPersonCamera extends React.Component {
 
     componentDidMount(){
         this.setupFirstPersonCamera();
-        if(this.props.default) this.props.setActive(this.camera);
+        if(this.props.default) this.props.setActive("FirstPerson");
         this.registerListeners();
     }
 

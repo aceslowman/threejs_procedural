@@ -42,7 +42,6 @@ export default class ProceduralMap extends React.Component {
 
     //------------------------------------------------------------------------
     addPass(pass) {
-        console.log(pass.material.name, pass);
         this.composer.addPass(pass);
     }
 
@@ -92,7 +91,8 @@ export default class ProceduralMap extends React.Component {
                     updatePassUniform: (p,n,v) => this.updatePassUniform(p,n,v), 
                     addPass: (p) => this.addPass(p),
                     composer: this.composer,  
-                    seed: this.seed
+                    seed: this.seed,
+                    expanded: false
                 }))}
             </React.Fragment>
         )

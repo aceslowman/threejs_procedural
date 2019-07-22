@@ -252,7 +252,7 @@ class FractalNoise extends React.Component{
     const {classes} = this.props;
 
     return (
-      <ExpansionPanel defaultExpanded={true}>
+      <ExpansionPanel defaultExpanded={this.props.expanded}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
           <Typography variant="h5" className={classes.heading}>FractalNoise</Typography>
         </ExpansionPanelSummary>

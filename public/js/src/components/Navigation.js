@@ -32,7 +32,7 @@ class Navigation extends React.Component {
         return(
             <Grid container spacing={this.state.open ? 0 : 0} alignItems="center" justify="space-evenly">
 
-                <Grid item>
+                {/* <Grid item>
                     <Tooltip disableFocusListener title="Terrain">
                         <IconButton
                             color={this.props.currentGroup == "Terrain" ? 'primary' : 'default'}
@@ -41,13 +41,24 @@ class Navigation extends React.Component {
                             <TerrainIcon />
                         </IconButton>
                     </Tooltip>
-                </Grid>
+                </Grid> */}
 
-                <Grid item>
+                {/* <Grid item>
                     <Tooltip disableFocusListener title="Physics">
                         <IconButton
                             color={this.props.currentGroup == "Physics" ? 'primary' : 'default'}
                             onClick={() => this.props.selectGroup("Physics")}
+                        >
+                            <WorldIcon />
+                        </IconButton>
+                    </Tooltip>
+                </Grid> */}
+
+                <Grid item>
+                    <Tooltip disableFocusListener title="World">
+                        <IconButton
+                            color={this.props.currentGroup == "World" ? 'primary' : 'default'}
+                            onClick={() => this.props.selectGroup("World")}
                         >
                             <WorldIcon />
                         </IconButton>
@@ -65,7 +76,7 @@ class Navigation extends React.Component {
                     </Tooltip>
                 </Grid>
 
-                <Grid item>
+                {/* <Grid item>
                     <Tooltip disableFocusListener title="Sky">
                         <IconButton
                             color={this.props.currentGroup == "Sky" ? 'primary' : 'default'}
@@ -76,7 +87,7 @@ class Navigation extends React.Component {
                             <SunIcon />
                         </IconButton>
                     </Tooltip>
-                </Grid>
+                </Grid> */}
 
                 <Grid item>
                     <Tooltip disableFocusListener title="Camera">

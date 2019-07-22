@@ -19,7 +19,7 @@ import CameraCommons from './partials/common/CameraCommons';
 // import subgui
 import OrthographicCamera from './partials/OrthographicCamera';
 import PerspectiveCamera from './partials/PerspectiveCamera';
-import FirstPersonCamera from './partials/FirstPersonCamera';
+import CameraTransform from './partials/CameraTransform';
 
 const styles = theme => ({
   root: {
@@ -45,7 +45,8 @@ class Camera extends React.Component {
     this.height   = props.height;
 
     this.state = {
-      activeCamera: ''
+      activeCamera: '',
+      activeTransform: ''
     }
   }
 
@@ -75,7 +76,6 @@ class Camera extends React.Component {
   }
 
   changeActiveCamera(camera){
-    console.log(camera);
     this.setState({activeCamera: camera});
     this.props.onRef(camera);
     // this.orbitControls.object = camera;
@@ -100,22 +100,22 @@ class Camera extends React.Component {
   }
 
   render(){
-    
     const { classes, ...other } = this.props; // seperate classes out so that
                                               // they aren't sent to children
 
     return (
-        <Paper className={classes.root} style={{display: this.props.display ? 'block' : 'none'}}>
-          <Grid
-            container
-            justify={'space-around'}
-            alignItems={'center'}
-            spacing={16}
-          >
-            <Grid item xs={12}>
-              <Typography variant="h5" gutterBottom>Camera</Typography>
-              <Divider />
-            </Grid>
+      <Paper className={classes.root} style={{display: this.props.display ? 'block' : 'none'}}>
+        <Grid
+          container
+          justify={'space-around'}
+          alignItems={'center'}
+          spacing={16}
+        >
+          <Grid item xs={12}>
+            <Typography variant="h5" gutterBottom>Camera</Typography>
+            <Divider />
+          </Grid>
+
           <CameraViews camera={this.state.activeCamera} view="ANGLE" {...this.other} />
 
           <Paper className={classes.root}>
@@ -123,53 +123,46 @@ class Camera extends React.Component {
               <Grid item xs={12}>
                 <Typography variant="h6" align="center">Camera Type</Typography>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 <Button 
                   color = {this.state.activeCamera && this.state.activeCamera.name == "OrthographicCamera" ? 'primary' : 'default'}
-                  onClick={() => this.changeActiveCamera("OrthographicCamera")} 
+                  onClick={() => this.changeActiveCamera("OrthographicCamera") /*TODO: fix*/} 
                   fullWidth 
                   variant="outlined"
                 >
                   Orthographic
                 </Button>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 <Button 
                   color={this.state.activeCamera && this.state.activeCamera.name == "PerspectiveCamera" ? 'primary' : 'default'} 
-                  onClick={() => this.changeActiveCamera("PerspectiveCamera")} 
+                  onClick={() => this.changeActiveCamera("PerspectiveCamera") /*TODO: fix*/} 
                   fullWidth 
                   variant="outlined"
                 >
                   Perspective
                 </Button>
-              </Grid>
-              <Grid item xs={4}>
-                <Button
-                  color = {
-                    this.state.activeCamera && this.state.activeCamera.name == "FirstPersonCamera" ? 'primary' : 'default'}
-                  onClick={() => this.changeActiveCamera("FirstPersonCamera")}
-                  fullWidth
-                  variant="outlined"
-                >
-                  First Person
-                </Button>
-              </Grid>            
+              </Grid>        
             </Grid>
           </Paper>
 
+          {this.state.activeCamera && <CameraTransform
+            width={this.width}
+            height={this.height}
+            camera={this.state.activeCamera}
+          />}
+
           <Paper className={classes.root}>
-            <FirstPersonCamera 
+            <PerspectiveCamera 
               default
               width={this.width}
               height={this.height}
-              active={this.state.activeCamera && this.state.activeCamera.name == "FirstPersonCamera"}
-              setActive={(r)=>this.changeActiveCamera(r)}
-            />
-            <PerspectiveCamera 
               active={this.state.activeCamera && this.state.activeCamera.name == "PerspectiveCamera"}
               setActive={(r)=>this.changeActiveCamera(r)}
             />
             <OrthographicCamera 
+              width={this.width}
+              height={this.height}
               active={this.state.activeCamera && this.state.activeCamera.name == "OrthographicCamera"}
               setActive={(r)=>this.changeActiveCamera(r)}
             />

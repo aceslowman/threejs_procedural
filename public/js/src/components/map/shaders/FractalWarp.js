@@ -250,7 +250,7 @@ class FractalWarp extends React.Component{
     const { classes } = this.props;
 
     return (
-      <ExpansionPanel defaultExpanded={true}>
+      <ExpansionPanel defaultExpanded={this.props.expanded}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
           <Typography variant="h5" className={classes.heading}>FractalWarp</Typography>
         </ExpansionPanelSummary>

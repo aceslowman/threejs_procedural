@@ -15,14 +15,12 @@ import Typography from '@material-ui/core/Typography';
 import Navigation from './Navigation';
 
 class GUI extends React.Component {
-  static displayName = 'GUI';
-
   constructor(props) {
     super(props);
 
     this.state = {
       open: true,
-      currentGroup: 'Terrain'
+      currentGroup: 'World'
     };
   }
 
@@ -40,9 +38,6 @@ class GUI extends React.Component {
   }
 
   render() {
-    console.log(this.state.currentGroup);
-    console.log(this.props.children[0]);
-
     return (
         <Drawer 
           id="GUI"

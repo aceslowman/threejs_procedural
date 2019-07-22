@@ -1,5 +1,5 @@
 import React from 'react';
-import * as THREE from 'three';
+import * as THREE from 'three'; 
 import SketchContext from '../../../SketchContext';
 
 import CameraCommons from './common/CameraCommons'
@@ -30,10 +30,13 @@ class OrthographicCamera extends React.Component {
     
     constructor(props) {
         super(props);
+        
+        this.width = props.width;
+        this.height = props.height;
     }
 
     componentDidMount(){
-        this.ortho = new THREE.OrthographicCamera(
+        this.camera = new THREE.OrthographicCamera(
             this.width / - 2,
             this.width / 2,
             this.height / 2,
@@ -42,11 +45,13 @@ class OrthographicCamera extends React.Component {
             2000
         );
 
-        this.ortho.name = "Default Orthographic";
-        this.ortho.zoom = 2;
-        this.ortho.position.y = 999;
-        this.ortho.updateProjectionMatrix();
-        this.ortho.updateMatrixWorld();
+        this.camera.name = "Default Orthographic";
+        this.camera.zoom = 2;
+        this.camera.position.y = 999;
+        this.camera.updateProjectionMatrix();
+        this.camera.updateMatrixWorld();
+
+        if(this.props.default) this.props.setActive(this.camera)
     }
 
     render() {

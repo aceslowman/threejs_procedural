@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import SketchContext from "../../SketchContext";
+import SketchContext from "../../../SketchContext";
 import { Divider } from '@material-ui/core'; 
 import TextField from '@material-ui/core/TextField';
 import Slider from '@material-ui/lab/Slider';
