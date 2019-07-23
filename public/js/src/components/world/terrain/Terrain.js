@@ -6,6 +6,7 @@ import * as THREE from 'three';
 
 import ProceduralMap from '../../map/ProceduralMap';
 
+import ColorLookup from '../../map/shaders/ColorLookup.js';
 import FractalNoise from "../../map/shaders/FractalNoise.js";
 import FractalWarp from "../../map/shaders/FractalWarp.js";
 
@@ -132,7 +133,8 @@ class Terrain extends React.Component {
 
     this.material = new THREE.MeshPhongMaterial({
       vertexColors: THREE.VertexColors,
-      flatShading: true,
+      flatShading: false,
+      color: 'white'
     });
 
     this.mesh = new THREE.Mesh(this.geometry, this.material);
@@ -140,27 +142,27 @@ class Terrain extends React.Component {
   }
 
   applyColor(buffer) {
-    console.log(this.geometry)
-    console.log('applying!', buffer)
     const color_buffer = buffer;
 
     const colors = this.geometry.getAttribute('color').array;
     const uvs = this.geometry.getAttribute('uv').array;
     const count = this.geometry.getAttribute('color').count;
 
+    let i2 = 0;
     for (let i = 0; i < count; i++) {
       const u = uvs[i * 2];
       const v = uvs[i * 2 + 1];
       const x = Math.floor(u * (this.width - 1.0));
       const y = Math.floor(v * (this.height - 1.0));
 
-      const d_index = (y * this.height + x) * 3;
-      let r = color_buffer[d_index];
+      const index = (y * this.height + x) * 4;
 
       // change the Y position
-      colors[i] = r;
-      colors[i + 1] = r;
-      colors[i + 2] = r;
+      colors[i2] = color_buffer[index];
+      colors[i2 + 1] = color_buffer[index + 1];
+      colors[i2 + 2] = color_buffer[index + 2];
+
+      i2 += 3;
     }
 
     this.geometry.getAttribute('color').needsUpdate = true;
@@ -386,7 +388,7 @@ class Terrain extends React.Component {
             seed={this.seed}
             onRef={ref => this.applyColor(ref)}
           >
-            <FractalNoise
+            {/* <FractalNoise
               needsSwap={true}
               octaves={8}
               map_min={0}
@@ -397,6 +399,10 @@ class Terrain extends React.Component {
               octaves={8}
               map_min={0}
               map_max={1}
+            /> */}
+            <ColorLookup
+              needsSwap={true}
+              renderToScreen={true}
             />
           </ProceduralMap>          
         </Grid>

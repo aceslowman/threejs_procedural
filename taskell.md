@@ -31,7 +31,7 @@
     * [x] generate heightmap from Terrain
     * [x] create rigidBody in Camera
     * [x] swap out test rigidbody with Object3D, and parent it to the first person camera.
-    * [ ] Fix structure in Camera component
+    * [x] Fix structure in Camera component
     * [ ] Create a toggle that allows for enabling/disabling of axis locking.
     * [x] Get basic keybindings working to allow for directional movement.
     * [x] Allow for looking around.
@@ -41,12 +41,8 @@
     * [ ] Throttle necessary listeners
     * [x] Implement simple jump
     * [ ] Implement simple sprint
-- [feature] seperate out menu items.
-    > I will be using display:block or display:none to hide and show relevant items. Some non-essential components can mount / unmount, possibly.
-    * [x] Allow for top level toggling of components
-    * [ ] Allow for intermediate toggling of components.
-    * [x] Tie  toggle params to a variable in GUI.
-    * [x] Create new Navigation elements for topmost items
+    * [ ] Implement keyup
+- [enhancement] implement displayCanvas for each ProceduralMap
 
 ## Done
 
@@ -123,6 +119,12 @@
 - [bug] correct 'every other change' issue with the ProceduralMap changes.
 - [feature] create 'sun' light in sky that corresponds with Sky.sunSphere
 - [feature] incorporate Ammo.js
+- [feature] seperate out menu items.
+    > I will be using display:block or display:none to hide and show relevant items. Some non-essential components can mount / unmount, possibly.
+    * [x] Allow for top level toggling of components
+    * [x] Allow for intermediate toggling of components.
+    * [x] Tie  toggle params to a variable in GUI.
+    * [x] Create new Navigation elements for topmost items
 
 ## Backburner
 
