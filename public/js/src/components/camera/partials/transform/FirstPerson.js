@@ -32,6 +32,7 @@ class FirstPersonCamera extends React.Component {
 
         this.state = {
             focalLength: 0,
+            sensitivity: 20,
             axisLock: false,
             noGravity: false,
             pointerLock: false
@@ -97,8 +98,8 @@ class FirstPersonCamera extends React.Component {
     move(e) {
         if(this.state.pointerLock){
             // if (!this.state.locked) {
-            const sensitivity = 20;
             const mode = 0;
+            const sensitivity = mode ? this.state.sensitivity * 100 : this.state.sensitivity;
 
             let body = this.fp_body;
 
@@ -178,8 +179,8 @@ class FirstPersonCamera extends React.Component {
 
             euler.setFromQuaternion(this.camera.quaternion);
 
-            euler.y -= movementX * 0.006;
-            euler.x -= movementY * 0.006;
+            euler.y -= movementX * 0.002;
+            euler.x -= movementY * 0.002;
 
             euler.x = Math.max(-PI_2, Math.min(PI_2, euler.x));
 
@@ -210,7 +211,7 @@ class FirstPersonCamera extends React.Component {
             canvas.style.border = "";
         }else{
             canvas.style.boxSizing = "border-box";
-            canvas.style.border = "2px solid pink";
+            canvas.style.border = "4px solid blue";
         }
     }
 
@@ -232,8 +233,6 @@ class FirstPersonCamera extends React.Component {
         document.addEventListener('pointerlockerror', () => this.onPointerlockError(), false);
         canvas.addEventListener('click', (e) => this.onClick(e));
         canvas.addEventListener('mousemove', (e)=> this.look(e))
-
-        // canvas.requestPointerLock();
     }
 
     removeListeners() {

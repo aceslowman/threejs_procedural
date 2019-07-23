@@ -53,6 +53,9 @@ class Terrain extends React.Component {
       this.detail
     );
 
+    plane.colors = new Float32Array(this.width * this.height * 4)
+    plane.addAttribute('color', new THREE.Float32BufferAttribute(plane.colors, 3));
+
     this.geometry = new THREE.BufferGeometry();
     this.geometry.copy(plane);  // this is important for RaytracingRenderer
                                 // as it will not use position from a
@@ -88,6 +91,9 @@ class Terrain extends React.Component {
       v    
     );
 
+    plane.colors = new Float32Array(this.width * this.height * 4)
+    plane.addAttribute('color', new THREE.BufferAttribute(plane.colors, 3));
+
     this.geometry = new THREE.BufferGeometry();
     this.geometry.copy(plane);  // this is important for RaytracingRenderer
                                 // as it will not use position from a
@@ -108,6 +114,9 @@ class Terrain extends React.Component {
       this.state.detail
     );
 
+    plane.colors = new Float32Array(this.width * this.height * 4)
+    plane.addAttribute('color', new THREE.BufferAttribute(plane.colors, 3));
+
     this.geometry = new THREE.BufferGeometry();
     this.geometry.copy(plane);  // this is important for RaytracingRenderer
                                 // as it will not use position from a 
@@ -119,22 +128,44 @@ class Terrain extends React.Component {
 
   //------------------------------------------------------------------------
   initializeMesh() {
-    this.material = new THREE.MeshNormalMaterial({side: THREE.DoubleSide, wireframe: false});
+    // this.material = new THREE.MeshNormalMaterial({side: THREE.DoubleSide, wireframe: false});
 
-    let mirrorMaterialSmooth = new THREE.MeshPhongMaterial({
-      color: 0xffaa00,
-      specular: 0x222222,
-      shininess: 10000,
-      vertexColors: THREE.NoColors,
-      flatShading: false,
-      // wireframe: true,
-      // side: THREE.DoubleSide
+    this.material = new THREE.MeshPhongMaterial({
+      vertexColors: THREE.VertexColors,
+      flatShading: true,
     });
-    mirrorMaterialSmooth.mirror = true;
-    mirrorMaterialSmooth.reflectivity = 0.3;
 
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.scene.add(this.mesh);
+  }
+
+  applyColor(buffer) {
+    console.log(this.geometry)
+    console.log('applying!', buffer)
+    const color_buffer = buffer;
+
+    const colors = this.geometry.getAttribute('color').array;
+    const uvs = this.geometry.getAttribute('uv').array;
+    const count = this.geometry.getAttribute('color').count;
+
+    for (let i = 0; i < count; i++) {
+      const u = uvs[i * 2];
+      const v = uvs[i * 2 + 1];
+      const x = Math.floor(u * (this.width - 1.0));
+      const y = Math.floor(v * (this.height - 1.0));
+
+      const d_index = (y * this.height + x) * 3;
+      let r = color_buffer[d_index];
+
+      // change the Y position
+      colors[i] = r;
+      colors[i + 1] = r;
+      colors[i + 2] = r;
+    }
+
+    this.geometry.getAttribute('color').needsUpdate = true;
+
+    console.log(colors)
   }
 
   displaceGeometry(buffer) {
@@ -336,10 +367,8 @@ class Terrain extends React.Component {
             name="Elevation"
             width={this.props.width}
             height={this.props.height}
-            displaceGeometry={(b) => this.displaceGeometry(b)}
             seed={this.seed}
-            onRef={ref => this.elevation = ref} // assign ref so that displacement 
-                                                // can be done without props
+            onRef={ref => this.displaceGeometry(ref)}
           >
             <FractalNoise
               needsSwap={true} 
@@ -350,7 +379,27 @@ class Terrain extends React.Component {
               octaves={8}
             />
           </ProceduralMap>
-          </Grid>
+          <ProceduralMap
+            name="Color"
+            width={this.props.width}
+            height={this.props.height}
+            seed={this.seed}
+            onRef={ref => this.applyColor(ref)}
+          >
+            <FractalNoise
+              needsSwap={true}
+              octaves={8}
+              map_min={0}
+              map_max={1}
+            />
+            <FractalWarp
+              needsSwap={true}
+              octaves={8}
+              map_min={0}
+              map_max={1}
+            />
+          </ProceduralMap>          
+        </Grid>
       </Paper>
     )}
 }

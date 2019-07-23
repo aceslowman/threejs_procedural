@@ -1,11 +1,21 @@
 import React from 'react';
 import SketchContext from '../../SketchContext';
+import Paper from '@material-ui/core/Paper';
+import { withStyles } from '@material-ui/core/styles';
 
 import * as THREE from 'three';
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { Typography, Divider } from '@material-ui/core';
 
-export default class ProceduralMap extends React.Component {
+const styles = theme => ({
+    root: {
+        padding: 8,
+        margin: '4px 4px 16px 4px'
+    }
+});
+
+class ProceduralMap extends React.Component {
     static contextType = SketchContext;
     
     constructor(props, context){
@@ -47,7 +57,7 @@ export default class ProceduralMap extends React.Component {
 
     updateComposer(){
         this.composer.render();
-        this.props.displaceGeometry(this.getBufferArray());
+        this.props.onRef(this.getBufferArray())
     }
 
     updatePassParam(pass_id, name, value) {
@@ -82,19 +92,25 @@ export default class ProceduralMap extends React.Component {
 
     //------------------------------------------------------------------------
     render() {
+        const { classes } = this.props;
+
         return(
-            <React.Fragment>
+            <Paper className={classes.root}>
+                <Typography variant="h5" gutterBottom>{this.name}</Typography>
+                <Divider />
                 {React.Children.map(this.passes, (child, i) => React.cloneElement(child, {
-                    index:i,
-                    updatePassParam: (p,n,v) => this.updatePassParam(p,n,v),     // pass the update props on to the
-                    updatePassDefine: (p,n,v) => this.updatePassDefine(p,n,v),   // props.children
-                    updatePassUniform: (p,n,v) => this.updatePassUniform(p,n,v), 
+                    index: i,
+                    updatePassParam: (p, n, v) => this.updatePassParam(p, n, v),     // pass the update props on to the
+                    updatePassDefine: (p, n, v) => this.updatePassDefine(p, n, v),   // props.children
+                    updatePassUniform: (p, n, v) => this.updatePassUniform(p, n, v),
                     addPass: (p) => this.addPass(p),
-                    composer: this.composer,  
+                    composer: this.composer,
                     seed: this.seed,
                     expanded: false
                 }))}
-            </React.Fragment>
+            </Paper>
         )
     }
 };
+
+export default withStyles(styles)(ProceduralMap);
