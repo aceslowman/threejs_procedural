@@ -1,6 +1,7 @@
 import React from 'react';
 import SketchContext from '../../SketchContext';
 import Paper from '@material-ui/core/Paper';
+import Checkbox from '@material-ui/core/Checkbox';
 import { withStyles } from '@material-ui/core/styles';
 
 import RootRef from '@material-ui/core/RootRef';
@@ -8,7 +9,7 @@ import RootRef from '@material-ui/core/RootRef';
 import * as THREE from 'three';
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-import { Typography, Divider } from '@material-ui/core';
+import { Typography, Divider, InputLabel, Grid } from '@material-ui/core';
 
 const styles = theme => ({
     root: {
@@ -45,6 +46,10 @@ class ProceduralMap extends React.Component {
 
         this.composer = new EffectComposer(this.renderer, this.target);
         this.composer.setSize(this.width, this.height);        
+
+        this.state = {
+            displayMap: props.displayMap
+        }
     }
 
     //------------------------------------------------------------------------
@@ -53,12 +58,14 @@ class ProceduralMap extends React.Component {
         this.composer.swapBuffers();
 
         this.updateComposer();
-        this.generateDisplayCanvas();
-        this.displayMapOnScreen();
+        // this.generateDisplayCanvas(); //TODO
+        if(this.state.displayMap) this.displayMapOnScreen();
     }
 
-    componentDidUpdate() {
-        // this.updateDisplayCanvas();
+    componentDidUpdate(prevProps, prevState) {
+        if(prevState.displayMap !== this.state.displayMap){
+            this.state.displayMap ? this.displayMapOnScreen() : this.removeMapOnScreen();
+        }
     }
 
     //------------------------------------------------------------------------
@@ -95,15 +102,17 @@ class ProceduralMap extends React.Component {
     }
 
     displayMapOnScreen(){
-        let mat = new THREE.MeshBasicMaterial({map: this.target.texture})
-        let geo = new THREE.PlaneBufferGeometry(100,100,10,10);
-        let mesh = new THREE.Mesh(geo, mat);
+        if(!this.displayMesh){
+            let mat = new THREE.MeshBasicMaterial({ map: this.target.texture })
+            let geo = new THREE.PlaneBufferGeometry(this.width, this.height, 10, 10);
+            this.displayMesh = new THREE.Mesh(geo, mat);
+        }
 
-        this.context.overlayScene.add(mesh);
+        this.context.overlayScene.add(this.displayMesh);
     }
 
     removeMapOnScreen(){
-
+        this.context.overlayScene.remove(this.displayMesh);
     }
 
     //------------------------------------------------------------------------
@@ -153,7 +162,27 @@ class ProceduralMap extends React.Component {
         return(
             <RootRef rootRef={this.mount}>
                 <Paper className={classes.root}>
-                    <Typography variant="h4" gutterBottom>{this.name}</Typography>
+                    
+                    <Grid container>
+                        <Grid item xs={9}>
+                            <Typography variant="h4" gutterBottom>
+                                {this.name}
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={3} align="right">
+                            <InputLabel margin="dense">Show</InputLabel>
+                            <Checkbox
+                                checked={this.state.displayMap}
+                                onChange={(e) => {
+                                    e.persist();
+                                    this.setState({ displayMap: e.target.checked })
+                                }}
+                            />
+                        </Grid>    
+                    </Grid>
+                    
+
+
                     <Divider />
                     {React.Children.map(this.passes, (child, i) => React.cloneElement(child, {
                         index: i,
@@ -161,6 +190,8 @@ class ProceduralMap extends React.Component {
                         updatePassDefine: (p, n, v) => this.updatePassDefine(p, n, v),   // props.children
                         updatePassUniform: (p, n, v) => this.updatePassUniform(p, n, v),
                         addPass: (p) => this.addPass(p),
+                        displayMapOnScreen: () => this.displayMapOnScreen(),
+                        removeMapOnScreen: () => this.removeMapOnScreen(),
                         composer: this.composer,
                         seed: this.seed,
                         expanded: false

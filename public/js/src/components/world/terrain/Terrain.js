@@ -371,6 +371,7 @@ class Terrain extends React.Component {
             height={this.props.height}
             seed={this.seed}
             onRef={ref => this.displaceGeometry(ref)}
+            displayMap={true}
           >
             <FractalNoise
               needsSwap={true} 
@@ -387,6 +388,7 @@ class Terrain extends React.Component {
             height={this.props.height}
             seed={this.seed}
             onRef={ref => this.applyColor(ref)}
+            displayMap={false}
           >
             {/* <FractalNoise
               needsSwap={true}

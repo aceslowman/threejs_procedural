@@ -157,7 +157,7 @@ class Renderer extends React.Component {
         // if physics has been initialized, update it.
         if(this.context.physics) this.context.physics.update(deltaTime);
         // this.renderer.clear();
-        // this.renderer.render(this.scene, this.props.camera);
+        this.renderer.render(this.scene, this.props.camera);
 
         /*
 

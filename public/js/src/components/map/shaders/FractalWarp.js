@@ -258,7 +258,6 @@ class FractalWarp extends React.Component{
           <Grid container>
 
 
-
             {/* ENABLE */}
             <Grid item xs={12} align="right">
               <InputLabel margin="dense">Enabled</InputLabel>
@@ -299,6 +298,8 @@ class FractalWarp extends React.Component{
                 type="number"
                 variant="filled"
                 margin="dense"
+                // onMouseDown={this.props.displayMapOnScreen()}
+                // onMouseUp={this.props.removeMapOnScreen()}
                 onChange={(e) => {
                   e.persist();
                   this.setState(state => (state.defines.NUM_OCTAVES = e.target.value));
