@@ -53,7 +53,8 @@ class ProceduralMap extends React.Component {
         this.composer.swapBuffers();
 
         this.updateComposer();
-        this.setupDisplayCanvas();
+        this.generateDisplayCanvas();
+        this.displayMapOnScreen();
     }
 
     componentDidUpdate() {
@@ -61,7 +62,7 @@ class ProceduralMap extends React.Component {
     }
 
     //------------------------------------------------------------------------
-    setupDisplayCanvas() {
+    generateDisplayCanvas() {
         this.displayCanvas = document.createElement('canvas');
         // this.displayCanvas.style.border = '1px solid pink';
         this.displayCanvas.style.padding = '15px';
@@ -71,7 +72,7 @@ class ProceduralMap extends React.Component {
 
         let imgData = ctx.createImageData(this.width, this.height);
         let raw = this.getBufferArray();
-        let data = new Uint8ClampedArray(raw.buffer);
+        let data = new Uint8Array(raw.buffer);
 
         // console.log(raw)
 
@@ -79,7 +80,7 @@ class ProceduralMap extends React.Component {
             if(i % 4 === 3) {
                 imgData.data[i] = 255;
             }else{
-                let v = data[i];
+                let v = raw.buffer[i] * 255;
                 imgData.data[i] = v;
             };
         }
@@ -93,28 +94,21 @@ class ProceduralMap extends React.Component {
         this.mount.current.insertBefore(this.displayCanvas,this.mount.current.children[1]);
     }
 
-    updateDisplayCanvas(){
-        let ctx = this.displayCanvas.getContext('2d');
-        let imgData = ctx.getImageData(0,0,this.width, this.height);
-        let raw = this.getBufferArray();
-        let data = new Uint8ClampedArray(raw.buffer);
+    displayMapOnScreen(){
+        let mat = new THREE.MeshBasicMaterial({map: this.target.texture})
+        let geo = new THREE.PlaneBufferGeometry(100,100,10,10);
+        let mesh = new THREE.Mesh(geo, mat);
 
-        // console.log(raw)
+        this.context.overlayScene.add(mesh);
+    }
 
-        for (let i = 0; i < imgData.data.length; i++) {
-            let v = data[i] * 255;
-            imgData.data[i] = v;
-        }
+    removeMapOnScreen(){
 
-        ctx.putImageData(imgData, 0, 0);
     }
 
     //------------------------------------------------------------------------
     addPass(pass) {
         this.composer.addPass(pass);
-        // if (this.composer.passes.length == 1) {
-        //     this.updateComposer();
-        // }
     }
 
     updateComposer(){

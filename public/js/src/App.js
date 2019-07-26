@@ -49,6 +49,7 @@ class App extends React.Component {
       width: '',
       height: '',
       scene: new THREE.Scene(),
+      overlayScene: new THREE.Scene({background: new THREE.Color('green')}),
       camera: new THREE.PerspectiveCamera(),
       clock: new THREE.Clock(),
       renderer: '',
@@ -102,6 +103,7 @@ class App extends React.Component {
       renderer: this.state.renderer,
       clock: this.state.clock,
       scene: this.state.scene,
+      overlayScene: this.state.overlayScene,
       seed: this.state.seed,
       physics: this.state.physics,
     }

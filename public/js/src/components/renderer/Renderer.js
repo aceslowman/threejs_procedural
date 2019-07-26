@@ -40,10 +40,20 @@ class Renderer extends React.Component {
     componentDidMount(){
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
 
-        this.renderer.autoClear = false;
+        this.renderer.autoClear = false; // for insetScene!
         this.renderer.autoClearColor = false;
 
         this.renderer.setSize(this.props.width, this.props.height);
+
+        this.insetCamera = new THREE.OrthographicCamera(
+            this.props.width / -2,
+            this.props.width / 2,
+            this.props.height / 2,
+            this.props.height / -2,
+            0,
+            1000
+        );
+        this.insetCamera.position.y = 1;
 
         this.props.onRef(this.renderer);
 
@@ -57,6 +67,15 @@ class Renderer extends React.Component {
     componentDidUpdate(prevProps){
         if(prevProps.width != this.props.width){
             this.renderer.setSize(this.props.width, this.props.height);
+            this.insetCamera = new THREE.OrthographicCamera(
+                this.props.width / -2,
+                this.props.width / 2,
+                this.props.height / 2,
+                this.props.height / -2,
+                0,
+                1000
+            );
+            this.insetCamera.position.y = 1;
         }
     }
 
@@ -137,7 +156,19 @@ class Renderer extends React.Component {
         this.stats.begin();
         // if physics has been initialized, update it.
         if(this.context.physics) this.context.physics.update(deltaTime);
-        this.renderer.render(this.scene, this.props.camera);
+        // this.renderer.clear();
+        // this.renderer.render(this.scene, this.props.camera);
+
+        /*
+
+            WARNING: calling clear() on the renderer results in malfunctions 
+            in the ProceduralMap, specifically the second pass of the elevation
+            map.
+
+        */
+        // this.renderer.clearDepth(); // clear the depth buffer
+        // console.log(this.context.overlayScene);
+        this.renderer.render(this.context.overlayScene, this.insetCamera);
         this.stats.end();
     }
 

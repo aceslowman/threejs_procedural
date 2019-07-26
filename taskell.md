@@ -43,6 +43,9 @@
     * [ ] Implement simple sprint
     * [ ] Implement keyup
 - [enhancement] implement displayCanvas for each ProceduralMap
+    > It would be nice to be able to embed the map in the actual controls, but if that isn't possible without significant resource drain, displaying the map, while editing it, in the main canvas, would be totally fine.
+    * [ ] Add function for generating a canvas of the map, and exporting.
+    * [ ] Add function to display map in main app canvas.
 
 ## Done
 
