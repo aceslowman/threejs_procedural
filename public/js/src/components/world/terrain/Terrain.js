@@ -9,7 +9,14 @@ import ProceduralMap from '../../map/ProceduralMap';
 import ColorLookup from '../../map/shaders/ColorLookup.js';
 import FractalNoise from "../../map/shaders/FractalNoise.js";
 import FractalWarp from "../../map/shaders/FractalWarp.js";
+import InputShader from "../../map/shaders/InputShader";
+import Gray2HSV from "../../map/shaders/Gray2HSV";
 
+import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Divider } from '@material-ui/core'; 
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -141,8 +148,8 @@ class Terrain extends React.Component {
     this.scene.add(this.mesh);
   }
 
-  applyColor(buffer) {
-    const color_buffer = buffer;
+  applyColor(map) {
+    const color_buffer = map.getBufferArray();
 
     const colors = this.geometry.getAttribute('color').array;
     const uvs = this.geometry.getAttribute('uv').array;
@@ -166,12 +173,10 @@ class Terrain extends React.Component {
     }
 
     this.geometry.getAttribute('color').needsUpdate = true;
-
-    console.log(colors)
   }
 
-  displaceGeometry(buffer) {
-    const displacement_buffer = buffer;
+  displaceGeometry(map) {
+    const displacement_buffer = map.getBufferArray();
 
     const positions = this.geometry.getAttribute('position').array;
     const uvs = this.geometry.getAttribute('uv').array;
@@ -314,64 +319,75 @@ class Terrain extends React.Component {
       <Paper className={classes.root} style={{display: this.props.display ? 'block' : 'none'}}>
         <Grid
           container
-          justify={'space-around'}
-          alignItems={'center'}
-          spacing={16}
         >
+          {/* <Grid item xs={12}>
+            <Typography variant="h3" gutterBottom>Terrain</Typography>
+          </Grid> */}
+          {/* <Paper className={classes.root}> */}
+
           <Grid item xs={12}>
-            <Typography variant="h5" gutterBottom>Terrain</Typography>
-            <Divider />
+            <ExpansionPanel defaultExpanded={this.props.expanded}>
+              <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="h4" className={classes.heading}>Mesh Settings</Typography>
+              </ExpansionPanelSummary>
+              <Divider />
+              <ExpansionPanelDetails>
+                <Grid container>
+                  <Grid item xs={6}>
+                    <FormControl fullWidth>
+                      <InputLabel htmlFor="detail-helper">size</InputLabel>
+                      <Select
+                        fullWidth
+                        value={this.state.width}
+                        onChange={(e) => this.updateMeshSize(e.target.value)}
+                      >
+                        <MenuItem value={32}>32</MenuItem>
+                        <MenuItem value={64}>64</MenuItem>
+                        <MenuItem value={128}>128</MenuItem>
+                        <MenuItem value={256}>256</MenuItem>
+                        <MenuItem value={512}>512</MenuItem>
+                        <MenuItem value={1024}>1024</MenuItem>
+                      </Select>
+                      <FormHelperText>dimensions of mesh</FormHelperText>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormControl fullWidth>
+                      <InputLabel htmlFor="detail-helper">detail</InputLabel>
+                      <Select
+                        fullWidth
+                        value={this.state.detail}
+                        onChange={(e) => this.updateMeshDetail(e.target.value)}
+                      >
+                        <MenuItem value={32}>32</MenuItem>
+                        <MenuItem value={64}>64</MenuItem>
+                        <MenuItem value={128}>128</MenuItem>
+                        <MenuItem value={256}>256</MenuItem>
+                        <MenuItem value={512}>512</MenuItem>
+                        <MenuItem value={1024}>1024</MenuItem>
+                      </Select>
+                      <FormHelperText>resolution of displacement</FormHelperText>
+                    </FormControl>
+                  </Grid>
+                </Grid>
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
+
           </Grid>
-          <Paper className={classes.root}>
-            <Grid container justify={'center'} alignItems={'center'} alignContent='center' spacing={16}>
-              <Grid item xs={12}>
-                <Typography variant="h6" align="center">Mesh Settings</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <FormControl fullWidth>
-                  <InputLabel htmlFor="detail-helper">size</InputLabel>
-                  <Select
-                    fullWidth
-                    value={this.state.width}
-                    onChange={(e) => this.updateMeshSize(e.target.value)}
-                  >
-                    <MenuItem value={32}>32</MenuItem>
-                    <MenuItem value={64}>64</MenuItem>
-                    <MenuItem value={128}>128</MenuItem>
-                    <MenuItem value={256}>256</MenuItem>
-                    <MenuItem value={512}>512</MenuItem>
-                    <MenuItem value={1024}>1024</MenuItem>
-                  </Select>
-                  <FormHelperText>dimensions of mesh</FormHelperText>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6}>
-                <FormControl fullWidth>
-                  <InputLabel htmlFor="detail-helper">detail</InputLabel>
-                  <Select
-                    fullWidth
-                    value={this.state.detail}
-                    onChange={(e)=>this.updateMeshDetail(e.target.value)}
-                  >
-                    <MenuItem value={32}>32</MenuItem>
-                    <MenuItem value={64}>64</MenuItem>
-                    <MenuItem value={128}>128</MenuItem>
-                    <MenuItem value={256}>256</MenuItem>
-                    <MenuItem value={512}>512</MenuItem>
-                    <MenuItem value={1024}>1024</MenuItem>
-                  </Select>
-                  <FormHelperText>resolution of displacement</FormHelperText>
-                </FormControl>
-              </Grid>
-            </Grid>
-          </Paper>
+        
+
+          {/* </Paper> */}
           <ProceduralMap
             name="Elevation"
             width={this.props.width}
             height={this.props.height}
             seed={this.seed}
-            onRef={ref => this.displaceGeometry(ref)}
-            displayMap={true}
+            onRef={ref => {
+              // this.elevation = ref;
+              this.setState({elevation: ref})
+              this.displaceGeometry(ref)
+            }}
+            displayMap={false}
           >
             <FractalNoise
               needsSwap={true} 
@@ -382,31 +398,24 @@ class Terrain extends React.Component {
               octaves={8}
             />
           </ProceduralMap>
-          <ProceduralMap
+          {this.state.elevation && <ProceduralMap
             name="Color"
             width={this.props.width}
             height={this.props.height}
             seed={this.seed}
-            onRef={ref => this.applyColor(ref)}
-            displayMap={false}
+            onRef={ref => {
+              this.applyColor(ref)
+            }}
+            // displayMap={true}
           >
-            {/* <FractalNoise
-              needsSwap={true}
-              octaves={8}
-              map_min={0}
-              map_max={1}
+            <InputShader
+              input={this.state.elevation.target.texture}
             />
-            <FractalWarp
-              needsSwap={true}
-              octaves={8}
-              map_min={0}
-              map_max={1}
-            /> */}
-            <ColorLookup
+            <Gray2HSV
               needsSwap={true}
               renderToScreen={true}
             />
-          </ProceduralMap>          
+          </ProceduralMap>}          
         </Grid>
       </Paper>
     )}

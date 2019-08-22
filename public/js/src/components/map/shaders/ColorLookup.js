@@ -95,21 +95,31 @@ class ColorLookup extends React.Component{
     //------------------------------------------------------------------------------
 
     this.vert = `
-      varying vec3 vPosition;
+      varying vec2 vUv;
 
       void main()	{
-          vPosition = position;
-          gl_Position = vec4( position, 1.0 );
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
       }
       `;
 
     this.frag = `
-      varying vec3 vPosition;
+      varying vec2 vUv;
 
-      uniform float u;
+      uniform sampler2D tDiffuse;
+
+      vec3 hsv2rgb(vec3 c) {
+        vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+        vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+        return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+      }
 
       void main() {
-        gl_FragColor = vec4(u, 0.0, 1.0, 1.0);
+        vec4 c = texture2D(tDiffuse, vUv);
+        
+        vec3 hsv = 4. * c.rgb;
+
+        gl_FragColor = vec4(hsv2rgb(hsv + vec3(2.0,0.,0.)), 1.0);
       }
     `;
 

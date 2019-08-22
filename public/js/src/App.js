@@ -138,8 +138,8 @@ class App extends React.Component {
                   {
                     this.state.renderer && <World
                       key='World'
-                      width={512}
-                      height={512}
+                      width={1024}
+                      height={1024}
                     />
                   }
                 </GUI>

@@ -21,9 +21,23 @@
 - [feature] create keybinding system (json representation of all keybindings, mapped to params)
     * [ ] Add listeners to move first person camera.
 - [improvement] create boundaryBox that will destroy rigidbodies and meshes
+- [enhancement] implement displayCanvas for each ProceduralMap
+    > It would be nice to be able to embed the map in the actual controls, but if that isn't possible without significant resource drain, displaying the map, while editing it, in the main canvas, would be totally fine.
+    * [x] Add function for generating a canvas of the map, and exporting.
+    * [x] Add function to display map in main app canvas.
+    * [ ] Allow for custom name in downloaded map.
+    * [ ] Fix issue where map downloaded is distorted and clamped.
+- [research] tessendorf?
+- [improvement] implement a separate method for shader displacement, vs the current method of direct displacement (cpu)
+- [feature] allow for terrain material assignment
 
 ## Doing
 
+- [feature] gradient generator
+- [settings] FirstPerson Camera UI
+    * [ ] Lock Axis
+    * [ ] Gravity On/Off
+    * [ ] Speed
 - [feature] implement first person camera mode
     > this should be the beginning of my integration of ammo.js. size isn't a huge concern, and the possibility of threading using web-workers at least addresses my future performance concerns. CURRENTLY, the heightfield is being generated, but it is slightly out of alignment. check anything related to a +1 or an offset.
     * [x] install ammo.js
@@ -32,20 +46,15 @@
     * [x] create rigidBody in Camera
     * [x] swap out test rigidbody with Object3D, and parent it to the first person camera.
     * [x] Fix structure in Camera component
-    * [ ] Create a toggle that allows for enabling/disabling of axis locking.
     * [x] Get basic keybindings working to allow for directional movement.
     * [x] Allow for looking around.
-    * [ ] Achieve backwards velocity
-    * [ ] Toggle on/off gravity
+    * [x] Achieve backwards velocity
     * [x] Lock pointer when canvas is clicked
     * [ ] Throttle necessary listeners
     * [x] Implement simple jump
-    * [ ] Implement simple sprint
-    * [ ] Implement keyup
-- [enhancement] implement displayCanvas for each ProceduralMap
-    > It would be nice to be able to embed the map in the actual controls, but if that isn't possible without significant resource drain, displaying the map, while editing it, in the main canvas, would be totally fine.
-    * [ ] Add function for generating a canvas of the map, and exporting.
-    * [ ] Add function to display map in main app canvas.
+    * [x] Implement simple sprint
+    * [x] Implement keyup
+    * [ ] Fix bugs with A and D
 
 ## Done
 
@@ -128,6 +137,16 @@
     * [x] Allow for intermediate toggling of components.
     * [x] Tie  toggle params to a variable in GUI.
     * [x] Create new Navigation elements for topmost items
+- [feature] allow ProceduralMap to accept a texture input as a prop
+    > The ProceduralMap class will need to allow optional input textures.
+    * [x] Input the Elevation map into the Color map.
+    * [x] Pass the input into the ColorLookup, and do a simple color shift using the grayscale.
+- [feature] move ColorLookup to GRAY2HSV
+- [ui] create Float, Vec2, Vec3 UI input classes.
+    > Basic elements need to be created for common shader data types.
+    * [x] FloatInput
+    * [x] VectorInput
+    * [x] BoolInput
 
 ## Backburner
 

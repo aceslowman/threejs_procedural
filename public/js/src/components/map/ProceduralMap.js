@@ -3,13 +3,22 @@ import SketchContext from '../../SketchContext';
 import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
 import { withStyles } from '@material-ui/core/styles';
+import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import IconButton from '@material-ui/core/IconButton';
+import SaveIcon from '@material-ui/icons/Save';
+
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
+
 
 import RootRef from '@material-ui/core/RootRef';
 
 import * as THREE from 'three';
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-import { Typography, Divider, InputLabel, Grid } from '@material-ui/core';
+import { Typography, Divider, InputLabel, Grid, ExpansionPanelDetails } from '@material-ui/core';
 
 const styles = theme => ({
     root: {
@@ -20,6 +29,10 @@ const styles = theme => ({
 
 class ProceduralMap extends React.Component {
     static contextType = SketchContext;
+
+    static defaultProps = {
+        expanded: true
+    }
     
     constructor(props, context){
         super(props);
@@ -45,7 +58,7 @@ class ProceduralMap extends React.Component {
         });
 
         this.composer = new EffectComposer(this.renderer, this.target);
-        this.composer.setSize(this.width, this.height);        
+        this.composer.setSize(this.width, this.height);     
 
         this.state = {
             displayMap: props.displayMap
@@ -58,28 +71,28 @@ class ProceduralMap extends React.Component {
         this.composer.swapBuffers();
 
         this.updateComposer();
-        // this.generateDisplayCanvas(); //TODO
         if(this.state.displayMap) this.displayMapOnScreen();
     }
 
     componentDidUpdate(prevProps, prevState) {
+        // console.log(this.name + "has been updated;")
         if(prevState.displayMap !== this.state.displayMap){
             this.state.displayMap ? this.displayMapOnScreen() : this.removeMapOnScreen();
         }
     }
 
     //------------------------------------------------------------------------
-    generateDisplayCanvas() {
+    saveMap() { // TODO: fix Uint8ClampedArray issue
         this.displayCanvas = document.createElement('canvas');
         // this.displayCanvas.style.border = '1px solid pink';
         this.displayCanvas.style.padding = '15px';
-        this.displayCanvas.width = this.mount.current.clientWidth;
-        this.displayCanvas.height = this.mount.current.clientWidth;
+        this.displayCanvas.width = this.width;
+        this.displayCanvas.height = this.height;
         let ctx = this.displayCanvas.getContext('2d');
 
         let imgData = ctx.createImageData(this.width, this.height);
         let raw = this.getBufferArray();
-        let data = new Uint8Array(raw.buffer);
+        let data = new Uint8ClampedArray(raw.buffer);
 
         // console.log(raw)
 
@@ -87,7 +100,7 @@ class ProceduralMap extends React.Component {
             if(i % 4 === 3) {
                 imgData.data[i] = 255;
             }else{
-                let v = raw.buffer[i] * 255;
+                let v = data[i];
                 imgData.data[i] = v;
             };
         }
@@ -98,13 +111,20 @@ class ProceduralMap extends React.Component {
 
         ctx.putImageData(imgData,0,0);
 
-        this.mount.current.insertBefore(this.displayCanvas,this.mount.current.children[1]);
+        var img = this.displayCanvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        window.location.href = img;
+
+        // TODO: allow for custom image name
+
+        // this.mount.current.insertBefore(this.displayCanvas,this.mount.current.children[1]);
     }
 
     displayMapOnScreen(){
+        // TODO: show text with resolution
+
         if(!this.displayMesh){
             let mat = new THREE.MeshBasicMaterial({ map: this.target.texture })
-            let geo = new THREE.PlaneBufferGeometry(this.width, this.height, 10, 10);
+            let geo = new THREE.PlaneBufferGeometry(512,512,1,1);
             this.displayMesh = new THREE.Mesh(geo, mat);
         }
 
@@ -122,7 +142,7 @@ class ProceduralMap extends React.Component {
 
     updateComposer(){
         this.composer.render();
-        this.props.onRef(this.getBufferArray())
+        this.props.onRef(this)
     }
 
     updatePassParam(pass_id, name, value) {
@@ -161,42 +181,44 @@ class ProceduralMap extends React.Component {
 
         return(
             <RootRef rootRef={this.mount}>
-                <Paper className={classes.root}>
-                    
-                    <Grid container>
-                        <Grid item xs={9}>
-                            <Typography variant="h4" gutterBottom>
-                                {this.name}
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={3} align="right">
-                            <InputLabel margin="dense">Show</InputLabel>
-                            <Checkbox
-                                checked={this.state.displayMap}
-                                onChange={(e) => {
-                                    e.persist();
-                                    this.setState({ displayMap: e.target.checked })
-                                }}
-                            />
-                        </Grid>    
-                    </Grid>
-                    
-
-
+                <ExpansionPanel defaultExpanded={this.props.expanded}>
+                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography variant="h4" className={classes.heading}>{this.name}</Typography>
+                    </ExpansionPanelSummary>
                     <Divider />
-                    {React.Children.map(this.passes, (child, i) => React.cloneElement(child, {
-                        index: i,
-                        updatePassParam: (p, n, v) => this.updatePassParam(p, n, v),     // pass the update props on to the
-                        updatePassDefine: (p, n, v) => this.updatePassDefine(p, n, v),   // props.children
-                        updatePassUniform: (p, n, v) => this.updatePassUniform(p, n, v),
-                        addPass: (p) => this.addPass(p),
-                        displayMapOnScreen: () => this.displayMapOnScreen(),
-                        removeMapOnScreen: () => this.removeMapOnScreen(),
-                        composer: this.composer,
-                        seed: this.seed,
-                        expanded: false
-                    }))}
-                </Paper>
+                    <ExpansionPanelDetails>
+                        <Grid container>
+                            {React.Children.map(this.passes, (child, i) => React.cloneElement(child, {
+                                index: i,
+                                updatePassParam: (p, n, v) => this.updatePassParam(p, n, v),     // pass the update props on to the
+                                updatePassDefine: (p, n, v) => this.updatePassDefine(p, n, v),   // props.children
+                                updatePassUniform: (p, n, v) => this.updatePassUniform(p, n, v),
+                                updateMap: () => this.updateComposer(),
+                                addPass: (p) => this.addPass(p),
+                                displayMapOnScreen: () => this.displayMapOnScreen(),
+                                removeMapOnScreen: () => this.removeMapOnScreen(),
+                                composer: this.composer,
+                                seed: this.seed,
+                                expanded: false
+                            }))}
+                        </Grid>
+                    </ExpansionPanelDetails>
+                    <ExpansionPanelActions>
+                        <IconButton 
+                            size="small"
+                            onClick={()=>this.saveMap()}
+                        >
+                            <SaveIcon/>
+                        </IconButton>
+                        <Checkbox
+                            // checked={this.state.displayMap}
+                            onChange={(e) => {
+                                e.persist();
+                                this.setState({ displayMap: e.target.checked })
+                            }}
+                        />
+                    </ExpansionPanelActions>
+                </ExpansionPanel>
             </RootRef>
         )
     }

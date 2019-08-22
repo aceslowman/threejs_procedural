@@ -55,7 +55,7 @@ class GUI extends React.Component {
             alignItems={'center'}
             style={{ padding: this.state.open ? '0px 15px' : '15px 0px' }}
           >
-            <Grid item>
+            {/* <Grid item>
               <Typography 
                 variant="h1" 
                 style={{ 
@@ -67,7 +67,7 @@ class GUI extends React.Component {
                 >
                   Procedural Tools
                 </Typography>
-            </Grid>
+            </Grid> */}
             <Grid item>
               <IconButton onClick={() => this.state.open ? this.handleDrawerClose() : this.handleDrawerOpen()}>
                 {this.state.open ? <ChevronLeft /> : <ChevronRight />}

@@ -9,6 +9,11 @@ import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/lab/Slider';
 
+// ui inputs
+import VectorInput from './inputs/VectorInput';
+import FloatInput from './inputs/FloatInput';
+import BoolInput from './inputs/BoolInput';
+
 const styles = theme => ({
     root: {
         padding: 8,
@@ -33,6 +38,7 @@ class FirstPersonCamera extends React.Component {
         this.state = {
             focalLength: 0,
             sensitivity: 20,
+            sprint_sensitivity: 80,
             axisLock: false,
             noGravity: false,
             pointerLock: false
@@ -76,15 +82,17 @@ class FirstPersonCamera extends React.Component {
         this.fp_body = new this.context.physics.Ammo.btRigidBody(rbInfo);
 
         // lock axis to keep camera upright. TODO: make toggleable
-        this.fp_body.setAngularFactor(this.context.physics.Ammo.btVector3(this.state.axisLock, 0, this.state.axisLock));
+        this.fp_body.setAngularFactor(new this.context.physics.Ammo.btVector3(this.state.axisLock, 0, this.state.axisLock));
 
         // toggle gravity TODO: make toggleable
-        this.fp_body.setGravity(this.context.physics.Ammo.btVector3(0,0,0));
+        this.fp_body.useGravity = false;
 
         this.fp_body.setActivationState(4);
         this.fp_body.setFriction(0);
 
         this.context.physics.physicsWorld.addRigidBody(this.fp_body);
+
+        this.fp_body.setGravity(new this.context.physics.Ammo.btVector3(0, 0, 0));
 
         this.fpTransform.userData.physicsBody = this.fp_body;
         this.context.physics.bodies.push(this.fpTransform);
@@ -97,9 +105,10 @@ class FirstPersonCamera extends React.Component {
 
     move(e) {
         if(this.state.pointerLock){
-            // if (!this.state.locked) {
             const mode = 0;
-            const sensitivity = mode ? this.state.sensitivity * 100 : this.state.sensitivity;
+            let sensitivity = mode ? this.state.sensitivity * 100 : this.state.sensitivity;
+
+            sensitivity += this.state.sprint ? this.state.sprint_sensitivity : 0;
 
             let body = this.fp_body;
 
@@ -112,7 +121,7 @@ class FirstPersonCamera extends React.Component {
 
             direction.normalize();
             switch (e.code) {
-                case "KeyW":
+                case "KeyW": // FORWARD
                     d = direction.multiplyScalar(sensitivity);
                     if (mode) {
                         body.applyForce(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
@@ -122,40 +131,49 @@ class FirstPersonCamera extends React.Component {
                     }
 
                     break;
-                case "KeyA":
+                case "KeyS": // BACKWARD
+                    d = direction.multiplyScalar(sensitivity);
+                    if (mode) {
+                        body.applyForce(new this.context.physics.Ammo.btVector3(-d.x, -d.y, -d.z));
+                    } else {
+                        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0, 0, 0));
+                        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(-d.x, -d.y, -d.z));
+                    }
+
+                    break;
+                case "KeyA": // LEFT
+                    /*
+                        NOTE: d.y is being discarded, which means left or right directions don't
+                        affect elevation
+                    */
+
                     axis = new THREE.Vector3(0, 1, 0);
                     d = direction.applyAxisAngle(axis, Math.PI / 2).multiplyScalar(sensitivity);
                     if (mode) {
-                        body.applyForce(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
+                        body.applyForce(new this.context.physics.Ammo.btVector3(d.x, 0, d.z));
                     } else {
                         body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0, 0, 0));
-                        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
+                        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x, 0, d.z));
                     }
 
                     break;
-                case "KeyS":
-                    axis = new THREE.Vector3(0, 1, 0);
-                    d = direction.applyAxisAngle(axis, Math.PI).multiplyScalar(sensitivity);
-                    if (mode) {
-                        body.applyForce(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
-                    } else {
-                        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0, 0, 0));
-                        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
-                    }
+                case "KeyD": // RIGHT
+                    /*
+                        NOTE: d.y is being discarded, which means left or right directions don't
+                        affect elevation
+                    */
 
-                    break;
-                case "KeyD":
                     axis = new THREE.Vector3(0, -1, 0);
                     d = direction.applyAxisAngle(axis, Math.PI / 2).multiplyScalar(sensitivity);
                     if (mode) {
-                        body.applyForce(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
+                        body.applyForce(new this.context.physics.Ammo.btVector3(d.x, 0, d.z));
                     } else {
                         body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0, 0, 0));
-                        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x, d.y, d.z));
+                        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(d.x, 0, d.z));
                     }
 
                     break;
-                case "Space":
+                case "Space": // JUMP
                     body.applyImpulse(new this.context.physics.Ammo.btVector3(0,sensitivity*10,0));
                     break;
             }
@@ -165,7 +183,25 @@ class FirstPersonCamera extends React.Component {
 
     stop(e){
         let body = this.fp_body;
-        body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0,0,0));
+
+        switch (e.code) {
+            case "KeyW":
+                body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0,0,0));
+                break;
+            case "KeyA":
+                body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0,0,0));
+                break;
+            case "KeyS":
+                body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0,0,0));
+                break;
+            case "KeyD":
+                body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0,0,0));
+                break;
+            case "Space":
+                body.setLinearVelocity(new this.context.physics.Ammo.btVector3(0, 0, 0));
+                break;
+        }
+        // TODO: break this into two different modes. impulse/velocity
     }
 
     look(e){
@@ -224,11 +260,33 @@ class FirstPersonCamera extends React.Component {
         this.setState({pointerLock: !this.state.pointerLock})
     }
 
+    onKeyDown(e){
+        // console.log(e.code)
+        switch (e.code) {
+            case "ShiftLeft":
+                this.setState({sprint: true})
+                break;
+        }
+
+        this.move(e);
+    }
+
+    onKeyUp(e){
+        // console.log(e.code)
+        switch (e.code) {
+            case "ShiftLeft":
+                this.setState({sprint: false})
+                break;
+        }
+
+        this.stop(e);
+    }   
+
     registerListeners() {
         let canvas = this.context.renderer.domElement;
 
-        document.addEventListener('keydown', (e) => this.move(e));
-        document.addEventListener('keyup', (e) => this.move(e));
+        document.addEventListener('keydown', (e) => this.onKeyDown(e));
+        document.addEventListener('keyup', (e) => this.onKeyUp(e));
         document.addEventListener('pointerlockchange', () => this.onPointerlockChange(), false);
         document.addEventListener('pointerlockerror', () => this.onPointerlockError(), false);
         canvas.addEventListener('click', (e) => this.onClick(e));
@@ -238,8 +296,8 @@ class FirstPersonCamera extends React.Component {
     removeListeners() {
         let canvas = this.context.renderer.domElement;
 
-        document.removeEventListener('keydown', (e) => this.move(e));
-        document.removeEventListener('keyup', (e) => this.move(e));
+        document.removeEventListener('keydown', (e) => this.onKeyDown(e));
+        document.removeEventListener('keyup', (e) => this.onKeyUp(e));
         document.removeEventListener('pointerlockchange', () => this.onPointerlockChange(), false);
         document.removeEventListener('pointerlockerror', () => this.onPointerlockError(), false);
         canvas.removeEventListener('mousemove', (e)=> this.look(e));
@@ -251,7 +309,18 @@ class FirstPersonCamera extends React.Component {
 
         return (
             <Grid item xs={12}>
-                
+                <BoolInput 
+                     value={this.state.lock_axis}
+                     name="Lock Axis"
+                />
+                <BoolInput 
+                     value={this.state.no_grav}
+                     name="Gravity On/Off"
+                />
+                <FloatInput 
+                     value={this.state.sensitivity}
+                     name="Lock Axis"
+                />
             </Grid>
         );
     }

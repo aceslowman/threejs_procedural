@@ -62,7 +62,7 @@ class Physics extends React.Component {
 
         this.props.onRef(this);
 
-        this.triggerTestPhysics(15,256,80,1);
+        // this.triggerTestPhysics(15,256,80,1);
     }
 
     triggerTestPhysics(num_obj, width, height, radius){

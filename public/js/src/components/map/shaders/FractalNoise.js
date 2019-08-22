@@ -47,7 +47,7 @@ class FractalNoise extends React.Component{
     s_y: 1.20,
     s_z: 1.30,
     map_min: -1.00,
-    map_max: 0.2,
+    map_max: 1.0,
     octaves: 8,
   };
 
@@ -260,7 +260,7 @@ class FractalNoise extends React.Component{
           <Grid container>
 
             
-            
+
             {/* ENABLE */}
             <Grid item xs={12} align="right">
               <InputLabel margin="dense">Enabled</InputLabel>
